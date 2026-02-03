@@ -1,0 +1,26 @@
+<div class="card" [ngClass]="cardClass()">
+  @if (!hidHeader()) {
+    <div class="card-header" [ngClass]="headerClass()">
+      @if (!customHeader()) {
+        <h5>{{ cardTitle() || 'Card Title' }}</h5>
+      }
+      @if (customHeader()) {
+        <ng-content select=".app-card-header"></ng-content>
+      }
+      @if (customDate()) {
+        <ng-content select=".app-card-subheader"></ng-content>
+      }
+    </div>
+  }
+
+  <div>
+    <div class="card-body" [ngClass]="blockClass()">
+      <ng-content></ng-content>
+    </div>
+  </div>
+  @if (isCardFooter()) {
+    <div class="card-footer" [ngClass]="footerClass()">
+      <ng-content select=".app-card-footer"></ng-content>
+    </div>
+  }
+</div>
