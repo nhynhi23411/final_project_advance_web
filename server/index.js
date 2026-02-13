@@ -1,27 +1,39 @@
+require("dotenv").config();
 const express = require("express");
+const passport = require("passport");
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
-
-app.get("/products", (req, res) => {
-  res.send([
-    {
-      productCode: 1,
-      productName: "Heineken",
-      productPrice: 19000,
-      description: "Bia Heineken",
-    },
-    { productCode: 2, productName: "Tiger", productPrice: 18000 },
-    { productCode: 3, productName: "Sapporo", productPrice: 21000 },
-  ]);
-});
-
+// Kết nối MongoDB
 const db = require("./config/db");
 db.connect();
 
+// Middleware parse JSON body
+app.use(express.json());
+
+// Cấu hình Passport JWT
+const { configurePassport } = require("./config/passport");
+configurePassport(passport);
+app.use(passport.initialize());
+
+// Routes
+const authRoutes = require("./routes/auth");
+const { jwtAuthGuard } = require("./middleware/jwtAuthGuard");
+
+app.get("/", (req, res) => {
+  res.send("Lost & Found API server is running");
+});
+
+app.use("/auth", authRoutes);
+
+// Ví dụ route cần đăng nhập
+app.get("/me", jwtAuthGuard, (req, res) => {
+  return res.json({
+    message: "Thông tin người dùng hiện tại",
+    user: req.user,
+  });
+});
+
 app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+  console.log(`API server listening at http://localhost:${port}`);
 });
