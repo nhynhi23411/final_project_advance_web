@@ -1,0 +1,76 @@
+<nav
+  class="pcoded-navbar menupos-fixed menu-light"
+  [ngClass]="{
+    'navbar-collapsed': isCollapsed,
+    'mob-open': isMobileOpen
+  }"
+>
+  <div class="navbar-content scroll-div">
+    <!-- Navbar Header -->
+    <div class="navbar-brand">
+      <a href="/" class="b-brand">
+        <span class="b-title">Admin</span>
+      </a>
+      <button type="button" class="btn-close" (click)="closeMenu.emit()" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <!-- Menu Items -->
+    <ul class="pcoded-navbar-nav">
+      <ng-container *ngFor="let item of menuItems">
+        <!-- Single Menu Item -->
+        <li *ngIf="!item.children" class="nav-item">
+          <a
+            [routerLink]="item.route"
+            routerLinkActive="active"
+            class="nav-link"
+            (click)="onMenuItemClick()"
+          >
+            <span class="pcoded-micon">
+              <i class="feather" [ngClass]="'icon-' + item.icon"></i>
+            </span>
+            <span class="pcoded-mtext">{{ item.label }}</span>
+          </a>
+        </li>
+
+        <!-- Menu Item with Submenu -->
+        <li *ngIf="item.children" class="nav-item">
+          <a
+            href="#"
+            class="nav-link"
+            (click)="toggleSubmenu(item); $event.preventDefault()"
+          >
+            <span class="pcoded-micon">
+              <i class="feather" [ngClass]="'icon-' + item.icon"></i>
+            </span>
+            <span class="pcoded-mtext">{{ item.label }}</span>
+            <span class="pcoded-arrow">
+              <i class="feather icon-chevron-right" [ngClass]="{ 'rotate-90': item.isOpen }"></i>
+            </span>
+          </a>
+
+          <!-- Submenu -->
+          <ul class="pcoded-submenu" *ngIf="item.isOpen">
+            <li *ngFor="let child of item.children">
+              <a
+                [routerLink]="child.route"
+                routerLinkActive="active"
+                class="nav-link"
+                (click)="onMenuItemClick()"
+              >
+                <span class="pcoded-micon">
+                  <i class="feather" [ngClass]="'icon-' + child.icon"></i>
+                </span>
+                <span class="pcoded-mtext">{{ child.label }}</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+      </ng-container>
+    </ul>
+  </div>
+</nav>
+
+<!-- Overlay for mobile -->
+<div class="pc-menu-overlay" *ngIf="isMobileOpen" (click)="closeMenu.emit()"></div>

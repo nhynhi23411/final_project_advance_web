@@ -1,0 +1,66 @@
+<nav class="navbar pcoded-header navbar-expand-lg navbar-light header-blue headerPos-fixed">
+  <div class="container-fluid">
+    <!-- Logo Section -->
+    <a class="navbar-brand" href="#">
+      <i class="feather icon-layers"></i> Admin Panel
+    </a>
+
+    <!-- Mobile Toggle -->
+    <button
+      class="btn btn-link d-lg-none"
+      type="button"
+      (click)="onToggleMobileSidebar()"
+      aria-label="Toggle navigation"
+    >
+      <i class="feather icon-menu"></i>
+    </button>
+
+    <!-- Desktop Toggle -->
+    <button
+      class="btn btn-link d-none d-lg-block"
+      type="button"
+      (click)="onToggleSidebar()"
+      aria-label="Toggle sidebar"
+    >
+      <i class="feather icon-menu"></i>
+    </button>
+
+    <!-- Right Side Items -->
+    <div class="ml-auto d-flex align-items-center">
+      <!-- Notifications -->
+      <div class="nav-item dropdown">
+        <a class="nav-link" href="#" role="button">
+          <i class="feather icon-bell"></i>
+          <span class="badge badge-danger">5</span>
+        </a>
+      </div>
+
+      <!-- Messages -->
+      <div class="nav-item dropdown">
+        <a class="nav-link" href="#" role="button">
+          <i class="feather icon-mail"></i>
+          <span class="badge badge-warning">3</span>
+        </a>
+      </div>
+
+      <!-- User Menu -->
+      <div class="nav-item dropdown">
+        <a
+          class="nav-link dropdown-toggle"
+          href="#"
+          role="button"
+          (click)="toggleUserMenu()"
+          [class.show]="isUserMenuOpen"
+        >
+          <i class="feather icon-user"></i>
+        </a>
+        <div class="dropdown-menu" [class.show]="isUserMenuOpen">
+          <a class="dropdown-item" href="#"> Profile </a>
+          <a class="dropdown-item" href="#"> Settings </a>
+          <hr />
+          <a class="dropdown-item" href="#" (click)="logout()"> Logout </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
