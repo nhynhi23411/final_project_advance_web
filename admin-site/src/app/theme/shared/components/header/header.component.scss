@@ -1,0 +1,35 @@
+.navbar {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  .nav-link {
+    position: relative;
+    margin: 0 8px;
+    cursor: pointer;
+
+    .badge {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      font-size: 10px;
+      padding: 2px 4px;
+    }
+
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  .dropdown-menu {
+    min-width: 150px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    
+    a {
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background-color: #f5f5f5;
+        pAdding-left: 20px;
+      }
+    }
+  }
+}

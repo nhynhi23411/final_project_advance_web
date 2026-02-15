@@ -4,15 +4,15 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 // Project Import
-import { NavBarComponent } from './nav-bar/nav-bar.component';
-import { NavigationComponent } from './navigation/navigation.component';
+import { HeaderComponent } from '../../shared/components/header/header.component';
+import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
+import { FooterComponent } from '../../shared/components/footer/footer.component';
 import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
-import { Footer } from './footer/footer';
 import { LayoutStateService } from '../../shared/service/layout-state.service';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterModule, NavBarComponent, NavigationComponent, CommonModule, BreadcrumbComponent, Footer],
+  imports: [RouterModule, CommonModule, HeaderComponent, SidebarComponent, FooterComponent, BreadcrumbComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })
@@ -20,52 +20,31 @@ export class AdminComponent {
   private layoutState = inject(LayoutStateService);
 
   // public props
-  navCollapsed!: boolean;
-  navCollapsedMob: boolean;
+  isNavCollapsed = false;
+  isMobileNavOpen = false;
   windowWidth: number;
 
   // constructor
   constructor() {
     this.windowWidth = window.innerWidth;
-    this.navCollapsedMob = false;
   }
 
   @HostListener('window:resize', ['$event'])
   // eslint-disable-next-line
   onResize(event: any): void {
     this.windowWidth = event.target.innerWidth;
-    if (this.windowWidth < 992) {
-      document.querySelector('.pcoded-navbar')?.classList.add('menupos-static');
-      if (document.querySelector('app-navigation.pcoded-navbar')?.classList.contains('navbar-collapsed')) {
-        document.querySelector('app-navigation.pcoded-navbar')?.classList.remove('navbar-collapsed');
-      }
-    }
   }
 
-  // public method
-  navMobClick() {
-    // if (this.windowWidth < 992) {
-    //   if (this.navCollapsedMob && !document.querySelector('app-navigation.pcoded-navbar')?.classList.contains('mob-open')) {
-    //     this.navCollapsedMob = !this.navCollapsedMob;
-    //     setTimeout(() => {
-    //       this.navCollapsedMob = !this.navCollapsedMob;
-    //     }, 100);
-    //   } else {
-    //     this.navCollapsedMob = !this.navCollapsedMob;
-    //   }
-    // }
-    this.layoutState.toggleNavCollapsedMob();
+  // public methods
+  toggleSidebar(): void {
+    this.isNavCollapsed = !this.isNavCollapsed;
   }
 
-  handleKeyDown(event: KeyboardEvent): void {
-    if (event.key === 'Escape') {
-      this.closeMenu();
-    }
+  toggleMobileSidebar(): void {
+    this.isMobileNavOpen = !this.isMobileNavOpen;
   }
 
-  closeMenu() {
-    if (document.querySelector('app-navigation.pcoded-navbar')?.classList.contains('mob-open')) {
-      document.querySelector('app-navigation.pcoded-navbar')?.classList.remove('mob-open');
-    }
+  closeMobileMenu(): void {
+    this.isMobileNavOpen = false;
   }
 }
