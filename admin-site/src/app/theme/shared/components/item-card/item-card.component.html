@@ -1,0 +1,92 @@
+<div class="item-card" [ngClass]="cardClass()" (click)="onCardClick()">
+  <!-- Image Section -->
+  <div class="item-card__image-wrapper" *ngIf="showImage()">
+    <img
+      [src]="getImageUrl()"
+      [alt]="item().title"
+      class="item-card__image"
+      loading="lazy"
+    />
+    <div class="item-card__overlay">
+      <button
+        type="button"
+        class="item-card__btn item-card__btn--like"
+        [class.liked]="item().isLiked"
+        (click)="onLikeClick($event)"
+        title="Like this item"
+      >
+        <i class="fa" [ngClass]="item().isLiked ? 'fa-heart' : 'fa-heart-o'"></i>
+        <span class="item-card__count" *ngIf="item().likes">
+          {{ item().likes }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="item-card__status" *ngIf="showStatus()">
+      <app-status-badge
+        [status]="item().status"
+        sizeClass="badge-sm"
+      ></app-status-badge>
+    </div>
+  </div>
+
+  <!-- Content Section -->
+  <div class="item-card__content">
+    <!-- Title & Category -->
+    <div class="item-card__header">
+      <h3 class="item-card__title">{{ item().title }}</h3>
+      <span class="item-card__category">{{ item().category }}</span>
+    </div>
+
+    <!-- Description -->
+    <p class="item-card__description">{{ item().description }}</p>
+
+    <!-- Meta Information -->
+    <div class="item-card__meta" *ngIf="item().location || item().date">
+      <span class="item-card__meta-item" *ngIf="item().location">
+        <i class="fa fa-map-marker"></i>
+        {{ item().location }}
+      </span>
+      <span class="item-card__meta-item" *ngIf="item().date">
+        <i class="fa fa-calendar"></i>
+        {{ item().date }}
+      </span>
+    </div>
+
+    <!-- Owner Information -->
+    <div class="item-card__owner" *ngIf="item().owner">
+      <span class="item-card__owner-label">Owner:</span>
+      <span class="item-card__owner-name">{{ item().owner }}</span>
+    </div>
+
+    <!-- Footer with Stats and Actions -->
+    <div class="item-card__footer">
+      <div class="item-card__stats">
+        <span class="item-card__stat" *ngIf="item().comments">
+          <i class="fa fa-comments"></i>
+          {{ item().comments }}
+        </span>
+      </div>
+
+      <div class="item-card__actions">
+        <button
+          type="button"
+          class="item-card__action-btn item-card__action-btn--edit"
+          (click)="onEditClick($event)"
+          title="Edit"
+        >
+          <i class="fa fa-edit"></i>
+        </button>
+        <button
+          type="button"
+          class="item-card__action-btn item-card__action-btn--delete"
+          (click)="onDeleteClick($event)"
+          title="Delete"
+        >
+          <i class="fa fa-trash"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -39,6 +39,10 @@ const routes: Routes = [
       {
         path: 'sample-page',
         loadComponent: () => import('./demo/other/sample-page/sample-page.component').then((c) => c.SamplePageComponent)
+      },
+      {
+        path: 'shared-components-demo',
+        loadComponent: () => import('./theme/shared-components-demo.component').then((c) => c.SharedComponentsDemoComponent)
       }
     ]
   },

@@ -1,0 +1,91 @@
+<div class="demo-container">
+  <!-- Title -->
+  <div class="demo-header">
+    <h1>Shared Components Demo</h1>
+    <p>Demo page for StatusBadge and ItemCard components</p>
+  </div>
+
+  <!-- Status Badge Demo Section -->
+  <app-card [cardTitle]="'Status Badge Component'">
+    <div class="demo-section">
+      <h2>Badge Status Demos</h2>
+      <p>Displaying all available status badges:</p>
+
+      <div class="status-grid">
+        <div class="status-item" *ngFor="let status of availableStatuses">
+          <h3>{{ status }}</h3>
+          <div class="badge-example">
+            <app-status-badge [status]="status" sizeClass="badge-md"></app-status-badge>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 32px">Badge Sizes</h3>
+      <div class="size-demo">
+        <div class="size-item" *ngFor="let size of badgeSizes">
+          <p>{{ size }}</p>
+          <app-status-badge status="APPROVED" [sizeClass]="size"></app-status-badge>
+        </div>
+      </div>
+    </div>
+  </app-card>
+
+  <!-- Item Card Demo Section -->
+  <app-card [cardTitle]="'Item Card Component'">
+    <div class="demo-section">
+      <h2>Item Cards with Status Filter</h2>
+
+      <!-- Status Filter Buttons -->
+      <div class="filter-section">
+        <label for="statusFilter">Filter by Status:</label>
+        <select
+          id="statusFilter"
+          [(ngModel)]="selectedStatus"
+          (change)="changeStatus(selectedStatus)"
+          class="filter-select"
+        >
+          <option *ngFor="let status of availableStatuses" [value]="status">
+            {{ status }}
+          </option>
+        </select>
+        <span class="item-count">
+          Found {{ getFilteredItems().length }} item(s)
+        </span>
+      </div>
+
+      <!-- Item Cards Grid -->
+      <div class="items-grid">
+        <app-item-card
+          *ngFor="let item of getFilteredItems()"
+          [item]="item"
+          [showImage]="true"
+          [showStatus]="true"
+          (cardClick)="onItemCardClick($event)"
+          (likeClick)="onLikeClick($event)"
+          (editClick)="onEditClick($event)"
+          (deleteClick)="onDeleteClick($event)"
+        ></app-item-card>
+      </div>
+
+      <div *ngIf="getFilteredItems().length === 0" class="empty-state">
+        <p>No items found for status: {{ selectedStatus }}</p>
+      </div>
+    </div>
+  </app-card>
+
+  <!-- Console Messages -->
+  <app-card [cardTitle]="'Console Output'">
+    <div class="console-info">
+      <p>
+        Open your browser's developer console (F12) to see the component event outputs when you
+        interact with the item cards.
+      </p>
+      <ul>
+        <li>Click on an item card to see card click event</li>
+        <li>Click the heart icon to like/unlike items</li>
+        <li>Click the edit button to trigger edit event</li>
+        <li>Click the delete button to trigger delete event</li>
+      </ul>
+    </div>
+  </app-card>
+</div>
