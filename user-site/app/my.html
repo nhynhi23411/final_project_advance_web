@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lost & Found - Tin của tôi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./app.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar lf-navbar">
+      <div class="container py-2">
+        <a class="navbar-brand fw-bold" href="/index.html">Lost & Found</a>
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-outline-secondary btn-sm" href="./create.html">Đăng tin</a>
+          <a class="btn btn-outline-secondary btn-sm" href="./my.html">Tin của tôi</a>
+          <a class="btn btn-outline-primary btn-sm" data-lf-login href="./login.html">Đăng nhập</a>
+          <a class="btn btn-outline-danger btn-sm d-none" data-lf-logout href="#">Đăng xuất</a>
+          <span class="small lf-muted ms-2" data-lf-user></span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container my-4">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h4 class="mb-0">Tin của tôi</h4>
+        <div class="d-flex gap-2">
+          <a class="btn btn-primary btn-sm" href="./create.html">Đăng tin mới</a>
+          <button class="btn btn-outline-secondary btn-sm" id="btnReload">Tải lại</button>
+        </div>
+      </div>
+
+      <div id="alert" class="alert alert-danger d-none"></div>
+      <div id="loading" class="lf-card p-4">Đang tải...</div>
+      <div id="list" class="row g-3 d-none"></div>
+    </main>
+
+    <script src="./app.js"></script>
+    <script>
+      if (!LF.requireAuth("./login.html")) {}
+      LF.wireNavbar();
+
+      const elAlert = document.getElementById("alert");
+      const elLoading = document.getElementById("loading");
+      const elList = document.getElementById("list");
+
+      function showError(err) {
+        elAlert.classList.remove("d-none");
+        elAlert.textContent = err?.message || String(err);
+      }
+
+      function card(item) {
+        const img = (item.images && item.images[0]) ? item.images[0] : null;
+        return `
+          <div class="col-12 col-md-6">
+            <div class="lf-card p-3 h-100">
+              ${img ? `<img class="lf-img-thumb mb-2" src="${img}" alt="image" />` : `<div class="lf-img-thumb mb-2 d-flex align-items-center justify-content-center lf-muted">No image</div>`}
+              <div class="d-flex justify-content-between align-items-start gap-2">
+                <div>
+                  <div class="small lf-muted">${item.type || ""} • ${item.category || ""}</div>
+                  <div class="fw-semibold">${item.title || ""}</div>
+                </div>
+                <div>${LF.statusBadge(item.status)}</div>
+              </div>
+              <div class="small mt-2 lf-muted">
+                ${item.location_text ? `📍 ${item.location_text}` : ""}
+              </div>
+              <div class="mt-3 d-flex gap-2">
+                <a class="btn btn-sm btn-primary" href="/app/detail?id=${encodeURIComponent(item._id)}">Chi tiết</a>
+                <a class="btn btn-sm btn-outline-secondary" href="/app/edit?id=${encodeURIComponent(item._id)}">Sửa</a>
+                <button class="btn btn-sm btn-outline-danger ms-auto" data-del="${item._id}">Xóa</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      async function load() {
+        elAlert.classList.add("d-none");
+        elLoading.classList.remove("d-none");
+        elList.classList.add("d-none");
+        elList.innerHTML = "";
+        try {
+          const items = await LF.myItems();
+          elList.innerHTML = (items || []).map(card).join("");
+          elLoading.classList.add("d-none");
+          elList.classList.remove("d-none");
+
+          LF.qsa("[data-del]").forEach((btn) => {
+            btn.addEventListener("click", async () => {
+              const id = btn.getAttribute("data-del");
+              if (!confirm("Xóa tin này? (sẽ xóa cả ảnh trên Cloudinary nếu có)")) return;
+              try {
+                await LF.deleteItem(id);
+                load();
+              } catch (e) {
+                showError(e);
+              }
+            });
+          });
+        } catch (e) {
+          elLoading.classList.add("d-none");
+          showError(e);
+        }
+      }
+
+      document.getElementById("btnReload").addEventListener("click", load);
+      load();
+    </script>
+  </body>
+</html>
+

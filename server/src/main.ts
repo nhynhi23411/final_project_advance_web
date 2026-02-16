@@ -8,6 +8,7 @@ async function bootstrap() {
 
   // Prefix chung cho API, ví dụ: /api/auth/login
   app.setGlobalPrefix("api");
+  app.enableCors({ origin: true, credentials: true,});
 
   // Validation cho DTO
   app.useGlobalPipes(
