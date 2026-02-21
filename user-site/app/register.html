@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lost & Found - Đăng ký</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="./app.css" rel="stylesheet">
+  </head>
+  <body>
+    <nav class="navbar lf-navbar">
+      <div class="container py-2">
+        <a class="navbar-brand fw-bold" href="/index.html">Lost & Found</a>
+        <div class="d-flex gap-2 align-items-center">
+          <a class="btn btn-outline-secondary btn-sm" href="./create.html">Đăng tin</a>
+          <a class="btn btn-outline-secondary btn-sm" href="./my.html">Tin của tôi</a>
+          <a class="btn btn-outline-primary btn-sm" data-lf-login href="./login.html">Đăng nhập</a>
+          <a class="btn btn-outline-danger btn-sm d-none" data-lf-logout href="#">Đăng xuất</a>
+          <span class="small lf-muted ms-2" data-lf-user></span>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container my-5" style="max-width: 520px;">
+      <div class="lf-card p-4">
+        <h3 class="mb-1">Đăng ký</h3>
+        <div class="lf-muted mb-3">Đăng ký xong sẽ tự đăng nhập (lưu token).</div>
+
+        <div id="alert" class="alert alert-danger d-none"></div>
+
+        <form id="form">
+          <div class="mb-3">
+            <label class="form-label">Tên hiển thị</label>
+            <input class="form-control" id="name" required placeholder="Nguyễn Văn A" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" type="email" id="email" required placeholder="test@example.com" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Mật khẩu (>= 6 ký tự)</label>
+            <input class="form-control" type="password" id="password" required minlength="6" />
+          </div>
+          <button class="btn btn-primary w-100" type="submit" id="btn">Tạo tài khoản</button>
+        </form>
+
+        <div class="mt-3 text-center">
+          Đã có tài khoản? <a href="./login.html">Đăng nhập</a>
+        </div>
+      </div>
+    </main>
+
+    <script src="./app.js"></script>
+    <script>
+      LF.wireNavbar();
+      const elAlert = document.getElementById("alert");
+      const btn = document.getElementById("btn");
+
+      function showError(msg) {
+        elAlert.classList.remove("d-none");
+        elAlert.textContent = msg;
+      }
+
+      document.getElementById("form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        elAlert.classList.add("d-none");
+        btn.disabled = true;
+        btn.textContent = "Đang tạo...";
+        try {
+          await LF.register({
+            name: document.getElementById("name").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            password: document.getElementById("password").value,
+          });
+          window.location.href = "./index.html";
+        } catch (err) {
+          showError(err?.message || "Đăng ký thất bại");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Tạo tài khoản";
+        }
+      });
+    </script>
+  </body>
+</html>
+
