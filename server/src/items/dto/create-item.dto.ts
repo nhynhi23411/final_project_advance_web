@@ -7,7 +7,7 @@ import {
   MaxLength,
   IsDateString,
 } from "class-validator";
-import { ITEM_TYPE } from "../schemas/item.schema";
+import { ITEM_TYPE, ITEM_STATUS } from "../schemas/item.schema";
 
 export class CreateItemDto {
   @IsEnum(ITEM_TYPE)
@@ -57,4 +57,8 @@ export class CreateItemDto {
   @IsArray()
   @IsString({ each: true })
   image_public_ids?: string[];
+
+  @IsOptional()
+  @IsEnum(ITEM_STATUS)
+  status?: string;
 }
