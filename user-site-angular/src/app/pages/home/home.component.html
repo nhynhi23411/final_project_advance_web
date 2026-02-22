@@ -1,0 +1,72 @@
+<section class="lf-hero">
+  <div class="row g-3 align-items-center">
+    <div class="col-12 col-md-8">
+      <div class="lf-status-pill mb-2">
+        <span class="badge bg-info me-1">&bull;</span>
+        Hệ thống hỗ trợ match Lost/Found, claim và hẹn trả đồ
+      </div>
+      <h1 class="h3 mb-2">Tìm lại đồ thất lạc, nhanh và an toàn.</h1>
+      <p class="mb-3">
+        Đăng tin Lost/Found, hệ thống sẽ gợi ý match, quản lý claim và trạng thái trao trả.
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <a routerLink="/create" class="btn btn-light btn-sm">Đăng tin ngay</a>
+        <a href="#lf-list" class="btn btn-outline-light btn-sm">Xem các tin mới</a>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 text-md-end">
+      <div class="small mb-1">Trạng thái nhanh</div>
+      <div class="d-flex flex-wrap gap-2 justify-content-md-end">
+        <span class="badge lf-badge-pending">PENDING</span>
+        <span class="badge lf-badge-approved">APPROVED</span>
+        <span class="badge lf-badge-returned">RETURNED</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="d-flex flex-wrap gap-2 mb-3" id="lf-list">
+  <select class="form-select form-select-sm" style="width: auto;" (change)="onFilterChange('type', $any($event.target).value)">
+    <option value="">Tất cả loại</option>
+    <option value="LOST">Lost</option>
+    <option value="FOUND">Found</option>
+  </select>
+  <input class="form-control form-control-sm" type="text" placeholder="Category" style="width: 120px;"
+    (change)="onFilterChange('category', $any($event.target).value)" />
+  <input class="form-control form-control-sm" type="text" placeholder="Địa điểm" style="width: 160px;"
+    (change)="onFilterChange('location', $any($event.target).value)" />
+  <button class="btn btn-outline-secondary btn-sm" type="button" (click)="load()">Lọc</button>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <p class="lf-muted">Đang tải...</p>
+} @else {
+  <div class="row g-3">
+    @for (item of items(); track item._id) {
+      <div class="col-12 col-sm-6 col-lg-4">
+        <div class="lf-card p-3 h-100">
+          @if (item.images && item.images.length && item.images[0]) {
+            <img class="lf-img-thumb mb-2" [src]="item.images[0]" [alt]="item.title" />
+          } @else {
+            <div class="lf-img-thumb mb-2 d-flex align-items-center justify-content-center lf-muted bg-light rounded">Chưa có ảnh</div>
+          }
+          <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+            <div class="small lf-muted">{{ item.type }} • {{ item.category || '—' }}</div>
+            <span [class]="statusBadge(item.status)">{{ item.status }}</span>
+          </div>
+          <h5 class="h6 mb-2">{{ item.title }}</h5>
+          <p class="small lf-muted mb-2 text-truncate">{{ item.description || '—' }}</p>
+          <p class="small mb-2"><strong>Địa điểm:</strong> {{ item.location_text }}</p>
+          <a [routerLink]="['/detail', item._id]" class="btn btn-outline-primary btn-sm">Chi tiết</a>
+        </div>
+      </div>
+    }
+  </div>
+  @if (items().length === 0) {
+    <p class="lf-muted">Chưa có tin nào.</p>
+  }
+}

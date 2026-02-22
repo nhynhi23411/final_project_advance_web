@@ -1,0 +1,75 @@
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h4 class="mb-0">Sửa tin</h4>
+  <a [routerLink]="['/detail', id()]" class="btn btn-outline-secondary btn-sm">Quay lại</a>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <div class="lf-card p-4">Đang tải...</div>
+} @else {
+  <div class="lf-card p-3">
+    <form (ngSubmit)="submit()" #f="ngForm">
+      <div class="row g-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Loại</label>
+          <select class="form-select" [(ngModel)]="type" name="type">
+            <option value="LOST">Đồ bị mất</option>
+            <option value="FOUND">Đồ nhặt được</option>
+          </select>
+        </div>
+        <div class="col-12 col-md-8">
+          <label class="form-label">Tiêu đề</label>
+          <input class="form-control" [(ngModel)]="title" name="title" maxlength="200" required />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Mô tả</label>
+          <textarea class="form-control" [(ngModel)]="description" name="description" rows="3"></textarea>
+        </div>
+
+        <div class="col-12 col-md-4">
+          <label class="form-label">Category</label>
+          <input class="form-control" [(ngModel)]="category" name="category" />
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Màu</label>
+          <input class="form-control" [(ngModel)]="color" name="color" />
+        </div>
+        <div class="col-12 col-md-4">
+          <label class="form-label">Hãng</label>
+          <input class="form-control" [(ngModel)]="brand" name="brand" />
+        </div>
+
+        <div class="col-12 col-md-6">
+          <label class="form-label">Dấu hiệu nhận biết</label>
+          <input class="form-control" [(ngModel)]="distinctive_marks" name="distinctive_marks" />
+        </div>
+        <div class="col-12 col-md-6">
+          <label class="form-label">Ngày mất/nhặt (YYYY-MM-DD)</label>
+          <input class="form-control" [(ngModel)]="lost_found_date" name="lost_found_date" />
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Địa điểm</label>
+          <input class="form-control" [(ngModel)]="location_text" name="location_text" required />
+        </div>
+
+        <div class="col-12">
+          <div class="lf-form-help">
+            Lưu ý: backend hiện chưa hỗ trợ cập nhật ảnh trong PATCH, trang này chỉ sửa các trường text.
+          </div>
+        </div>
+
+        <div class="col-12 d-flex gap-2">
+          <button class="btn btn-primary" type="submit" [disabled]="saving()">
+            {{ saving() ? 'Đang lưu...' : 'Lưu' }}
+          </button>
+          <a [routerLink]="['/detail', id()]" class="btn btn-outline-secondary">Xem chi tiết</a>
+        </div>
+      </div>
+    </form>
+  </div>
+}
