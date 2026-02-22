@@ -5,6 +5,7 @@ export type ItemDocument = Item & Document;
 
 export const ITEM_STATUS = [
   "PENDING_APPROVAL",
+  "PENDING_ADMIN",
   "APPROVED",
   "REJECTED",
   "MATCHED",

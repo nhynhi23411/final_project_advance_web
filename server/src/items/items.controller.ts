@@ -35,7 +35,7 @@ function isValidObjectId(id: string): boolean {
 export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
-    private readonly cloudinary: CloudinaryService
+    private readonly cloudinary: CloudinaryService,
   ) {}
 
   @Get()
@@ -43,7 +43,7 @@ export class ItemsController {
     @Query("type") type?: string,
     @Query("category") category?: string,
     @Query("location") location?: string,
-    @Query("status") status?: string
+    @Query("status") status?: string,
   ) {
     return this.itemsService.findAllByFilter({
       type,
@@ -62,7 +62,9 @@ export class ItemsController {
   @Get(":id")
   findOne(@Param("id") id: string) {
     if (!isValidObjectId(id)) {
-      throw new BadRequestException("Id không hợp lệ. Dùng POST /api/items/upload-image để upload ảnh.");
+      throw new BadRequestException(
+        "Id không hợp lệ. Dùng POST /api/items/upload-image để upload ảnh.",
+      );
     }
     return this.itemsService.findOne(id);
   }
@@ -72,7 +74,7 @@ export class ItemsController {
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor("file", uploadOpts))
   async uploadImage(
-    @UploadedFile() file: File | undefined
+    @UploadedFile() file: File | undefined,
   ): Promise<{ url: string; publicId: string }> {
     if (!file?.buffer) throw new BadRequestException("Chưa chọn ảnh");
     const result = await this.cloudinary.uploadBuffer(file.buffer, {
@@ -83,20 +85,27 @@ export class ItemsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  create(
-    @Body() dto: CreateItemDto,
-    @Request() req: { user: { userId: string } }
-  ) {
-    return this.itemsService.create({
+  async create(@Body() dto: CreateItemDto, @Request() req: any) {
+    console.log("POST /api/items incoming body:", JSON.stringify(req.body));
+    const payload = {
       ...dto,
       created_by: req.user.userId,
       images: dto.images ?? [],
       image_public_ids: dto.image_public_ids ?? [],
+      status: req.body.status,
     } as CreateItemDto & {
       created_by: string;
       images: string[];
       image_public_ids: string[];
-    });
+    };
+    try {
+      const created = await this.itemsService.create(payload);
+      console.log("Created item result:", JSON.stringify(created));
+      return created;
+    } catch (err) {
+      console.error("Create item error:", err);
+      throw err;
+    }
   }
 
   @Patch(":id")
@@ -104,7 +113,7 @@ export class ItemsController {
   async update(
     @Param("id") id: string,
     @Body() dto: UpdateItemDto,
-    @Request() req: { user: { userId: string } }
+    @Request() req: { user: { userId: string } },
   ) {
     if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
     const item = await this.itemsService.findOne(id);
@@ -120,7 +129,7 @@ export class ItemsController {
   @UseGuards(JwtAuthGuard)
   async remove(
     @Param("id") id: string,
-    @Request() req: { user: { userId: string } }
+    @Request() req: { user: { userId: string } },
   ) {
     if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
     const item = await this.itemsService.findOne(id);
