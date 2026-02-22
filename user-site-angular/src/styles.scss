@@ -1,0 +1,97 @@
+@import "app/app.styles";
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Roboto", sans-serif;
+}
+
+.lf-navbar {
+  background: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.lf-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border: 1px solid #eee;
+}
+
+.lf-muted {
+  color: #6c757d;
+}
+
+.lf-hero {
+  background: linear-gradient(135deg, #0f3b8a, #154e8d);
+  color: #fff;
+  border-radius: 18px;
+  padding: 32px 28px;
+  margin-bottom: 24px;
+
+  h1 {
+    font-weight: 700;
+    letter-spacing: 0.3px;
+  }
+
+  p {
+    opacity: 0.9;
+  }
+}
+
+.lf-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 13px;
+}
+
+.lf-img-thumb {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.lf-form-help {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.lf-preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.lf-preview {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #dee2e6;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.lf-preview-tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 11px;
+  text-align: center;
+  padding: 2px;
+}
+
+.lf-badge-pending { background-color: #ffc107; color: #000; }
+.lf-badge-approved { background-color: #198754; color: #fff; }
+.lf-badge-returned { background-color: #6c757d; color: #fff; }

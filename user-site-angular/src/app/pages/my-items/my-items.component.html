@@ -1,0 +1,49 @@
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h4 class="mb-0">Tin của tôi</h4>
+  <div class="d-flex gap-2">
+    <a routerLink="/create" class="btn btn-primary btn-sm">Đăng tin mới</a>
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="load()">Tải lại</button>
+  </div>
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <div class="lf-card p-4">Đang tải...</div>
+} @else {
+  <div class="row g-3">
+    @for (item of items(); track item._id) {
+      <div class="col-12 col-md-6">
+        <div class="lf-card p-3 h-100">
+          @if (item.images && item.images[0]) {
+            <img class="lf-img-thumb mb-2" [src]="item.images[0]" alt="image" />
+          } @else {
+            <div class="lf-img-thumb mb-2 d-flex align-items-center justify-content-center lf-muted">No image</div>
+          }
+          <div class="d-flex justify-content-between align-items-start gap-2">
+            <div>
+              <div class="small lf-muted">{{ item.type }} • {{ item.category || '—' }}</div>
+              <div class="fw-semibold">{{ item.title }}</div>
+            </div>
+            <span [class]="statusBadge(item.status)">{{ item.status }}</span>
+          </div>
+          <div class="small mt-2 lf-muted">📍 {{ item.location_text }}</div>
+          <div class="mt-3 d-flex gap-2">
+            <a [routerLink]="['/detail', item._id]" class="btn btn-sm btn-primary">Chi tiết</a>
+            <a [routerLink]="['/edit', item._id]" class="btn btn-sm btn-outline-secondary">Sửa</a>
+            <button class="btn btn-sm btn-outline-danger ms-auto" type="button"
+              [disabled]="deletingId() === item._id"
+              (click)="delete(item._id)">
+              {{ deletingId() === item._id ? 'Đang xóa...' : 'Xóa' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+  @if (items().length === 0) {
+    <p class="lf-muted">Bạn chưa có tin nào. <a routerLink="/create">Đăng tin ngay</a>.</p>
+  }
+}

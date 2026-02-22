@@ -1,0 +1,83 @@
+<div class="d-flex align-items-center justify-content-between mb-2">
+  <h4 class="mb-0">Đăng tin Lost/Found</h4>
+  <a routerLink="/my" class="btn btn-outline-secondary btn-sm">Quản lý tin</a>
+</div>
+
+@if (error) {
+  <div class="alert alert-danger">{{ error }}</div>
+}
+
+<div class="lf-card p-3">
+  <form (ngSubmit)="submit()" #f="ngForm">
+    <div class="row g-3">
+      <div class="col-12 col-md-4">
+        <label class="form-label">Loại</label>
+        <select class="form-select" [(ngModel)]="type" name="type" required>
+          <option value="LOST">Đồ bị mất</option>
+          <option value="FOUND">Đồ nhặt được</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-8">
+        <label class="form-label">Tiêu đề</label>
+        <input class="form-control" [(ngModel)]="title" name="title" maxlength="200" required placeholder="Ví dụ: Ví da màu nâu" />
+        <div class="lf-form-help mt-1">Tối đa 200 ký tự.</div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Mô tả</label>
+        <textarea class="form-control" [(ngModel)]="description" name="description" rows="3" placeholder="Mô tả chi tiết..."></textarea>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="form-label">Category</label>
+        <input class="form-control" [(ngModel)]="category" name="category" placeholder="Ví dụ: Wallet" />
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Màu</label>
+        <input class="form-control" [(ngModel)]="color" name="color" placeholder="Ví dụ: nâu" />
+      </div>
+      <div class="col-12 col-md-4">
+        <label class="form-label">Hãng</label>
+        <input class="form-control" [(ngModel)]="brand" name="brand" placeholder="Ví dụ: Samsung" />
+      </div>
+
+      <div class="col-12 col-md-6">
+        <label class="form-label">Dấu hiệu nhận biết</label>
+        <input class="form-control" [(ngModel)]="distinctive_marks" name="distinctive_marks" placeholder="Ví dụ: có vết xước góc trái" />
+      </div>
+      <div class="col-12 col-md-6">
+        <label class="form-label">Ngày mất/nhặt (YYYY-MM-DD)</label>
+        <input class="form-control" [(ngModel)]="lost_found_date" name="lost_found_date" placeholder="2026-02-16" />
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Địa điểm</label>
+        <input class="form-control" [(ngModel)]="location_text" name="location_text" required placeholder="Ví dụ: Tòa A, căng tin..." />
+        <div class="lf-form-help mt-1">Backend dùng field <code>location_text</code> để lọc theo địa điểm.</div>
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Ảnh (tối đa 5)</label>
+        <input class="form-control" type="file" accept="image/*" multiple (change)="onFileChange($event)" />
+        <div class="lf-form-help mt-1">Ảnh upload qua API <code>/api/items/upload-image</code>.</div>
+        @if (previewUrls.length) {
+          <div class="lf-preview-grid mt-3">
+            @for (url of previewUrls; track url) {
+              <div class="lf-preview">
+                <img [src]="url" alt="preview" />
+                <div class="lf-preview-tag">#{{ $index + 1 }}</div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <div class="col-12 d-flex gap-2">
+        <button class="btn btn-primary" type="submit" [disabled]="loading">
+          {{ loading ? 'Đang xử lý...' : 'Đăng tin' }}
+        </button>
+        <a routerLink="/home" class="btn btn-outline-secondary">Hủy</a>
+      </div>
+    </div>
+  </form>
+</div>

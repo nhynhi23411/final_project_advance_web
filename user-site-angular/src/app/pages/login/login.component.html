@@ -1,0 +1,26 @@
+<div class="lf-card p-4" style="max-width: 520px; margin: 0 auto;">
+  <h3 class="mb-1">Đăng nhập</h3>
+  <div class="lf-muted mb-3">Dùng email + password. Sau khi login sẽ lưu token trong trình duyệt.</div>
+
+  @if (error) {
+    <div class="alert alert-danger">{{ error }}</div>
+  }
+
+  <form (ngSubmit)="submit()" #f="ngForm">
+    <div class="mb-3">
+      <label class="form-label">Email</label>
+      <input class="form-control" type="email" [(ngModel)]="email" name="email" required placeholder="test@example.com" />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Mật khẩu</label>
+      <input class="form-control" type="password" [(ngModel)]="password" name="password" required minlength="6" placeholder="******" />
+    </div>
+    <button class="btn btn-primary w-100" type="submit" [disabled]="loading">
+      {{ loading ? 'Đang đăng nhập...' : 'Đăng nhập' }}
+    </button>
+  </form>
+
+  <div class="mt-3 text-center">
+    Chưa có tài khoản? <a routerLink="/register">Đăng ký</a>
+  </div>
+</div>

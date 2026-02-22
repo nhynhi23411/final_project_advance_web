@@ -1,0 +1,56 @@
+@if (error()) {
+  <div class="alert alert-danger">{{ error() }}</div>
+}
+
+@if (loading()) {
+  <div class="lf-card p-4">Đang tải...</div>
+}
+
+@if (item(); as it) {
+  <div class="row g-3">
+    <div class="col-12 col-lg-6">
+      <div class="lf-card p-3">
+        <div class="d-flex justify-content-between align-items-start gap-2">
+          <div>
+            <div class="small lf-muted">{{ it.type }} • {{ it.category || '—' }}</div>
+            <h3 class="mb-1">{{ it.title }}</h3>
+          </div>
+          <span [class]="statusBadge(it.status)">{{ it.status }}</span>
+        </div>
+        <div class="lf-muted mb-2">
+          @if (it.location_text) { 📍 {{ it.location_text }} }
+          @if (it.lost_found_date || it.createdAt) { • 🕒 {{ fmtDate(it.lost_found_date || it.createdAt) }} }
+        </div>
+        <div class="mb-3">{{ it.description || '—' }}</div>
+        <div class="row g-2">
+          <div class="col-6"><div class="lf-muted small">Màu</div><div>{{ it.color || '—' }}</div></div>
+          <div class="col-6"><div class="lf-muted small">Hãng</div><div>{{ it.brand || '—' }}</div></div>
+          <div class="col-12"><div class="lf-muted small">Dấu hiệu nhận biết</div><div>{{ it.distinctive_marks || '—' }}</div></div>
+        </div>
+        <div class="mt-3 d-flex gap-2">
+          <a routerLink="/home" class="btn btn-outline-secondary">Quay lại</a>
+          @if (isOwner(it)) {
+            <a [routerLink]="['/edit', it._id]" class="btn btn-outline-primary">Sửa</a>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-lg-6">
+      <div class="lf-card p-3">
+        <h5>Ảnh</h5>
+        @if (it.images && it.images.length) {
+          <div class="lf-preview-grid">
+            @for (url of it.images; track url; let i = $index) {
+              <div class="lf-preview">
+                <img [src]="url" [alt]="'img ' + (i+1)" />
+                <div class="lf-preview-tag">#{{ i+1 }}</div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="lf-muted">Chưa có ảnh.</div>
+        }
+      </div>
+    </div>
+  </div>
+}

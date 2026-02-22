@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+.angular/
+out-tsc/
+tmp/
+bazel-out/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.history/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs & env
+*.log
+npm-debug.log*
+yarn-error.log
+.env
+.env.local
+.env.*.local
+
+# Coverage / test
+coverage/
+.nyc_output/
+
+# Cursor / agent
+.cursor/
+.agents/
