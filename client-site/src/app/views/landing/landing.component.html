@@ -6,7 +6,8 @@
     <div
       class="absolute top-0 w-full h-full bg-center bg-cover"
       style="
-        background-image: url('https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1267&q=80');
+        /* Gợi ý: sau này đổi thành ảnh liên quan đồ thất lạc (chìa khóa, ví, điện thoại...) */
+        background-image: url(&quot;https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80&quot;);
       "
     >
       <span
@@ -19,13 +20,33 @@
         <div class="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
           <div class="pr-12">
             <h1 class="text-white font-semibold text-5xl">
-              Your story starts with us.
+              Tìm lại đồ thất lạc dễ dàng.
             </h1>
             <p class="mt-4 text-lg text-blueGray-200">
-              This is a simple example of a Landing Page you can build using
-              Notus Angular. It features multiple CSS components based on the
-              Tailwind CSS design system.
+              Đăng tin đồ bị mất hoặc đồ nhặt được, hệ thống giúp bạn kết nối,
+              đối soát và hẹn trả một cách an toàn, minh bạch.
             </p>
+
+            <!-- THÊM SEARCH BAR (không xoá gì, chỉ bổ sung) -->
+            <div class="mt-8 w-full">
+              <div
+                class="relative flex w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden"
+              >
+                <input
+                  type="text"
+                  placeholder="Tìm ví, điện thoại, balo... theo tên, loại, địa điểm"
+                  class="w-full px-4 py-3 text-blueGray-700 placeholder-blueGray-300 focus:outline-none"
+                />
+                <button
+                  class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 flex items-center justify-center"
+                  type="button"
+                >
+                  <i class="fas fa-search mr-2"></i>
+                  <span class="hidden sm:inline">Tìm kiếm</span>
+                </button>
+              </div>
+            </div>
+            <!-- END SEARCH BAR -->
           </div>
         </div>
       </div>
@@ -62,12 +83,12 @@
               <div
                 class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400"
               >
-                <i class="fas fa-award"></i>
+                <i class="fas fa-map-marker-alt"></i>
               </div>
-              <h6 class="text-xl font-semibold">Awarded Agency</h6>
+              <h6 class="text-xl font-semibold">Đăng tin đồ bị mất</h6>
               <p class="mt-2 mb-4 text-blueGray-500">
-                Divide details about your product or agency work into parts. A
-                paragraph describing a feature will be enough.
+                Ghi rõ loại đồ, màu sắc, địa điểm, thời gian và mô tả chi tiết
+                để tăng khả năng được match với tin nhặt được.
               </p>
             </div>
           </div>
@@ -81,12 +102,12 @@
               <div
                 class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400"
               >
-                <i class="fas fa-retweet"></i>
+                <i class="fas fa-hand-holding-heart"></i>
               </div>
-              <h6 class="text-xl font-semibold">Free Revisions</h6>
+              <h6 class="text-xl font-semibold">Đăng tin đồ nhặt được</h6>
               <p class="mt-2 mb-4 text-blueGray-500">
-                Keep you user engaged by providing meaningful information.
-                Remember that by this time, the user is curious.
+                Chia sẻ thông tin món đồ bạn nhặt được để hệ thống tự động đối
+                chiếu và thông báo cho chủ nhân phù hợp.
               </p>
             </div>
           </div>
@@ -100,12 +121,12 @@
               <div
                 class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-emerald-400"
               >
-                <i class="fas fa-fingerprint"></i>
+                <i class="fas fa-shield-alt"></i>
               </div>
-              <h6 class="text-xl font-semibold">Verified Company</h6>
+              <h6 class="text-xl font-semibold">Đối soát & chống gian lận</h6>
               <p class="mt-2 mb-4 text-blueGray-500">
-                Write a few lines about each one. A paragraph describing a
-                feature will be enough. Keep you user engaged!
+                Admin hỗ trợ đối chiếu thông tin, xác minh người nhận và lưu lại
+                lịch sử để tránh giả mạo và đảm bảo an toàn.
               </p>
             </div>
           </div>
@@ -120,23 +141,23 @@
             <i class="fas fa-user-friends text-xl"></i>
           </div>
           <h3 class="text-3xl mb-2 font-semibold leading-normal">
-            Working with us is a pleasure
+            Kết nối người mất và người nhặt
           </h3>
           <p
             class="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600"
           >
-            Don't let your uses guess by attaching tooltips and popoves to any
-            element. Just make sure you enable them first via JavaScript.
+            Hệ thống tự động match tin “mất” và “nhặt” theo thông tin mô tả như
+            loại đồ, màu sắc, địa điểm, thời gian và ghi chú chi tiết.
           </p>
           <p
             class="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600"
           >
-            The kit comes with three pre-built pages to help you get started
-            faster. You can change the text and images and you're good to go.
-            Just make sure you enable them first via JavaScript.
+            Toàn bộ trạng thái được theo dõi xuyên suốt: đăng tin → duyệt →
+            match → hẹn trả → xác minh → hoàn tất/đóng, giúp bạn dễ dàng tra cứu
+            lại.
           </p>
           <a [routerLink]="['/']" class="font-bold text-blueGray-700 mt-8">
-            Check Notus Angular!
+            Bắt đầu đăng tin ngay
           </a>
         </div>
 
@@ -146,7 +167,7 @@
           >
             <img
               alt="..."
-              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1051&q=80"
+              src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=1051&q=80"
               class="w-full align-middle rounded-t-lg"
             />
             <blockquote class="relative p-8 mb-4">
@@ -161,11 +182,10 @@
                   class="text-red-600 fill-current"
                 ></polygon>
               </svg>
-              <h4 class="text-xl font-bold text-white">Top Notch Services</h4>
+              <h4 class="text-xl font-bold text-white">Trả lại đúng người</h4>
               <p class="text-md font-light mt-2 text-white">
-                The Arctic Ocean freezes every winter and much of the sea-ice
-                then thaws every summer, and that process will continue whatever
-                happens.
+                Quy trình hẹn trả có xác minh và ghi nhận lịch sử giúp tăng niềm
+                tin giữa người nhặt, người mất và cộng đồng xung quanh.
               </p>
             </blockquote>
           </div>
@@ -173,7 +193,275 @@
       </div>
     </div>
   </section>
+  <section class="pt-20 pb-24 bg-blueGray-100">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap justify-between items-center mb-10">
+        <div class="w-full md:w-auto mb-4 md:mb-0">
+          <h2 class="text-3xl font-semibold text-blueGray-800">
+            Bài đăng gần đây
+          </h2>
+          <p class="mt-2 text-blueGray-500 text-sm">
+            Một số tin đồ mất / đồ nhặt được vừa được cộng đồng cập nhật.
+          </p>
+        </div>
+        <div class="w-full md:w-auto text-left md:text-right">
+          <a
+            [routerLink]="['/posts']"
+            class="inline-flex items-center text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+          >
+            Xem tất cả bài đăng
+            <i class="fas fa-arrow-right ml-2 text-xs"></i>
+          </a>
+        </div>
+      </div>
 
+      <div class="flex flex-wrap items-stretch -mx-4">
+        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+          <article
+            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
+          >
+            <div
+              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
+            >
+              <div class="flex justify-between items-center w-full">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-wider"
+                >
+                  <i class="fas fa-exclamation-circle mr-1"></i> Bị mất
+                </span>
+                <span class="text-[10px] text-blueGray-400 font-medium"
+                  >2 giờ trước</span
+                >
+              </div>
+              <span
+                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
+                title="Ví da màu nâu"
+              >
+                Ví da màu nâu
+              </span>
+            </div>
+
+            <div class="w-full h-44 overflow-hidden flex-shrink-0">
+              <div class="w-full h-144 overflow-hidden flex-shrink-0 relative">
+                <img
+                  src="https://media.loveitopcdn.com/5779/huong-dan-lam-vi-da-nam-handmade-01.jpeg"
+                  alt="Ví da"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                <p class="flex items-start">
+                  <i
+                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
+                  ></i>
+                  <span class="line-clamp-2 leading-snug"
+                    >Công viên trung tâm Long Xuyên</span
+                  >
+                </p>
+                <p class="flex items-center">
+                  <i class="far fa-clock text-blueGray-400 w-4"></i> 20h00,
+                  24/02/2026
+                </p>
+                <p class="flex items-center">
+                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Nâu -
+                  Loại: Ví
+                </p>
+              </div>
+              <button
+                type="button"
+                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
+              >
+                Xem chi tiết
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+          <article
+            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
+          >
+            <div
+              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
+            >
+              <div class="flex justify-between items-center w-full">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"
+                >
+                  <i class="fas fa-hand-holding-heart mr-1"></i> Nhặt được
+                </span>
+                <span class="text-[10px] text-blueGray-400 font-medium"
+                  >5 giờ trước</span
+                >
+              </div>
+              <span
+                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
+                title="Điện thoại iPhone màu đen"
+              >
+                Điện thoại iPhone màu đen
+              </span>
+            </div>
+            <div class="w-full h-44 overflow-hidden flex-shrink-0">
+              <img
+                src="https://cdn-media.sforum.vn/storage/app/media/ctv_seo8/iphone%20ch%E1%BB%A5p%20%E1%BA%A3nh%20b%E1%BB%8B%20xoay%20ngang/iphone-chup-anh-bi-xoay-ngang-2.jpg"
+                alt="iPhone"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                <p class="flex items-start">
+                  <i
+                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
+                  ></i>
+                  <span class="line-clamp-2 leading-snug"
+                    >Quán cà phê gần Đại học An Giang</span
+                  >
+                </p>
+                <p class="flex items-center">
+                  <i class="far fa-clock text-blueGray-400 w-4"></i> 16h30,
+                  24/02/2026
+                </p>
+                <p class="flex items-center">
+                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Đen -
+                  Loại: Điện thoại
+                </p>
+              </div>
+              <button
+                type="button"
+                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
+              >
+                Xem chi tiết
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+          <article
+            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
+          >
+            <div
+              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
+            >
+              <div class="flex justify-between items-center w-full">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"
+                >
+                  <i class="fas fa-hand-holding-heart mr-1"></i> Nhặt được
+                </span>
+                <span class="text-[10px] text-blueGray-400 font-medium"
+                  >Hôm qua</span
+                >
+              </div>
+              <span
+                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
+                title="Balo laptop màu đen hiệu Mikkor có chứa giấy tờ"
+              >
+                Balo laptop màu đen hiệu Mikkor có chứa giấy tờ
+              </span>
+            </div>
+            <div class="w-full h-44 overflow-hidden flex-shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=600&q=80"
+                alt="Balo"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                <p class="flex items-start">
+                  <i
+                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
+                  ></i>
+                  <span class="line-clamp-2 leading-snug"
+                    >Trước cổng bến xe Long Xuyên</span
+                  >
+                </p>
+                <p class="flex items-center">
+                  <i class="far fa-clock text-blueGray-400 w-4"></i> 18h15,
+                  23/02/2026
+                </p>
+                <p class="flex items-center">
+                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Đen -
+                  Loại: Balo
+                </p>
+              </div>
+              <button
+                type="button"
+                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
+              >
+                Xem chi tiết
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+          <article
+            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
+          >
+            <div
+              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
+            >
+              <div class="flex justify-between items-center w-full">
+                <span
+                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-wider"
+                >
+                  <i class="fas fa-exclamation-circle mr-1"></i> Bị mất
+                </span>
+                <span class="text-[10px] text-blueGray-400 font-medium"
+                  >1 ngày trước</span
+                >
+              </div>
+              <span
+                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
+                title="Chùm chìa khóa xe máy có móc khóa hình gấu"
+              >
+                Chùm chìa khóa xe máy có móc khóa hình gấu
+              </span>
+            </div>
+            <div class="w-full h-44 overflow-hidden flex-shrink-0">
+              <img
+                src="https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=600&q=80"
+                alt="Chìa khóa"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                <p class="flex items-start">
+                  <i
+                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
+                  ></i>
+                  <span class="line-clamp-2 leading-snug"
+                    >Hầm gửi xe siêu thị Coopmart</span
+                  >
+                </p>
+                <p class="flex items-center">
+                  <i class="far fa-clock text-blueGray-400 w-4"></i> 19h00,
+                  23/02/2026
+                </p>
+                <p class="flex items-center">
+                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Bạc -
+                  Loại: Chìa khóa
+                </p>
+              </div>
+              <button
+                type="button"
+                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
+              >
+                Xem chi tiết
+              </button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
   <section class="relative py-20">
     <div
       class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
@@ -201,7 +489,7 @@
           <img
             alt="..."
             class="max-w-full rounded-lg shadow-lg"
-            src="https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80"
+            src="https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
           />
         </div>
         <div class="w-full md:w-5/12 ml-auto mr-auto px-4">
@@ -211,11 +499,10 @@
             >
               <i class="fas fa-rocket text-xl"></i>
             </div>
-            <h3 class="text-3xl font-semibold">A growing company</h3>
+            <h3 class="text-3xl font-semibold">Quy trình rõ ràng</h3>
             <p class="mt-4 text-lg leading-relaxed text-blueGray-500">
-              The extension comes with three pre-built pages to help you get
-              started faster. You can change the text and images and you're good
-              to go.
+              Mỗi tin đăng đều đi qua các bước: tạo tin, duyệt, match, hẹn trả,
+              xác minh và hoàn tất, giúp mọi thao tác minh bạch và dễ theo dõi.
             </p>
             <ul class="list-none mt-6">
               <li class="py-2">
@@ -229,7 +516,7 @@
                   </div>
                   <div>
                     <h4 class="text-blueGray-500">
-                      Carefully crafted components
+                      Thu thập thuộc tính chi tiết cho mỗi món đồ
                     </h4>
                   </div>
                 </div>
@@ -244,7 +531,9 @@
                     </span>
                   </div>
                   <div>
-                    <h4 class="text-blueGray-500">Amazing page examples</h4>
+                    <h4 class="text-blueGray-500">
+                      Match tự động giữa tin “mất” và “nhặt”
+                    </h4>
                   </div>
                 </div>
               </li>
@@ -258,7 +547,9 @@
                     </span>
                   </div>
                   <div>
-                    <h4 class="text-blueGray-500">Dynamic components</h4>
+                    <h4 class="text-blueGray-500">
+                      Hẹn trả và xác minh qua kênh quản trị viên
+                    </h4>
                   </div>
                 </div>
               </li>
@@ -273,15 +564,15 @@
     <div class="container mx-auto px-4">
       <div class="flex flex-wrap justify-center text-center mb-24">
         <div class="w-full lg:w-6/12 px-4">
-          <h2 class="text-4xl font-semibold">Here are our heroes</h2>
+          <h2 class="text-4xl font-semibold">Những người kết nối cộng đồng</h2>
           <p class="text-lg leading-relaxed m-4 text-blueGray-500">
-            According to the National Oceanic and Atmospheric Administration,
-            Ted, Scambos, NSIDClead scentist, puts the potentially record
-            maximum.
+            Đội ngũ vận hành và cộng đồng người dùng cùng nhau xây dựng hệ sinh
+            thái trả lại đồ thất lạc một cách văn minh, đáng tin cậy.
           </p>
         </div>
       </div>
       <div class="flex flex-wrap">
+        <!-- giữ nguyên các card team, chỉ đổi mô tả nếu muốn -->
         <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
           <div class="px-6">
             <img
@@ -292,7 +583,7 @@
             <div class="pt-6 text-center">
               <h5 class="text-xl font-bold">Ryan Tompson</h5>
               <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Web Developer
+                Lost & Found Moderator
               </p>
               <div class="mt-6">
                 <button
@@ -317,6 +608,7 @@
             </div>
           </div>
         </div>
+
         <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
           <div class="px-6">
             <img
@@ -327,7 +619,7 @@
             <div class="pt-6 text-center">
               <h5 class="text-xl font-bold">Romina Hadid</h5>
               <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Marketing Specialist
+                Community Manager
               </p>
               <div class="mt-6">
                 <button
@@ -346,6 +638,7 @@
             </div>
           </div>
         </div>
+
         <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
           <div class="px-6">
             <img
@@ -356,7 +649,7 @@
             <div class="pt-6 text-center">
               <h5 class="text-xl font-bold">Alexa Smith</h5>
               <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                UI/UX Designer
+                UX Designer
               </p>
               <div class="mt-6">
                 <button
@@ -381,6 +674,7 @@
             </div>
           </div>
         </div>
+
         <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
           <div class="px-6">
             <img
@@ -391,7 +685,7 @@
             <div class="pt-6 text-center">
               <h5 class="text-xl font-bold">Jenna Kardi</h5>
               <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Founder and CEO
+                Founder & Admin Lead
               </p>
               <div class="mt-6">
                 <button
@@ -450,11 +744,10 @@
     <div class="container mx-auto px-4 lg:pt-24 lg:pb-64">
       <div class="flex flex-wrap text-center justify-center">
         <div class="w-full lg:w-6/12 px-4">
-          <h2 class="text-4xl font-semibold text-white">Build something</h2>
+          <h2 class="text-4xl font-semibold text-white">Theo dõi trạng thái</h2>
           <p class="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">
-            Put the potentially record low maximum sea ice extent tihs year down
-            to low ice. According to the National Oceanic and Atmospheric
-            Administration, Ted, Scambos.
+            Mỗi món đồ đều gắn với một timeline trạng thái rõ ràng, giúp bạn
+            biết chính xác tin đang ở bước nào trong quy trình xử lý.
           </p>
         </div>
       </div>
@@ -466,11 +759,11 @@
             <i class="fas fa-medal text-xl"></i>
           </div>
           <h6 class="text-xl mt-5 font-semibold text-white">
-            Excelent Services
+            Đăng & duyệt tin
           </h6>
           <p class="mt-2 mb-4 text-blueGray-400">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
+            Tin đăng được admin duyệt nhanh chóng để đảm bảo nội dung rõ ràng,
+            đúng quy định và dễ match.
           </p>
         </div>
         <div class="w-full lg:w-3/12 px-4 text-center">
@@ -479,12 +772,10 @@
           >
             <i class="fas fa-poll text-xl"></i>
           </div>
-          <h5 class="text-xl mt-5 font-semibold text-white">
-            Grow your market
-          </h5>
+          <h5 class="text-xl mt-5 font-semibold text-white">Match & hẹn trả</h5>
           <p class="mt-2 mb-4 text-blueGray-400">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
+            Khi có tin phù hợp, hệ thống gợi ý match và hỗ trợ thiết lập buổi
+            hẹn trả giữa hai bên.
           </p>
         </div>
         <div class="w-full lg:w-3/12 px-4 text-center">
@@ -493,15 +784,16 @@
           >
             <i class="fas fa-lightbulb text-xl"></i>
           </div>
-          <h5 class="text-xl mt-5 font-semibold text-white">Launch time</h5>
+          <h5 class="text-xl mt-5 font-semibold text-white">Xác minh & đóng</h5>
           <p class="mt-2 mb-4 text-blueGray-400">
-            Some quick example text to build on the card title and make up the
-            bulk of the card's content.
+            Sau khi trả đồ, admin xác minh kết quả và đóng yêu cầu, lưu lại lịch
+            sử cho lần tra cứu sau này.
           </p>
         </div>
       </div>
     </div>
   </section>
+
   <section class="relative block py-24 lg:pt-0 bg-blueGray-800">
     <div class="container mx-auto px-4">
       <div class="flex flex-wrap justify-center lg:-mt-64 -mt-48">
@@ -510,21 +802,22 @@
             class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200"
           >
             <div class="flex-auto p-5 lg:p-10">
-              <h4 class="text-2xl font-semibold">Want to work with us?</h4>
+              <h4 class="text-2xl font-semibold">Cần hỗ trợ thêm?</h4>
               <p class="leading-relaxed mt-1 mb-4 text-blueGray-500">
-                Complete this form and we will get back to you in 24 hours.
+                Điền thông tin bên dưới nếu bạn cần trợ giúp về việc đăng tin,
+                match nhầm, hoặc xử lý tranh chấp liên quan đến đồ thất lạc.
               </p>
               <div class="relative w-full mb-3 mt-8">
                 <label
                   class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                   htmlFor="full-name"
                 >
-                  Full Name
+                  Họ và tên
                 </label>
                 <input
                   type="text"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Full Name"
+                  placeholder="Nhập họ và tên"
                 />
               </div>
 
@@ -538,7 +831,7 @@
                 <input
                   type="email"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Email"
+                  placeholder="Địa chỉ email liên hệ"
                 />
               </div>
 
@@ -547,13 +840,13 @@
                   class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
                   htmlFor="message"
                 >
-                  Message
+                  Nội dung
                 </label>
                 <textarea
                   rows="4"
                   cols="80"
                   class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-                  placeholder="Type a message..."
+                  placeholder="Mô tả vấn đề bạn đang gặp phải..."
                 ></textarea>
               </div>
               <div class="text-center mt-6">
@@ -561,7 +854,7 @@
                   class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                   type="button"
                 >
-                  Send Message
+                  Gửi yêu cầu hỗ trợ
                 </button>
               </div>
             </div>

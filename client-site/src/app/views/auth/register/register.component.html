@@ -39,7 +39,9 @@
                 Name
               </label>
               <input
-                type="email"
+                type="text"
+                name="name"
+                [(ngModel)]="name"
                 class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                 placeholder="Name"
               />
@@ -54,6 +56,8 @@
               </label>
               <input
                 type="email"
+                name="email"
+                [(ngModel)]="email"
                 class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                 placeholder="Email"
               />
@@ -68,6 +72,8 @@
               </label>
               <input
                 type="password"
+                name="password"
+                [(ngModel)]="password"
                 class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                 placeholder="Password"
               />
@@ -93,6 +99,7 @@
               <button
                 class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                 type="button"
+                (click)="handleRegister()"
               >
                 Create Account
               </button>
