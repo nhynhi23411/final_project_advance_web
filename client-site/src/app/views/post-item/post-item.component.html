@@ -1,152 +1,122 @@
-<div class="min-h-screen bg-gray-50 py-8">
+<div class="min-h-screen bg-blueGray-100 py-8">
     <div class="container mx-auto px-4">
         <div class="max-w-xl mx-auto">
 
-            <!-- Header -->
-            <h1 class="text-3xl font-extrabold mb-6" style="color: #1B2A4A;">Đăng tin</h1>
+            <h1 class="text-3xl font-extrabold text-blueGray-800 mb-6">Đăng tin</h1>
 
-            <!-- Success banner -->
             <div *ngIf="submitSuccess"
-                class="mb-6 p-4 bg-green-50 border border-green-300 rounded-lg text-green-800 font-semibold text-sm flex items-center">
-                <svg class="w-5 h-5 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+                class="mb-6 p-4 bg-emerald-50 border border-emerald-300 rounded-lg text-emerald-700 font-semibold text-sm flex items-center">
+                <i class="fas fa-check-circle mr-2"></i>
                 Đăng tin thành công! Bài đăng đang chờ duyệt.
             </div>
 
-            <!-- Error banner -->
             <div *ngIf="submitError"
-                class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-700 font-semibold text-sm">
+                class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-600 font-semibold text-sm">
                 {{ submitError }}
             </div>
 
             <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
 
-                <!-- ═══════════ Loại bài đăng ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Loại bài đăng<span style="color: #F44336;">*</span>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
+                        Loại bài đăng<span class="text-red-500">*</span>
                     </label>
                     <div class="flex gap-6">
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="radio" formControlName="type" value="LOST"
-                                class="form-radio text-blue-600 w-4 h-4" />
-                            <span class="ml-2 text-sm text-gray-700">Tôi bị mất đồ</span>
+                                class="form-radio text-lightBlue-600 w-4 h-4" />
+                            <span class="ml-2 text-sm text-blueGray-600">Tôi bị mất đồ</span>
                         </label>
                         <label class="inline-flex items-center cursor-pointer">
                             <input type="radio" formControlName="type" value="FOUND"
-                                class="form-radio text-blue-600 w-4 h-4" />
-                            <span class="ml-2 text-sm text-gray-700">Tôi nhặt được đồ</span>
+                                class="form-radio text-lightBlue-600 w-4 h-4" />
+                            <span class="ml-2 text-sm text-blueGray-600">Tôi nhặt được đồ</span>
                         </label>
                     </div>
                     <p *ngIf="isInvalid('type')" class="text-red-500 text-xs mt-1">{{ getError('type') }}</p>
                 </div>
 
-                <!-- ═══════════ Tiêu đề ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Tiêu đề<span style="color: #F44336;">*</span>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
+                        Tiêu đề<span class="text-red-500">*</span>
                     </label>
                     <input type="text" formControlName="title" placeholder="Nhập tiêu đề..."
-                        class="w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 transition"
-                        [style.border-color]="isInvalid('title') ? '#F44336' : '#B0BEC5'" />
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 focus:border-lightBlue-300 transition"
+                        [class.border-red-400]="isInvalid('title')" />
                     <div class="flex justify-between mt-1">
                         <p *ngIf="isInvalid('title')" class="text-red-500 text-xs">{{ getError('title') }}</p>
-                        <p class="text-xs text-gray-400 ml-auto">
+                        <p class="text-xs text-blueGray-400 ml-auto">
                             {{ form.get('title')?.value?.length || 0 }}/200
                         </p>
                     </div>
                 </div>
 
-                <!-- ═══════════ Danh mục sản phẩm ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Danh mục sản phẩm<span style="color: #F44336;">*</span>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
+                        Danh mục sản phẩm<span class="text-red-500">*</span>
                     </label>
                     <select formControlName="category"
-                        class="w-full px-4 py-3 border rounded-lg text-sm bg-white focus:outline-none focus:ring-2 transition appearance-none"
-                        [style.border-color]="isInvalid('category') ? '#F44336' : '#B0BEC5'">
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 bg-white placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 focus:border-lightBlue-300 transition appearance-none"
+                        [class.border-red-400]="isInvalid('category')">
                         <option value="" disabled>Danh mục</option>
                         <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
                     </select>
                     <p *ngIf="isInvalid('category')" class="text-red-500 text-xs mt-1">{{ getError('category') }}</p>
                 </div>
 
-                <!-- ═══════════ Dynamic metadata fields ═══════════ -->
                 <div *ngFor="let field of dynamicFields" class="transition-all duration-300">
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        {{ field.label }}
-                    </label>
-                    <!-- Text input -->
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">{{ field.label }}</label>
                     <input *ngIf="field.type === 'text'" type="text" [formControlName]="field.key"
                         [placeholder]="field.placeholder || ''"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition" />
-                    <!-- Textarea -->
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition" />
                     <textarea *ngIf="field.type === 'textarea'" [formControlName]="field.key"
                         [placeholder]="field.placeholder || ''" rows="2"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"></textarea>
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition resize-none"></textarea>
                 </div>
 
-                <!-- ═══════════ Địa điểm ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Địa điểm<span style="color: #F44336;">*</span>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
+                        Địa điểm<span class="text-red-500">*</span>
                     </label>
                     <input type="text" formControlName="location_text" placeholder="Địa điểm"
-                        class="w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition"
-                        [style.border-color]="isInvalid('location_text') ? '#F44336' : '#B0BEC5'" />
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition"
+                        [class.border-red-400]="isInvalid('location_text')" />
                     <p *ngIf="isInvalid('location_text')" class="text-red-500 text-xs mt-1">{{ getError('location_text')
                         }}</p>
                 </div>
 
-                <!-- ═══════════ Thời điểm ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Thời điểm<span style="color: #F44336;">*</span>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
+                        Thời điểm<span class="text-red-500">*</span>
                     </label>
                     <input type="date" formControlName="lost_found_date"
-                        class="w-full px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 transition"
-                        [style.border-color]="isInvalid('lost_found_date') ? '#F44336' : '#B0BEC5'" />
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition"
+                        [class.border-red-400]="isInvalid('lost_found_date')" />
                     <p *ngIf="isInvalid('lost_found_date')" class="text-red-500 text-xs mt-1">{{
                         getError('lost_found_date') }}</p>
                 </div>
 
-                <!-- ═══════════ Mô tả chi tiết ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Nhập mô tả chi tiết
-                    </label>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">Nhập mô tả chi tiết</label>
                     <textarea formControlName="description" placeholder="Mô tả chi tiết vật phẩm...." rows="4"
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition resize-none"></textarea>
+                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition resize-none"></textarea>
                 </div>
 
-                <!-- ═══════════ Hình ảnh ═══════════ -->
                 <div>
-                    <label class="block text-sm font-bold mb-2" style="color: #1B2A4A;">
-                        Hình ảnh
-                    </label>
-                    <app-image-uploader #imageUploader (imagesChanged)="onImagesChanged($event)"></app-image-uploader>
+                    <label class="block text-sm font-bold text-blueGray-700 mb-2">Hình ảnh</label>
+                    <app-image-uploader #imageUploader (filesSelected)="onFilesSelected($event)"></app-image-uploader>
                 </div>
 
                 <div class="flex gap-6 pt-4 pb-2">
                     <button type="button" (click)="resetForm()"
-                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white transition-colors duration-200 hover:opacity-90"
-                        style="background: #F44336;">
+                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white bg-red-500 active:bg-red-600 uppercase shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150">
                         Xóa thông tin
                     </button>
-                    <button type="submit"
-                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white transition-colors duration-200 hover:opacity-90 disabled:opacity-50"
-                        style="background: #3B5998;" [disabled]="submitting">
+                    <button type="submit" [disabled]="submitting"
+                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white bg-blueGray-700 active:bg-blueGray-600 uppercase shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150 disabled:opacity-50">
                         <span *ngIf="!submitting">Đăng tin</span>
                         <span *ngIf="submitting" class="inline-flex items-center">
-                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
-                                    stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z">
-                                </path>
-                            </svg>
-                            Đang gửi...
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Đang gửi...
                         </span>
                     </button>
                 </div>
