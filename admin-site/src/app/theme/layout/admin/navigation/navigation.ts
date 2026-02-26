@@ -149,6 +149,14 @@ export const NavigationItems: NavigationItem[] = [
         url: '/tables',
         classes: 'nav-item',
         icon: 'feather icon-server'
+      },
+      {
+        id: 'moderation',
+        title: 'Moderation',
+        type: 'item',
+        url: '/moderation',
+        classes: 'nav-item',
+        icon: 'feather icon-shield'
       }
     ]
   },

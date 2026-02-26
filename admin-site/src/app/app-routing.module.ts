@@ -13,7 +13,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/analytics',
+        redirectTo: '/moderation',
         pathMatch: 'full'
       },
       {
@@ -35,6 +35,10 @@ const routes: Routes = [
       {
         path: 'tables',
         loadComponent: () => import('./demo/tables/tbl-bootstrap/tbl-bootstrap.component').then((c) => c.TblBootstrapComponent)
+      },
+      {
+        path: 'moderation',
+        loadComponent: () => import('./demo/admin-moderation/moderation.component').then((c) => c.ModerationComponent)
       },
       {
         path: 'sample-page',
