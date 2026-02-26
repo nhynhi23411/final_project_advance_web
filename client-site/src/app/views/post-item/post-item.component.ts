@@ -19,7 +19,6 @@ export class PostItemComponent implements OnInit {
     submitError = '';
     submitSuccess = false;
 
-    /** URLs & publicIds received from ImageUploader */
     private uploadedUrls: string[] = [];
     private uploadedPublicIds: string[] = [];
 
@@ -39,46 +38,58 @@ export class PostItemComponent implements OnInit {
             description: [''],
         });
 
-        // Watch category changes to load dynamic metadata fields
         this.form.get('category')!.valueChanges.subscribe((cat: string) => {
             this.onCategoryChange(cat);
         });
     }
 
-    /* ---------- Dynamic fields ---------- */
-
     private onCategoryChange(category: string): void {
-        // Remove old dynamic controls
         for (const field of this.dynamicFields) {
             if (this.form.contains(field.key)) {
                 this.form.removeControl(field.key);
             }
         }
-
-        // Load new fields
         this.dynamicFields = CATEGORY_METADATA[category] || [];
-
-        // Add new controls
         for (const field of this.dynamicFields) {
             this.form.addControl(field.key, new FormControl(''));
         }
     }
 
-    /* ---------- Image upload callback ---------- */
+    onFilesSelected(files: File[]): void {
+        files.forEach((file, i) => {
+            const idx = this.imageUploader.images.length - files.length + i;
+            this.imageUploader.updateImageStatus(idx, { uploading: true });
 
-    onImagesChanged(data: { urls: string[]; publicIds: string[] }): void {
-        this.uploadedUrls = data.urls;
-        this.uploadedPublicIds = data.publicIds;
+            this.itemService.uploadImage(file).subscribe({
+                next: (res) => {
+                    this.imageUploader.updateImageStatus(idx, {
+                        uploading: false,
+                        done: true,
+                        url: res.url,
+                        publicId: res.publicId,
+                    });
+                    this.syncUploadedImages();
+                },
+                error: (err) => {
+                    this.imageUploader.updateImageStatus(idx, {
+                        uploading: false,
+                        error: err?.error?.message || 'Upload thất bại',
+                    });
+                },
+            });
+        });
     }
 
-    /* ---------- Submit ---------- */
+    private syncUploadedImages(): void {
+        const done = this.imageUploader.images.filter(img => img.done);
+        this.uploadedUrls = done.map(img => img.url);
+        this.uploadedPublicIds = done.map(img => img.publicId);
+    }
 
     onSubmit(): void {
-        // Mark all fields as touched to show validation errors
-        Object.keys(this.form.controls).forEach((key) => {
+        Object.keys(this.form.controls).forEach(key => {
             this.form.get(key)!.markAsTouched();
         });
-
         if (this.form.invalid) return;
 
         this.submitting = true;
@@ -86,16 +97,12 @@ export class PostItemComponent implements OnInit {
         this.submitSuccess = false;
 
         const raw = this.form.value;
-
-        // Build payload matching CreateItemDto
         const payload: ItemPayload = {
             type: raw.type,
             title: raw.title.trim(),
             category: raw.category,
             location_text: raw.location_text.trim(),
-            lost_found_date: raw.lost_found_date
-                ? new Date(raw.lost_found_date).toISOString()
-                : undefined,
+            lost_found_date: raw.lost_found_date ? new Date(raw.lost_found_date).toISOString() : undefined,
             description: raw.description?.trim() || undefined,
             color: raw.color?.trim() || undefined,
             brand: raw.brand?.trim() || undefined,
@@ -108,10 +115,7 @@ export class PostItemComponent implements OnInit {
             next: () => {
                 this.submitting = false;
                 this.submitSuccess = true;
-                // Optional: redirect or reset after short delay
-                setTimeout(() => {
-                    this.resetForm();
-                }, 2000);
+                setTimeout(() => this.resetForm(), 2000);
             },
             error: (err) => {
                 this.submitting = false;
@@ -120,8 +124,6 @@ export class PostItemComponent implements OnInit {
         });
     }
 
-    /* ---------- Reset ---------- */
-
     resetForm(): void {
         this.form.reset({ type: '', category: '' });
         this.dynamicFields = [];
@@ -129,13 +131,8 @@ export class PostItemComponent implements OnInit {
         this.uploadedPublicIds = [];
         this.submitError = '';
         this.submitSuccess = false;
-
-        if (this.imageUploader) {
-            this.imageUploader.reset();
-        }
+        if (this.imageUploader) this.imageUploader.reset();
     }
-
-    /* ---------- Helpers for template ---------- */
 
     isInvalid(name: string): boolean {
         const ctrl = this.form.get(name);
@@ -146,9 +143,7 @@ export class PostItemComponent implements OnInit {
         const ctrl = this.form.get(name);
         if (!ctrl || !ctrl.errors) return '';
         if (ctrl.errors.required) return 'Trường này không được để trống';
-        if (ctrl.errors.maxlength) {
-            return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
-        }
+        if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
         return '';
     }
 }
