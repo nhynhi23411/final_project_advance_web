@@ -61,6 +61,9 @@ export class Item {
 
   @Prop({ type: Types.ObjectId, ref: "User", required: true })
   created_by!: Types.ObjectId;
+
+  @Prop({ default: 0 })
+  activeClaimCount!: number;
 }
 
 export const ItemSchema = SchemaFactory.createForClass(Item);
