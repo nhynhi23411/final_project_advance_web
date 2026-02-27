@@ -1,0 +1,149 @@
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
+import { CATEGORIES, CATEGORY_METADATA, MetadataField } from '../../config/category-metadata.config';
+import { ItemService, ItemPayload } from '../../services/item.service';
+import { ImageUploaderComponent } from '../../components/image-uploader/image-uploader.component';
+
+@Component({
+    selector: 'app-post-item',
+    templateUrl: './post-item.component.html',
+})
+export class PostItemComponent implements OnInit {
+    @ViewChild('imageUploader') imageUploader!: ImageUploaderComponent;
+
+    form!: FormGroup;
+    categories = CATEGORIES;
+    dynamicFields: MetadataField[] = [];
+    submitting = false;
+    submitError = '';
+    submitSuccess = false;
+
+    private uploadedUrls: string[] = [];
+    private uploadedPublicIds: string[] = [];
+
+    constructor(
+        private fb: FormBuilder,
+        private itemService: ItemService,
+        private router: Router,
+    ) { }
+
+    ngOnInit(): void {
+        this.form = this.fb.group({
+            type: ['', Validators.required],
+            title: ['', [Validators.required, Validators.maxLength(200)]],
+            category: ['', Validators.required],
+            location_text: ['', Validators.required],
+            lost_found_date: ['', Validators.required],
+            description: [''],
+        });
+
+        this.form.get('category')!.valueChanges.subscribe((cat: string) => {
+            this.onCategoryChange(cat);
+        });
+    }
+
+    private onCategoryChange(category: string): void {
+        for (const field of this.dynamicFields) {
+            if (this.form.contains(field.key)) {
+                this.form.removeControl(field.key);
+            }
+        }
+        this.dynamicFields = CATEGORY_METADATA[category] || [];
+        for (const field of this.dynamicFields) {
+            this.form.addControl(field.key, new FormControl(''));
+        }
+    }
+
+    onFilesSelected(files: File[]): void {
+        files.forEach((file, i) => {
+            const idx = this.imageUploader.images.length - files.length + i;
+            this.imageUploader.updateImageStatus(idx, { uploading: true });
+
+            this.itemService.uploadImage(file).subscribe({
+                next: (res) => {
+                    this.imageUploader.updateImageStatus(idx, {
+                        uploading: false,
+                        done: true,
+                        url: res.url,
+                        publicId: res.publicId,
+                    });
+                    this.syncUploadedImages();
+                },
+                error: (err) => {
+                    this.imageUploader.updateImageStatus(idx, {
+                        uploading: false,
+                        error: err?.error?.message || 'Upload thất bại',
+                    });
+                },
+            });
+        });
+    }
+
+    private syncUploadedImages(): void {
+        const done = this.imageUploader.images.filter(img => img.done);
+        this.uploadedUrls = done.map(img => img.url);
+        this.uploadedPublicIds = done.map(img => img.publicId);
+    }
+
+    onSubmit(): void {
+        Object.keys(this.form.controls).forEach(key => {
+            this.form.get(key)!.markAsTouched();
+        });
+        if (this.form.invalid) return;
+
+        this.submitting = true;
+        this.submitError = '';
+        this.submitSuccess = false;
+
+        const raw = this.form.value;
+        const payload: ItemPayload = {
+            type: raw.type,
+            title: raw.title.trim(),
+            category: raw.category,
+            location_text: raw.location_text.trim(),
+            lost_found_date: raw.lost_found_date ? new Date(raw.lost_found_date).toISOString() : undefined,
+            description: raw.description?.trim() || undefined,
+            color: raw.color?.trim() || undefined,
+            brand: raw.brand?.trim() || undefined,
+            distinctive_marks: raw.distinctive_marks?.trim() || undefined,
+            images: this.uploadedUrls.length ? this.uploadedUrls : undefined,
+            image_public_ids: this.uploadedPublicIds.length ? this.uploadedPublicIds : undefined,
+        };
+
+        this.itemService.createItem(payload).subscribe({
+            next: () => {
+                this.submitting = false;
+                this.submitSuccess = true;
+                setTimeout(() => this.resetForm(), 2000);
+            },
+            error: (err) => {
+                this.submitting = false;
+                this.submitError = err?.error?.message || 'Đăng tin thất bại. Vui lòng thử lại.';
+            },
+        });
+    }
+
+    resetForm(): void {
+        this.form.reset({ type: '', category: '' });
+        this.dynamicFields = [];
+        this.uploadedUrls = [];
+        this.uploadedPublicIds = [];
+        this.submitError = '';
+        this.submitSuccess = false;
+        if (this.imageUploader) this.imageUploader.reset();
+    }
+
+    isInvalid(name: string): boolean {
+        const ctrl = this.form.get(name);
+        return !!(ctrl && ctrl.invalid && ctrl.touched);
+    }
+
+    getError(name: string): string {
+        const ctrl = this.form.get(name);
+        if (!ctrl || !ctrl.errors) return '';
+        if (ctrl.errors.required) return 'Trường này không được để trống';
+        if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
+        return '';
+    }
+}
