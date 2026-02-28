@@ -1,0 +1,192 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="min-h-screen bg-blueGray-50">
+  <!-- Header -->
+  <div class="bg-white border-b border-blueGray-200 sticky top-16 z-40">
+    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
+      <h1 class="text-2xl font-bold text-blueGray-800">Chi tiết đồ thất lạc</h1>
+      <button
+        (click)="goBack()"
+        class="flex items-center text-blueGray-600 hover:text-blueGray-800 transition-colors"
+      >
+        <i class="fas fa-arrow-left mr-2"></i>
+        <span>Quay lại</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Success Message -->
+  <div
+    *ngIf="successMessage"
+    class="container mx-auto px-4 mt-4"
+  >
+    <div
+      class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center"
+    >
+      <i class="fas fa-check-circle mr-3 text-lg"></i>
+      <span>{{ successMessage }}</span>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div
+    *ngIf="error"
+    class="container mx-auto px-4 mt-4"
+  >
+    <div
+      class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center"
+    >
+      <i class="fas fa-exclamation-circle mr-3 text-lg"></i>
+      <span>{{ error }}</span>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div
+    *ngIf="isLoading"
+    class="container mx-auto px-4 py-16 flex justify-center"
+  >
+    <div class="text-center">
+      <div class="inline-block animate-spin mb-4">
+        <i class="fas fa-spinner text-4xl text-blueGray-400"></i>
+      </div>
+      <p class="text-blueGray-600">Đang tải thông tin...</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div
+    *ngIf="!isLoading && item"
+    class="container mx-auto px-4 py-8"
+  >
+    <div class="flex flex-col lg:flex-row gap-8">
+      <!-- main area -->
+      <section class="flex-1 lg:pr-6">
+        <!-- image + gallery -->
+        <div class="bg-white rounded-lg shadow overflow-hidden">
+          <div class="relative bg-blueGray-100 h-80 flex items-center justify-center">
+            <img
+              *ngIf="item.images && item.images.length"
+              [src]="item.images[0]"
+              [alt]="item.title"
+              class="w-full h-full object-cover main-photo"
+            />
+            <div
+              *ngIf="!item.images || item.images.length === 0"
+              class="text-blueGray-400 text-center"
+            >
+              <i class="fas fa-image text-6xl mb-4"></i>
+              <p>Không có hình ảnh</p>
+            </div>
+          </div>
+          <div
+            *ngIf="item.images && item.images.length > 1"
+            class="flex gap-2 overflow-x-auto p-2 bg-blueGray-50"
+          >
+            <img
+              *ngFor="let img of item.images; let i = index"
+              [src]="img"
+              [alt]="'Hình ' + (i + 1)"
+              class="w-20 h-20 object-cover rounded cursor-pointer border border-blueGray-200 hover:border-blueGray-400"
+            />
+          </div>
+        </div>
+
+        <!-- title / metadata card -->
+        <div class="mt-6 bg-white rounded-lg shadow p-6">
+          <h2 class="text-2xl font-bold text-blueGray-800 mb-4 detail-title">{{ item.title }}</h2>
+          <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div>
+              <dt class="font-semibold text-blueGray-600">Loại</dt>
+              <dd class="mt-1">
+                <span
+                  [class]="getItemTypeClass() + ' inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold'"
+                >
+                  <i [class]="getItemTypeIcon() + ' mr-1'"></i>
+                  {{ getItemTypeLabel() }}
+                </span>
+              </dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-blueGray-600">Danh mục</dt>
+              <dd class="mt-1">{{ item.category }}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-blueGray-600">Màu sắc</dt>
+              <dd class="mt-1">{{ item.color || 'Không xác định' }}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-blueGray-600">Địa điểm</dt>
+              <dd class="mt-1">{{ item.location_text }}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-blueGray-600">Ngày</dt>
+              <dd class="mt-1">{{ formatDate(item.lost_found_date) }}</dd>
+            </div>
+            <div>
+              <dt class="font-semibold text-blueGray-600">Trạng thái</dt>
+              <dd class="mt-1 font-semibold">{{ getStatusLabel() }}</dd>
+            </div>
+          </dl>
+
+          <div class="mt-6">
+            <h3 class="text-lg font-semibold text-blueGray-800 mb-2">Mô tả</h3>
+            <p class="prose text-blueGray-700 leading-relaxed whitespace-pre-wrap">
+              {{ item.description || 'Không có mô tả' }}
+            </p>
+          </div>
+
+          <div *ngIf="item.distinctive_marks" class="mt-6 border-t pt-4">
+            <dt class="font-semibold text-blueGray-600">Đặc điểm nhận dạng</dt>
+            <dd class="mt-1 whitespace-pre-wrap">{{ item.distinctive_marks }}</dd>
+          </div>
+        </div>
+      </section>
+
+      <!-- sidebar -->
+      <aside class="lg:w-80 lg:ml-8 flex-shrink-0">
+        <div *ngIf="isClaimButtonVisible()" class="bg-white rounded-lg shadow p-6 mb-6">
+          <h3 class="text-lg font-bold mb-4">Gửi yêu cầu xác minh</h3>
+          <p class="text-sm text-blueGray-600 mb-4">
+            Nếu bạn nghĩ đây là đồ của mình, hãy gửi chứng cứ.
+          </p>
+          <button
+            (click)="isLoggedIn ? openClaimModal() : router.navigate(['/login'])"
+            [disabled]="isClaimButtonDisabled()"
+            class="w-full bg-blueGray-700 hover:bg-blueGray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase px-4 py-2 rounded text-sm"
+          >
+            {{ isLoggedIn ? 'Gửi yêu cầu' : 'Đăng nhập để xác minh' }}
+          </button>
+          <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="mt-2 text-xs text-yellow-700">
+            Bạn đã đạt giới hạn yêu cầu
+          </p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6">
+          <h3 class="text-lg font-bold mb-4">Thông tin đăng</h3>
+          <ul class="text-sm space-y-3">
+            <li>
+              <strong>Người đăng:</strong> {{ item.created_by }}
+            </li>
+            <li>
+              <strong>Ngày đăng:</strong> {{ formatDate(item.created_at) }}
+            </li>
+            <li>
+              <strong>Cập nhật:</strong> {{ formatDate(item.updated_at) }}
+            </li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>
+
+<!-- Claim Modal -->
+<app-claim-modal
+  *ngIf="showClaimModal"
+  [item]="item"
+  (close)="closeClaimModal()"
+  (success)="onClaimSuccess()"
+></app-claim-modal>

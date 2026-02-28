@@ -1,0 +1,67 @@
+:host {
+  display: block;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* style overrides for detail page */
+.container {
+  max-width: 1024px;
+}
+
+/* title sizes */
+h2 {
+  color: #2f4f4f;
+  @apply text-2xl md:text-3xl leading-tight;
+}
+
+/* metadata definitions */
+dt {
+  display: block;
+  color: #4a5568;
+  @apply text-xs font-semibold;
+}
+
+dd {
+  margin-left: 0;
+  color: #2d3748;
+  @apply text-sm mt-1;
+}
+
+/* images */
+img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* limit main photo height so it doesn’t overpower text */
+.main-photo {
+  max-height: 400px;
+}
+
+// Responsive improvements
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.75rem;
+  }
+}
