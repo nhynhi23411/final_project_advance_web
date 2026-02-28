@@ -203,6 +203,9 @@
           <p class="mt-2 text-blueGray-500 text-sm">
             Một số tin đồ mất / đồ nhặt được vừa được cộng đồng cập nhật.
           </p>
+          <p *ngIf="isUsingSample" class="mt-1 text-yellow-600 text-xs">
+            (Hiển thị mẫu vì chưa có bài đăng thật)
+          </p>
         </div>
         <div class="w-full md:w-auto text-left md:text-right">
           <a
@@ -216,249 +219,78 @@
       </div>
 
       <div class="flex flex-wrap items-stretch -mx-4">
-        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-          <article
-            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-          >
-            <div
-              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-            >
-              <div class="flex justify-between items-center w-full">
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-wider"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i> Bị mất
-                </span>
-                <span class="text-[10px] text-blueGray-400 font-medium"
-                  >2 giờ trước</span
-                >
-              </div>
-              <span
-                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                title="Ví da màu nâu"
-              >
-                Ví da màu nâu
-              </span>
-            </div>
+        <!-- dynamic generation of cards -->
+        <ng-container *ngIf="!isLoadingItems; else loadingItems">
+          <ng-container *ngIf="items.length > 0; else noItems">
+            <div *ngFor="let item of items" class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+              <article class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]">
+                <div class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]">
+                  <div class="flex justify-between items-center w-full">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                          [ngClass]="{
+                            'bg-red-100 text-red-600': item.type === 'LOST',
+                            'bg-emerald-100 text-emerald-600': item.type === 'FOUND'
+                          }">
+                      <i [ngClass]="{
+                          'fas fa-exclamation-circle': item.type === 'LOST',
+                          'fas fa-hand-holding-heart': item.type === 'FOUND'
+                        }" class="mr-1"></i>
+                      {{ item.type === 'LOST' ? 'Bị mất' : 'Nhặt được' }}
+                    </span>
+                    <span class="text-[10px] text-blueGray-400 font-medium">
+                      {{ item.lost_found_date | date:'short' }}
+                    </span>
+                  </div>
+                  <span class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1" [title]="item.title">
+                    {{ item.title }}
+                  </span>
+                </div>
 
-            <div class="w-full h-44 overflow-hidden flex-shrink-0">
-              <div class="w-full h-144 overflow-hidden flex-shrink-0 relative">
-                <img
-                  src="https://media.loveitopcdn.com/5779/huong-dan-lam-vi-da-nam-handmade-01.jpeg"
-                  alt="Ví da"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-            </div>
+                <div class="w-full overflow-hidden flex-shrink-0">
+                  <!-- maintain 4:3 ratio with fixed height for uniformity -->
+                  <div class="relative w-full" style="padding-top:56.25%;">
+                    <img [src]="item.images && item.images.length ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'"
+                         [alt]="item.title" class="absolute top-0 left-0 w-full h-full object-cover" />
+                  </div>
+                </div>
 
-            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                <p class="flex items-start">
-                  <i
-                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                  ></i>
-                  <span class="line-clamp-2 leading-snug"
-                    >Công viên trung tâm Long Xuyên</span
-                  >
-                </p>
-                <p class="flex items-center">
-                  <i class="far fa-clock text-blueGray-400 w-4"></i> 20h00,
-                  24/02/2026
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Nâu -
-                  Loại: Ví
-                </p>
-              </div>
-              <button
-                type="button"
-                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-              >
-                Xem chi tiết
-              </button>
+                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                    <p class="flex items-start">
+                      <i class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"></i>
+                      <span class="line-clamp-2 leading-snug">{{ item.location_text }}</span>
+                    </p>
+                    <p class="flex items-center">
+                      <i class="far fa-clock text-blueGray-400 w-4"></i>
+                      {{ item.lost_found_date | date:'short' }}
+                    </p>
+                    <p class="flex items-center">
+                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
+                      Màu: {{ item.color || 'Không xác định' }} - Loại: {{ item.category }}
+                    </p>
+                  </div>
+                  <button type="button" (click)="viewItemDetail(item._id)" class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors">
+                    Xem chi tiết
+                  </button>
+                </div>
+              </article>
             </div>
-          </article>
-        </div>
+          </ng-container>
+        </ng-container>
 
-        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-          <article
-            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-          >
-            <div
-              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-            >
-              <div class="flex justify-between items-center w-full">
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"
-                >
-                  <i class="fas fa-hand-holding-heart mr-1"></i> Nhặt được
-                </span>
-                <span class="text-[10px] text-blueGray-400 font-medium"
-                  >5 giờ trước</span
-                >
-              </div>
-              <span
-                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                title="Điện thoại iPhone màu đen"
-              >
-                Điện thoại iPhone màu đen
-              </span>
-            </div>
-            <div class="w-full h-44 overflow-hidden flex-shrink-0">
-              <img
-                src="https://cdn-media.sforum.vn/storage/app/media/ctv_seo8/iphone%20ch%E1%BB%A5p%20%E1%BA%A3nh%20b%E1%BB%8B%20xoay%20ngang/iphone-chup-anh-bi-xoay-ngang-2.jpg"
-                alt="iPhone"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                <p class="flex items-start">
-                  <i
-                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                  ></i>
-                  <span class="line-clamp-2 leading-snug"
-                    >Quán cà phê gần Đại học An Giang</span
-                  >
-                </p>
-                <p class="flex items-center">
-                  <i class="far fa-clock text-blueGray-400 w-4"></i> 16h30,
-                  24/02/2026
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Đen -
-                  Loại: Điện thoại
-                </p>
-              </div>
-              <button
-                type="button"
-                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </article>
-        </div>
+        <!-- loading and empty templates -->
+        <ng-template #loadingItems>
+          <div class="w-full text-center py-8">
+            <i class="fas fa-spinner animate-spin text-2xl text-blueGray-400"></i>
+            <p class="mt-2 text-blueGray-600">Đang tải bài đăng...</p>
+          </div>
+        </ng-template>
 
-        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-          <article
-            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-          >
-            <div
-              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-            >
-              <div class="flex justify-between items-center w-full">
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-emerald-100 text-emerald-600 text-[10px] font-bold uppercase tracking-wider"
-                >
-                  <i class="fas fa-hand-holding-heart mr-1"></i> Nhặt được
-                </span>
-                <span class="text-[10px] text-blueGray-400 font-medium"
-                  >Hôm qua</span
-                >
-              </div>
-              <span
-                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                title="Balo laptop màu đen hiệu Mikkor có chứa giấy tờ"
-              >
-                Balo laptop màu đen hiệu Mikkor có chứa giấy tờ
-              </span>
-            </div>
-            <div class="w-full h-44 overflow-hidden flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?auto=format&fit=crop&w=600&q=80"
-                alt="Balo"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                <p class="flex items-start">
-                  <i
-                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                  ></i>
-                  <span class="line-clamp-2 leading-snug"
-                    >Trước cổng bến xe Long Xuyên</span
-                  >
-                </p>
-                <p class="flex items-center">
-                  <i class="far fa-clock text-blueGray-400 w-4"></i> 18h15,
-                  23/02/2026
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Đen -
-                  Loại: Balo
-                </p>
-              </div>
-              <button
-                type="button"
-                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </article>
-        </div>
-
-        <div class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-          <article
-            class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-          >
-            <div
-              class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-            >
-              <div class="flex justify-between items-center w-full">
-                <span
-                  class="inline-flex items-center px-2 py-1 rounded-full bg-red-100 text-red-600 text-[10px] font-bold uppercase tracking-wider"
-                >
-                  <i class="fas fa-exclamation-circle mr-1"></i> Bị mất
-                </span>
-                <span class="text-[10px] text-blueGray-400 font-medium"
-                  >1 ngày trước</span
-                >
-              </div>
-              <span
-                class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                title="Chùm chìa khóa xe máy có móc khóa hình gấu"
-              >
-                Chùm chìa khóa xe máy có móc khóa hình gấu
-              </span>
-            </div>
-            <div class="w-full h-44 overflow-hidden flex-shrink-0">
-              <img
-                src="https://images.unsplash.com/photo-1508974239320-0a029497e820?auto=format&fit=crop&w=600&q=80"
-                alt="Chìa khóa"
-                class="w-full h-full object-cover"
-              />
-            </div>
-            <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-              <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                <p class="flex items-start">
-                  <i
-                    class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                  ></i>
-                  <span class="line-clamp-2 leading-snug"
-                    >Hầm gửi xe siêu thị Coopmart</span
-                  >
-                </p>
-                <p class="flex items-center">
-                  <i class="far fa-clock text-blueGray-400 w-4"></i> 19h00,
-                  23/02/2026
-                </p>
-                <p class="flex items-center">
-                  <i class="fas fa-tag text-blueGray-400 w-4"></i> Màu: Bạc -
-                  Loại: Chìa khóa
-                </p>
-              </div>
-              <button
-                type="button"
-                class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-              >
-                Xem chi tiết
-              </button>
-            </div>
-          </article>
-        </div>
+        <ng-template #noItems>
+          <div class="w-full text-center py-8 text-blueGray-500">
+            <p>Chưa có bài đăng gần đây.</p>
+          </div>
+        </ng-template>
       </div>
     </div>
   </section>
