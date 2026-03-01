@@ -13,6 +13,7 @@ import { IndexComponent } from "./views/index/index.component";
 import { LandingComponent } from "./views/landing/landing.component";
 import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
+import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 
 const routes: Routes = [
   // auth views
@@ -29,6 +30,7 @@ const routes: Routes = [
   { path: "profile", component: ProfileComponent },
   { path: "landing", component: LandingComponent },
   { path: "post-item", component: PostItemComponent },
+  { path: "items/:id", component: ItemDetailComponent },
   { path: "", component: IndexComponent },
   { path: "**", redirectTo: "", pathMatch: "full" },
 ];

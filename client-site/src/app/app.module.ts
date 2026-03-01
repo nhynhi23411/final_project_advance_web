@@ -18,9 +18,11 @@ import { IndexComponent } from "./views/index/index.component";
 import { LandingComponent } from "./views/landing/landing.component";
 import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
+import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
+import { ClaimModalComponent } from "./components/claim-modal/claim-modal.component";
 
 // components for views and layouts
 
@@ -56,6 +58,8 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
     ProfileComponent,
     PostItemComponent,
     ImageUploaderComponent,
+    ItemDetailComponent,
+    ClaimModalComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   providers: [],
