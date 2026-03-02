@@ -36,8 +36,8 @@ export class ClaimsController {
 
     @Get()
     @UseGuards(AuthGuard("jwt"))
-    findAll(@Query("item_id") itemId?: string, @Request() req?: any) {
-        if (itemId) return this.claimsService.findByItem(itemId);
+    findAll(@Query("post_id") postId?: string, @Request() req?: any) {
+        if (postId) return this.claimsService.findByPost(postId);
         return this.claimsService.findByUser(req.user.userId);
     }
 }

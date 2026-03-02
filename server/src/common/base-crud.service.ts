@@ -2,7 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { Model, Document } from "mongoose";
 
 /**
- * Base CRUD service chuẩn, có thể kế thừa cho bất kỳ resource nào (Item, Claim, ...).
+ * Base CRUD service chuẩn, có thể kế thừa cho bất kỳ resource nào (Post, Claim, ...).
  * Class con: constructor(@InjectModel(Entity.name) model: Model<EntityDocument>) { super(model); }
  */
 @Injectable()

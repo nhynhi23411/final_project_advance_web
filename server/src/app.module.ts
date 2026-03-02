@@ -6,7 +6,7 @@ import { AppController } from "./app.controller";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module";
-import { ItemsModule } from "./items/items.module";
+import { PostsModule } from "./posts/posts.module";
 import { ClaimsModule } from "./claims/claims.module";
 import { MeController } from "./me/me.controller";
 import { KeywordModule } from "./keyword/keyword.module";
@@ -29,7 +29,7 @@ import { KeywordModule } from "./keyword/keyword.module";
     CloudinaryModule,
     UsersModule,
     AuthModule,
-    ItemsModule,
+    PostsModule,
     ClaimsModule,
   ],
   controllers: [AppController, MeController],
