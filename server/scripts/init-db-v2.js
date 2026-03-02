@@ -70,6 +70,18 @@ async function ensureIndexes(db) {
   await db.collection("moderation_runs").createIndex({ post_id: 1, created_at: -1 });
   await db.collection("moderation_findings").createIndex({ run_id: 1, created_at: -1 });
 
+  // MATCH_SUGGESTIONS
+  await db.collection("match_suggestions").createIndex(
+    { lost_post_id: 1, found_post_id: 1 },
+    { unique: true }
+  );
+  await db.collection("match_suggestions").createIndex({ status: 1, created_at: -1 });
+
+    // BLACKLISTED_KEYWORDS
+  // BLACKLISTED_KEYWORDS
+await db.collection("blacklisted_keywords").createIndex({ keyword: 1 }, { unique: true });
+await db.collection("blacklisted_keywords").createIndex({ is_active: 1, updated_at: -1 });
+
   // POST_REVIEWS
   await db.collection("post_reviews").createIndex({ post_id: 1, created_at: -1 });
   await db.collection("post_reviews").createIndex({ admin_user_id: 1, created_at: -1 });
@@ -130,7 +142,7 @@ async function main() {
         email: { bsonType: "string", minLength: 3, maxLength: 255 },
         phone: { bsonType: "string", minLength: 6, maxLength: 20 },
         role: { enum: ["ADMIN", "OWNER", "FINDER"] },
-        status: { enum: ["ACTIVE", "BANNED", "WARNED", "INACTIVE"] },
+        status: { enum: ["ACTIVE", "BANNED"] },
         warning_count: { bsonType: "int", minimum: 0 },
         banned_at: dateOrNull(),
         created_at: { bsonType: "date" },
@@ -158,6 +170,7 @@ async function main() {
         active_claim_count: { bsonType: "int", minimum: 0, maximum: MAX_CLAIMS_LIMIT },
         dedupe_hash: stringOrNull(),
         scoring_value: { bsonType: ["int", "null"], minimum: 0 },
+        is_match_scored: { bsonType: "bool" },
         approved_at: dateOrNull(),
         reject_reason: stringOrNull(),
         archived_reason: stringOrNull(),
@@ -305,6 +318,53 @@ async function main() {
     }
   });
 
+  // ===== MATCH_SUGGESTIONS =====
+  await ensureCollection(db, "match_suggestions", {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["lost_post_id", "found_post_id", "status", "created_at", "updated_at"],
+      additionalProperties: true,
+      properties: {
+        _id: { bsonType: "objectId" },
+        lost_post_id: { bsonType: "objectId" },
+        found_post_id: { bsonType: "objectId" },
+
+        // status cho A4 (tối thiểu)
+        status: { enum: ["PENDING", "ACCEPTED", "DISMISSED"] },
+
+        score: { bsonType: ["int", "null"], minimum: 0, maximum: 100 },
+        note: stringOrNull(),
+
+        created_at: { bsonType: "date" },
+        updated_at: { bsonType: "date" }
+      }
+    }
+  });
+
+  // ===== BLACKLISTED_KEYWORDS =====
+await ensureCollection(db, "blacklisted_keywords", {
+  $jsonSchema: {
+    bsonType: "object",
+    required: ["keyword", "is_active", "created_at", "updated_at"],
+    additionalProperties: true,
+    properties: {
+      _id: { bsonType: "objectId" },
+
+      // lưu keyword đã normalize (lowercase + trim)
+      keyword: { bsonType: "string", minLength: 1, maxLength: 200 },
+
+      // flag bật/tắt theo yêu cầu đề bài
+      is_active: { bsonType: "bool" },
+
+      // optional: lưu bản gốc (nếu bạn muốn so sánh)
+      keyword_raw: { bsonType: ["string", "null"] },
+
+      created_at: { bsonType: "date" },
+      updated_at: { bsonType: "date" }
+    }
+  }
+});
+
   // ===== MATCHES =====
   await ensureCollection(db, "matches", {
     $jsonSchema: {
@@ -339,7 +399,7 @@ async function main() {
 
         from_status: stringOrNull(),
         to_status: stringOrNull(),
-
+        reason: stringOrNull(),
         source: { enum: ["API", "ADMIN_DASHBOARD", "CRON", "AUTO_MODERATION"] },
         payload: { bsonType: ["object", "null"] },
         created_at: { bsonType: "date" },
