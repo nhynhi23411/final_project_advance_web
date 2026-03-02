@@ -17,7 +17,7 @@ import { User } from "../users/schemas/user.schema";
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService
+    private readonly jwtService: JwtService,
   ) {}
 
   private buildUserResponse(user: User, accessToken: string) {
@@ -26,30 +26,50 @@ export class AuthService {
       accessToken,
       user: {
         id: (user as any)._id,
+        username: user.username,
         name: user.name,
         email: user.email,
+        phone: user.phone,
         role: user.role,
+        status: user.status,
       },
     };
   }
 
   async register(dto: RegisterDto) {
-    const existing = await this.usersService.findByEmail(dto.email);
-    if (existing) {
+    const existingEmail = await this.usersService.findByEmail(dto.email);
+    if (existingEmail) {
       throw new ConflictException("Email đã được sử dụng");
+    }
+
+    const existingUsername = await this.usersService.findByUsername(
+      dto.username,
+    );
+    if (existingUsername) {
+      throw new ConflictException("Username đã được sử dụng");
+    }
+
+    const existingPhone = await this.usersService.findByPhone(dto.phone);
+    if (existingPhone) {
+      throw new ConflictException("Số điện thoại đã được sử dụng");
     }
 
     const hashedPassword = await bcrypt.hash(dto.password, 10);
     const user = await this.usersService.create({
       name: dto.name,
+      username: dto.username,
       email: dto.email,
       password: hashedPassword,
-      role: "USER",
+      phone: dto.phone,
+      role: dto.role || "FINDER",
+      status: "ACTIVE",
+      warning_count: 0,
     } as any);
 
     const payload = {
       sub: (user as any)._id.toString(),
       email: user.email,
+      username: user.username,
       role: user.role,
     };
     const token = await this.jwtService.signAsync(payload);
@@ -71,6 +91,7 @@ export class AuthService {
     const payload = {
       sub: (user as any)._id.toString(),
       email: user.email,
+      username: user.username,
       role: user.role,
     };
     const token = await this.jwtService.signAsync(payload);
@@ -78,4 +99,3 @@ export class AuthService {
     return this.buildUserResponse(user, token);
   }
 }
-

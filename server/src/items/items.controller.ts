@@ -20,6 +20,7 @@ import { ItemsService } from "./items.service";
 import { CreateItemDto } from "./dto/create-item.dto";
 import { UpdateItemDto } from "./dto/update-item.dto";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
+import { KeywordService } from "../keyword/keyword.service";
 
 const uploadOpts = {
   storage: memoryStorage(),
@@ -36,6 +37,7 @@ export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
     private readonly cloudinary: CloudinaryService,
+    private readonly keywordService: KeywordService,
   ) {}
 
   @Get()
@@ -98,6 +100,22 @@ export class ItemsController {
       images: string[];
       image_public_ids: string[];
     };
+
+    // If auto-moderation middleware already flagged this body as PENDING_ADMIN,
+    // reject creation immediately to prevent saving content that matches blacklist.json
+    if (payload.status === "PENDING_ADMIN") {
+      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    }
+
+    // profanity check against DB-backed keywords as an additional guard
+    if (
+      this.keywordService.checkProfanity(payload.title) ||
+      (payload.description &&
+        this.keywordService.checkProfanity(payload.description))
+    ) {
+      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    }
+
     try {
       const created = await this.itemsService.create(payload);
       console.log("Created item result:", JSON.stringify(created));
@@ -122,6 +140,15 @@ export class ItemsController {
     if (createdBy !== req.user.userId) {
       throw new BadRequestException("Chỉ sửa được bài của bạn");
     }
+
+    // profanity check when updating
+    if (
+      (dto.title && this.keywordService.checkProfanity(dto.title)) ||
+      (dto.description && this.keywordService.checkProfanity(dto.description))
+    ) {
+      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    }
+
     return this.itemsService.update(id, dto);
   }
 
