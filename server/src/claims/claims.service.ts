@@ -68,15 +68,18 @@ export class ClaimsService {
             throw new ForbiddenException("Chỉ người đăng tin mới được duyệt claim");
         }
 
-        if (dto.action === "ACCEPTED") {
-            claim.status = "ACCEPTED";
+        if (dto.action === "UNDER_VERIFICATION") {
+            claim.status = "UNDER_VERIFICATION";
+            await claim.save();
+        } else if (dto.action === "SUCCESSFUL") {
+            claim.status = "SUCCESSFUL";
             await claim.save();
 
             await this.postModel.findByIdAndUpdate(claim.post_id, {
-                status: "MATCHED",
+                status: "RETURNED",
             });
-        } else {
-            claim.status = "REJECTED";
+        } else if (dto.action === "REJECTED" || dto.action === "CANCELLED") {
+            claim.status = dto.action;
             await claim.save();
 
             await this.postModel.findByIdAndUpdate(claim.post_id, {

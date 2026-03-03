@@ -3,7 +3,13 @@ import { Document, Types } from "mongoose";
 
 export type ClaimDocument = Claim & Document;
 
-export const CLAIM_STATUS = ["PENDING", "ACCEPTED", "REJECTED"] as const;
+export const CLAIM_STATUS = [
+    "PENDING",
+    "UNDER_VERIFICATION",
+    "SUCCESSFUL",
+    "REJECTED",
+    "CANCELLED"
+] as const;
 export type ClaimStatus = (typeof CLAIM_STATUS)[number];
 
 @Schema({ timestamps: true })

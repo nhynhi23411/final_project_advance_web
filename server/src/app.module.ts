@@ -1,4 +1,5 @@
 import { Module } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import configuration from "./config/configuration";
@@ -13,6 +14,7 @@ import { KeywordModule } from "./keyword/keyword.module";
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -35,4 +37,4 @@ import { KeywordModule } from "./keyword/keyword.module";
   controllers: [AppController, MeController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule { }

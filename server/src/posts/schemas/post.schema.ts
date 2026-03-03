@@ -4,14 +4,13 @@ import { Document, Types } from "mongoose";
 export type PostDocument = Post & Document;
 
 export const POST_STATUS = [
-  "PENDING_APPROVAL",
+  "PENDING_SYSTEM",
   "PENDING_ADMIN",
   "APPROVED",
-  "REJECTED",
-  "MATCHED",
-  "RETURN_PENDING",
+  "NEEDS_UPDATE",
   "RETURNED",
-  "CLOSED",
+  "REJECTED",
+  "ARCHIVED",
 ] as const;
 export type PostStatus = (typeof POST_STATUS)[number];
 
@@ -29,7 +28,7 @@ export class Post {
   @Prop({ default: "" })
   description!: string;
 
-  @Prop({ enum: POST_STATUS, default: "PENDING_APPROVAL" })
+  @Prop({ enum: POST_STATUS, default: "PENDING_SYSTEM" })
   status!: PostStatus;
 
   @Prop({ default: 0 })
