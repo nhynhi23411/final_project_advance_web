@@ -17,8 +17,12 @@ export class KeywordService implements OnModuleInit {
    * Public so other services can refresh the cache without restarting.
    */
   public async reloadCache() {
+    console.log('Querying keywords from DB...');
     const records = await this.keywordRepo.findActive();
-    this.blacklistedKeywords = records.map((r) => r.keyword.toLowerCase());
+    console.log('Database Name:', (this.keywordRepo as any).model.db.name);
+    
+    this.blacklistedKeywords = records.map((r) => r.keyword.trim().toLowerCase());
+    console.log('--- TRẠNG THÁI RAM ---:', Object.keys(this.blacklistedKeywords).length, 'từ khóa');
     this.logger.log(
       `Reloaded ${this.blacklistedKeywords.length} keywords into RAM`,
     );
@@ -28,7 +32,20 @@ export class KeywordService implements OnModuleInit {
    * Simple profanity check using string inclusion.
    */
   checkProfanity(text: string): boolean {
-    const lowered = text.toLowerCase();
-    return this.blacklistedKeywords.some((kw) => lowered.includes(kw));
+    if (!text) return false;
+    
+    // 1. Chuẩn hóa: bỏ dấu tiếng Việt, bỏ các ký tự đặc biệt như . , _ - và bỏ khoảng trắng
+    const normalizedText = text.toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // Bỏ dấu tiếng Việt
+      .replace(/[.,\-_ ]/g, ''); // Bỏ ký tự đặc biệt
+
+    console.log('--- DEBUG FILTER ---');
+    console.log('Text sau chuẩn hóa:', normalizedText);
+    console.log('Danh sách RAM:', this.blacklistedKeywords);
+
+    return this.blacklistedKeywords.some(keyword => {
+      const cleanKeyword = keyword.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[.,\-_ ]/g, '').trim();
+      return normalizedText.includes(cleanKeyword);
+    });
   }
 }

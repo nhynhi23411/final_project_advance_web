@@ -96,15 +96,6 @@ export class PostsController {
       throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
     }
 
-    // profanity check against DB-backed keywords as an additional guard
-    if (
-      this.keywordService.checkProfanity(dto.title) ||
-      (dto.description &&
-        this.keywordService.checkProfanity(dto.description))
-    ) {
-      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
-    }
-
     try {
       const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
       console.log("Created post result:", JSON.stringify(created));
