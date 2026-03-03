@@ -2,6 +2,6 @@ import { IsEnum, IsNotEmpty } from "class-validator";
 
 export class ReviewClaimDto {
     @IsNotEmpty()
-    @IsEnum(["ACCEPTED", "REJECTED"])
-    action!: "ACCEPTED" | "REJECTED";
+    @IsEnum(["UNDER_VERIFICATION", "SUCCESSFUL", "REJECTED", "CANCELLED"])
+    action!: "UNDER_VERIFICATION" | "SUCCESSFUL" | "REJECTED" | "CANCELLED";
 }

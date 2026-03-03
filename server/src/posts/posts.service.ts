@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { BaseCrudService } from "../common/base-crud.service";
@@ -16,18 +17,19 @@ export class PostsService extends BaseCrudService<
 > {
   constructor(
     @InjectModel(Post.name) protected override readonly model: Model<PostDocument>,
-    private readonly keywordService: KeywordService
+    private readonly keywordService: KeywordService,
+    private readonly eventEmitter: EventEmitter2
   ) {
     super(model);
   }
 
   async createPostWithUser(dto: CreatePostDto, userId: string, manualStatus?: string): Promise<PostDocument> {
     console.log('DỮ LIỆU NHẬN ĐƯỢC:', dto.title, dto.description);
-    const hasProfanity = this.keywordService.checkProfanity(dto.title) || 
-                         this.keywordService.checkProfanity(dto.description || '');
+    const hasProfanity = this.keywordService.checkProfanity(dto.title) ||
+      this.keywordService.checkProfanity(dto.description || '');
     if (hasProfanity) {
-       console.log('PHÁT HIỆN TỪ CẤM - CHUẨN BỊ THROW LỖI');
-       throw new BadRequestException('Nội dung vi phạm chính sách!');
+      console.log('PHÁT HIỆN TỪ CẤM - CHUẨN BỊ THROW LỖI');
+      throw new BadRequestException('Nội dung vi phạm chính sách!');
     }
 
     let locationData = dto.location;
@@ -46,11 +48,13 @@ export class PostsService extends BaseCrudService<
       created_by_user_id: new Types.ObjectId(userId),
       images: dto.images ?? [],
       image_public_ids: dto.image_public_ids ?? [],
-      status: manualStatus || dto.status || "PENDING_APPROVAL",
+      status: "PENDING_SYSTEM",
     };
-    
+
     const created = new this.model(payload);
-    return (await created.save()) as PostDocument;
+    const saved = await created.save() as PostDocument;
+    this.eventEmitter.emit('item.created', { itemId: saved._id });
+    return saved;
   }
 
   async findAllByFilter(query: {

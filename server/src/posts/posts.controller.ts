@@ -38,7 +38,7 @@ export class PostsController {
     private readonly postsService: PostsService,
     private readonly cloudinary: CloudinaryService,
     private readonly keywordService: KeywordService,
-  ) {}
+  ) { }
 
   @Get()
   findAll(
@@ -90,16 +90,12 @@ export class PostsController {
   async create(@Body() dto: CreatePostDto, @Request() req: any) {
     console.log("POST /api/posts incoming body:", JSON.stringify(req.body));
 
-    // If auto-moderation middleware already flagged this body as PENDING_ADMIN,
-    // reject creation immediately to prevent saving content that matches blacklist.json
-    if (req.body.status === "PENDING_ADMIN") {
-      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
-    }
+
 
     try {
       const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
       console.log("Created post result:", JSON.stringify(created));
-      return created;
+      return { message: 'Bài đăng đang được kiểm duyệt', data: created };
     } catch (err: any) {
       console.error("Create post error:", err);
       if (err.errInfo && err.errInfo.details) {
@@ -151,7 +147,7 @@ export class PostsController {
     const doc = post as any;
     if (Array.isArray(doc.image_public_ids)) {
       for (const pid of doc.image_public_ids) {
-        await this.cloudinary.deleteByPublicId(pid).catch(() => {});
+        await this.cloudinary.deleteByPublicId(pid).catch(() => { });
       }
     }
     return this.postsService.delete(id);
