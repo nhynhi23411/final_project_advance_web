@@ -11,7 +11,7 @@ export class BlacklistedKeyword {
 
   @Prop({ default: true })
   // marked with `!` as well since mongoose will supply a value
-  isActive!: boolean;
+  is_active!: boolean;
 }
 
 export const BlacklistedKeywordSchema =

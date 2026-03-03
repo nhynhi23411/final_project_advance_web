@@ -10,12 +10,14 @@ import { Claim, ClaimDocument } from "./schemas/claim.schema";
 import { CreateClaimDto } from "./dto/create-claim.dto";
 import { ReviewClaimDto } from "./dto/review-claim.dto";
 import { Post, PostDocument } from "../posts/schemas/post.schema";
+import { KeywordService } from "../keyword/keyword.service";
 
 @Injectable()
 export class ClaimsService {
     constructor(
         @InjectModel(Claim.name) private claimModel: Model<ClaimDocument>,
         @InjectModel(Post.name) private postModel: Model<PostDocument>,
+        private readonly keywordService: KeywordService,
     ) { }
 
     async create(dto: CreateClaimDto, claimerId: string) {
@@ -25,6 +27,10 @@ export class ClaimsService {
             throw new BadRequestException(
                 "Chỉ được claim post đã được duyệt (APPROVED)",
             );
+        }
+
+        if (dto.message && this.keywordService.checkProfanity(dto.message)) {
+            throw new BadRequestException("Lời nhắn chứa từ ngữ không phù hợp!");
         }
 
         const existingClaim = await this.claimModel.findOne({

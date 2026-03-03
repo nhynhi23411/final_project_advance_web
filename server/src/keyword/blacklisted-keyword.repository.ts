@@ -18,10 +18,10 @@ export class BlacklistedKeywordRepository {
   }
 
   /**
-   * Only return active keywords (isActive = true).
+   * Only return active keywords (is_active = true).
    */
   findActive(): Promise<BlacklistedKeywordDocument[]> {
-    return this.model.find({ isActive: true }).exec();
+    return this.model.find({ is_active: true }).exec();
   }
 
   // crud helpers used by admin service
@@ -44,8 +44,8 @@ export class BlacklistedKeywordRepository {
 
   toggleStatus(
     id: string,
-    isActive: boolean,
+    is_active: boolean,
   ): Promise<BlacklistedKeywordDocument | null> {
-    return this.model.findByIdAndUpdate(id, { isActive }, { new: true }).exec();
+    return this.model.findByIdAndUpdate(id, { is_active }, { new: true }).exec();
   }
 }
