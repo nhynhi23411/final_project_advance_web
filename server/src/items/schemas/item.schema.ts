@@ -4,14 +4,13 @@ import { Document, Types } from "mongoose";
 export type ItemDocument = Item & Document;
 
 export const ITEM_STATUS = [
-  "PENDING_APPROVAL",
+  "PENDING_SYSTEM",
   "PENDING_ADMIN",
   "APPROVED",
-  "REJECTED",
-  "MATCHED",
-  "RETURN_PENDING",
+  "NEEDS_UPDATE",
   "RETURNED",
-  "CLOSED",
+  "REJECTED",
+  "ARCHIVED",
 ] as const;
 export type ItemStatus = (typeof ITEM_STATUS)[number];
 
@@ -56,7 +55,7 @@ export class Item {
   @Prop({ type: [String], default: [] })
   image_public_ids!: string[];
 
-  @Prop({ enum: ITEM_STATUS, default: "PENDING_APPROVAL" })
+  @Prop({ enum: ITEM_STATUS, default: "PENDING_SYSTEM" })
   status!: ItemStatus;
 
   @Prop({ type: Types.ObjectId, ref: "User", required: true })

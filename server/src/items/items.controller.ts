@@ -17,6 +17,7 @@ import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage, File } from "multer";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { ItemsService } from "./items.service";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { CreateItemDto } from "./dto/create-item.dto";
 import { UpdateItemDto } from "./dto/update-item.dto";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
@@ -36,7 +37,8 @@ export class ItemsController {
   constructor(
     private readonly itemsService: ItemsService,
     private readonly cloudinary: CloudinaryService,
-  ) {}
+    private readonly eventEmitter: EventEmitter2,
+  ) { }
 
   @Get()
   findAll(
@@ -92,7 +94,7 @@ export class ItemsController {
       created_by: req.user.userId,
       images: dto.images ?? [],
       image_public_ids: dto.image_public_ids ?? [],
-      status: req.body.status,
+      status: "PENDING_SYSTEM",
     } as CreateItemDto & {
       created_by: string;
       images: string[];
@@ -101,7 +103,11 @@ export class ItemsController {
     try {
       const created = await this.itemsService.create(payload);
       console.log("Created item result:", JSON.stringify(created));
-      return created;
+      this.eventEmitter.emit('item.created', { itemId: (created as any)._id || (created as any).id });
+      return {
+        message: "Bài đăng đang được kiểm duyệt",
+        data: created
+      };
     } catch (err) {
       console.error("Create item error:", err);
       throw err;
@@ -141,7 +147,7 @@ export class ItemsController {
     const doc = item as any;
     if (Array.isArray(doc.image_public_ids)) {
       for (const pid of doc.image_public_ids) {
-        await this.cloudinary.deleteByPublicId(pid).catch(() => {});
+        await this.cloudinary.deleteByPublicId(pid).catch(() => { });
       }
     }
     return this.itemsService.delete(id);
