@@ -1,19 +1,25 @@
 import { Module } from "@nestjs/common";
+import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
+import configuration from "./config/configuration";
 import { AppController } from "./app.controller";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
 import { CloudinaryModule } from "./cloudinary/cloudinary.module";
-import { ItemsModule } from "./items/items.module";
+import { PostsModule } from "./posts/posts.module";
 import { ClaimsModule } from "./claims/claims.module";
 import { MeController } from "./me/me.controller";
+import { KeywordModule } from "./keyword/keyword.module";
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
+      load: [configuration],
     }),
+    KeywordModule,
     MongooseModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
@@ -25,11 +31,10 @@ import { MeController } from "./me/me.controller";
     CloudinaryModule,
     UsersModule,
     AuthModule,
-    ItemsModule,
+    PostsModule,
     ClaimsModule,
   ],
   controllers: [AppController, MeController],
   providers: [],
 })
 export class AppModule { }
-

@@ -48,21 +48,21 @@
                     role="status"
                     aria-hidden="true"
                   ></span>
-                  APPROVED
+                  Duyệt
                 </button>
                 <button
                   class="btn btn-danger btn-sm me-1"
                   (click)="reject(item)"
                   [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
                 >
-                  REJECTED
+                  Từ chối
                 </button>
                 <button
                   class="btn btn-warning btn-sm"
                   (click)="requestUpdate(item)"
                   [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
                 >
-                  NEEDS UPDATE
+                  Yêu cầu cập nhật
                 </button>
               </td>
             </tr>
@@ -78,7 +78,6 @@
     </app-card>
   </div>
 </div>
-
 <!-- Reason modal -->
 <div *ngIf="showReasonModal" class="modal d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
   <div class="modal-dialog modal-dialog-centered" role="document">

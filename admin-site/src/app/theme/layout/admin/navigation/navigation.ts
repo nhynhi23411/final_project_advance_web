@@ -47,5 +47,5 @@ export const NavigationItems: NavigationItem[] = [
         icon: 'feather icon-file-text'
       }
     ]
-  }
+  },
 ];

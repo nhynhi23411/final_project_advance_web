@@ -7,11 +7,11 @@ import {
   MaxLength,
   IsDateString,
 } from "class-validator";
-import { ITEM_TYPE, ITEM_STATUS } from "../schemas/item.schema";
+import { POST_TYPE, POST_STATUS } from "../schemas/post.schema";
 
-export class CreateItemDto {
-  @IsEnum(ITEM_TYPE)
-  type!: "LOST" | "FOUND";
+export class CreatePostDto {
+  @IsEnum(POST_TYPE)
+  post_type!: "LOST" | "FOUND";
 
   @IsNotEmpty()
   @IsString()
@@ -27,26 +27,12 @@ export class CreateItemDto {
   category?: string;
 
   @IsOptional()
-  @IsString()
-  color?: string;
+  location?: Record<string, any>;
 
   @IsOptional()
-  @IsString()
-  brand?: string;
+  metadata?: Record<string, any>;
 
-  @IsOptional()
-  @IsString()
-  distinctive_marks?: string;
-
-  @IsOptional()
-  @IsDateString()
-  lost_found_date?: string;
-
-  @IsOptional()
-  @IsString()
-  location_text?: string;
-
-  /** URL ảnh (sau khi gọi POST /items/upload-image) */
+  /** URL ảnh (sau khi gọi POST /posts/upload-image) */
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -59,6 +45,24 @@ export class CreateItemDto {
   image_public_ids?: string[];
 
   @IsOptional()
-  @IsEnum(ITEM_STATUS)
+  @IsEnum(POST_STATUS)
   status?: string;
+
+  @IsOptional()
+  dedupe_hash?: string;
+  
+  @IsOptional()
+  scoring_value?: number;
+  
+  @IsOptional()
+  approved_at?: Date;
+  
+  @IsOptional()
+  reject_reason?: string;
+  
+  @IsOptional()
+  archived_reason?: string;
+
+  @IsOptional()
+  is_match_scored?: boolean;
 }

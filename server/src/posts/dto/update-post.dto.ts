@@ -1,9 +1,9 @@
 import { IsEnum, IsOptional, IsString, IsArray, MaxLength, IsDateString } from "class-validator";
-import { ITEM_TYPE } from "../schemas/item.schema";
+import { POST_TYPE } from "../schemas/post.schema";
 
-export class UpdateItemDto {
+export class UpdatePostDto {
   @IsOptional()
-  @IsEnum(ITEM_TYPE)
+  @IsEnum(POST_TYPE)
   type?: "LOST" | "FOUND";
 
   @IsOptional()

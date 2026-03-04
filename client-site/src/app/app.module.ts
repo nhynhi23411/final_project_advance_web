@@ -23,6 +23,7 @@ import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
 import { ClaimModalComponent } from "./components/claim-modal/claim-modal.component";
 import { AuthNavbarComponent } from "./components/navbars/auth-navbar/auth-navbar.component";
+import { IndexNavbarComponent } from "./components/navbars/index-navbar/index-navbar.component";
 
 // components for views and layouts
 
@@ -46,6 +47,7 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
     MapExampleComponent,
     AuthComponent,
     AuthNavbarComponent,
+    IndexNavbarComponent,
     LoginComponent,
     RegisterComponent,
     LandingComponent,

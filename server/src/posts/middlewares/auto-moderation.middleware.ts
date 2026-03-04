@@ -1,32 +1,10 @@
-import { Injectable, NestMiddleware } from "@nestjs/common";
+import { Injectable, NestMiddleware, BadRequestException } from "@nestjs/common";
 import { Request, Response, NextFunction } from "express";
-import * as fs from "fs";
-import * as path from "path";
+import { KeywordService } from "../../keyword/keyword.service";
 
 @Injectable()
 export class AutoModerationMiddleware implements NestMiddleware {
-  private blacklist: string[] = [];
-
-  constructor() {
-    try {
-      const blacklistPath = path.join(__dirname, "../../common/blacklist.json");
-      const raw = fs.readFileSync(blacklistPath, { encoding: "utf8" });
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed?.blacklist)) {
-        this.blacklist = parsed.blacklist
-          .map((it: any) =>
-            it && it.word ? String(it.word).toLowerCase().trim() : null,
-          )
-          .filter(Boolean);
-      }
-    } catch (err) {
-      this.blacklist = [];
-      console.warn(
-        "AutoModerationMiddleware: could not load blacklist.json",
-        (err as any)?.message || err,
-      );
-    }
-  }
+  constructor(private readonly keywordService: KeywordService) {}
 
   async use(req: Request, _res: Response, next: NextFunction) {
     const body = (req as any).body || {};
@@ -36,16 +14,8 @@ export class AutoModerationMiddleware implements NestMiddleware {
 
     const reasons: string[] = [];
 
-    // KEYWORD MATCH: Sửa đổi để chỉ khớp nguyên từ (Whole Word Match)
-    const matchedKeywords = this.blacklist.filter((word) => {
-      if (!word) return false;
-      // \b đảm bảo từ khóa đứng độc lập (không nằm trong từ khác)
-      const wordRegex = new RegExp(`\\b${this.escapeRegExp(word)}\\b`, "gi");
-      return wordRegex.test(fullText);
-    });
-
-    if (matchedKeywords.length) {
-      reasons.push(`keyword:${matchedKeywords.join(",")}`);
+    if (this.keywordService.checkProfanity(fullText)) {
+      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
     }
 
     // REGEX CHECKS: Giữ nguyên logic nhận diện số và link
@@ -88,11 +58,6 @@ export class AutoModerationMiddleware implements NestMiddleware {
 
   private normalize(input: any): string {
     return (input || "").toString().toLowerCase().trim().replace(/\s+/g, " ");
-  }
-
-  // Hàm hỗ trợ để xử lý các ký tự đặc biệt trong từ khóa khi đưa vào Regex
-  private escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   private async checkDuplicate(_userId: any, _title: string): Promise<boolean> {

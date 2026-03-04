@@ -16,10 +16,11 @@ import {
 import { FileInterceptor } from "@nestjs/platform-express";
 import { memoryStorage, File } from "multer";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
-import { ItemsService } from "./items.service";
-import { CreateItemDto } from "./dto/create-item.dto";
-import { UpdateItemDto } from "./dto/update-item.dto";
+import { PostsService } from "./posts.service";
+import { CreatePostDto } from "./dto/create-post.dto";
+import { UpdatePostDto } from "./dto/update-post.dto";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
+import { KeywordService } from "../keyword/keyword.service";
 
 const uploadOpts = {
   storage: memoryStorage(),
@@ -31,12 +32,13 @@ function isValidObjectId(id: string): boolean {
   return /^[a-fA-F0-9]{24}$/.test(id);
 }
 
-@Controller("items")
-export class ItemsController {
+@Controller("posts")
+export class PostsController {
   constructor(
-    private readonly itemsService: ItemsService,
+    private readonly postsService: PostsService,
     private readonly cloudinary: CloudinaryService,
-  ) {}
+    private readonly keywordService: KeywordService,
+  ) { }
 
   @Get()
   findAll(
@@ -45,7 +47,7 @@ export class ItemsController {
     @Query("location") location?: string,
     @Query("status") status?: string,
   ) {
-    return this.itemsService.findAllByFilter({
+    return this.postsService.findAllByFilter({
       type,
       category,
       location,
@@ -56,20 +58,20 @@ export class ItemsController {
   @Get("my")
   @UseGuards(JwtAuthGuard)
   findMy(@Request() req: { user: { userId: string } }) {
-    return this.itemsService.findByUser(req.user.userId);
+    return this.postsService.findByUser(req.user.userId);
   }
 
   @Get(":id")
   findOne(@Param("id") id: string) {
     if (!isValidObjectId(id)) {
       throw new BadRequestException(
-        "Id không hợp lệ. Dùng POST /api/items/upload-image để upload ảnh.",
+        "Id không hợp lệ. Dùng POST /api/posts/upload-image để upload ảnh.",
       );
     }
-    return this.itemsService.findOne(id);
+    return this.postsService.findOne(id);
   }
 
-  /** Upload một ảnh lên Cloudinary. Trả về { url, publicId } để client gửi vào POST /items. */
+  /** Upload một ảnh lên Cloudinary. Trả về { url, publicId } để client gửi vào POST /posts. */
   @Post("upload-image")
   @UseGuards(JwtAuthGuard)
   @UseInterceptors(FileInterceptor("file", uploadOpts))
@@ -85,25 +87,20 @@ export class ItemsController {
 
   @Post()
   @UseGuards(JwtAuthGuard)
-  async create(@Body() dto: CreateItemDto, @Request() req: any) {
-    console.log("POST /api/items incoming body:", JSON.stringify(req.body));
-    const payload = {
-      ...dto,
-      created_by: req.user.userId,
-      images: dto.images ?? [],
-      image_public_ids: dto.image_public_ids ?? [],
-      status: req.body.status,
-    } as CreateItemDto & {
-      created_by: string;
-      images: string[];
-      image_public_ids: string[];
-    };
+  async create(@Body() dto: CreatePostDto, @Request() req: any) {
+    console.log("POST /api/posts incoming body:", JSON.stringify(req.body));
+
+
+
     try {
-      const created = await this.itemsService.create(payload);
-      console.log("Created item result:", JSON.stringify(created));
-      return created;
-    } catch (err) {
-      console.error("Create item error:", err);
+      const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
+      console.log("Created post result:", JSON.stringify(created));
+      return { message: 'Bài đăng đang được kiểm duyệt', data: created };
+    } catch (err: any) {
+      console.error("Create post error:", err);
+      if (err.errInfo && err.errInfo.details) {
+        console.error("Validation Details:", JSON.stringify(err.errInfo.details, null, 2));
+      }
       throw err;
     }
   }
@@ -112,17 +109,26 @@ export class ItemsController {
   @UseGuards(JwtAuthGuard)
   async update(
     @Param("id") id: string,
-    @Body() dto: UpdateItemDto,
+    @Body() dto: UpdatePostDto,
     @Request() req: { user: { userId: string } },
   ) {
     if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
-    const item = await this.itemsService.findOne(id);
-    if (!item) return null;
-    const createdBy = (item as any).created_by?.toString?.();
+    const post = await this.postsService.findOne(id);
+    if (!post) return null;
+    const createdBy = (post as any).created_by_user_id?.toString?.();
     if (createdBy !== req.user.userId) {
       throw new BadRequestException("Chỉ sửa được bài của bạn");
     }
-    return this.itemsService.update(id, dto);
+
+    // profanity check when updating
+    if (
+      (dto.title && this.keywordService.checkProfanity(dto.title)) ||
+      (dto.description && this.keywordService.checkProfanity(dto.description))
+    ) {
+      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    }
+
+    return this.postsService.update(id, dto);
   }
 
   @Delete(":id")
@@ -132,18 +138,18 @@ export class ItemsController {
     @Request() req: { user: { userId: string } },
   ) {
     if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
-    const item = await this.itemsService.findOne(id);
-    if (!item) return null;
-    const createdBy = (item as any).created_by?.toString?.();
+    const post = await this.postsService.findOne(id);
+    if (!post) return null;
+    const createdBy = (post as any).created_by_user_id?.toString?.();
     if (createdBy !== req.user.userId) {
       throw new BadRequestException("Chỉ xóa được bài của bạn");
     }
-    const doc = item as any;
+    const doc = post as any;
     if (Array.isArray(doc.image_public_ids)) {
       for (const pid of doc.image_public_ids) {
-        await this.cloudinary.deleteByPublicId(pid).catch(() => {});
+        await this.cloudinary.deleteByPublicId(pid).catch(() => { });
       }
     }
-    return this.itemsService.delete(id);
+    return this.postsService.delete(id);
   }
 }

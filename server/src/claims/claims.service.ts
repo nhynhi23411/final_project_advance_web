@@ -9,41 +9,47 @@ import { Model, Types } from "mongoose";
 import { Claim, ClaimDocument } from "./schemas/claim.schema";
 import { CreateClaimDto } from "./dto/create-claim.dto";
 import { ReviewClaimDto } from "./dto/review-claim.dto";
-import { Item, ItemDocument } from "../items/schemas/item.schema";
+import { Post, PostDocument } from "../posts/schemas/post.schema";
+import { KeywordService } from "../keyword/keyword.service";
 
 @Injectable()
 export class ClaimsService {
     constructor(
         @InjectModel(Claim.name) private claimModel: Model<ClaimDocument>,
-        @InjectModel(Item.name) private itemModel: Model<ItemDocument>,
+        @InjectModel(Post.name) private postModel: Model<PostDocument>,
+        private readonly keywordService: KeywordService,
     ) { }
 
     async create(dto: CreateClaimDto, claimerId: string) {
-        const item = await this.itemModel.findById(dto.item_id);
-        if (!item) throw new NotFoundException("Item không tồn tại");
-        if (item.status !== "APPROVED") {
+        const post = await this.postModel.findById(dto.post_id);
+        if (!post) throw new NotFoundException("Post không tồn tại");
+        if (post.status !== "APPROVED") {
             throw new BadRequestException(
-                "Chỉ được claim item đã được duyệt (APPROVED)",
+                "Chỉ được claim post đã được duyệt (APPROVED)",
             );
         }
 
+        if (dto.message && this.keywordService.checkProfanity(dto.message)) {
+            throw new BadRequestException("Lời nhắn chứa từ ngữ không phù hợp!");
+        }
+
         const existingClaim = await this.claimModel.findOne({
-            item_id: new Types.ObjectId(dto.item_id),
+            post_id: new Types.ObjectId(dto.post_id),
             claimer_id: new Types.ObjectId(claimerId),
             status: "PENDING",
         });
         if (existingClaim) {
-            throw new BadRequestException("Bạn đã gửi claim cho item này rồi");
+            throw new BadRequestException("Bạn đã gửi claim cho post này rồi");
         }
 
         const claim = await this.claimModel.create({
-            item_id: new Types.ObjectId(dto.item_id),
+            post_id: new Types.ObjectId(dto.post_id),
             claimer_id: new Types.ObjectId(claimerId),
             message: dto.message || "",
         });
 
-        await this.itemModel.findByIdAndUpdate(dto.item_id, {
-            $inc: { activeClaimCount: 1 },
+        await this.postModel.findByIdAndUpdate(dto.post_id, {
+            $inc: { active_claim_count: 1 },
         });
 
         return claim;
@@ -56,34 +62,37 @@ export class ClaimsService {
             throw new BadRequestException("Claim đã được xử lý");
         }
 
-        const item = await this.itemModel.findById(claim.item_id);
-        if (!item) throw new NotFoundException("Item không tồn tại");
-        if (item.created_by.toString() !== userId) {
+        const post = await this.postModel.findById(claim.post_id);
+        if (!post) throw new NotFoundException("Post không tồn tại");
+        if (post.created_by_user_id.toString() !== userId) {
             throw new ForbiddenException("Chỉ người đăng tin mới được duyệt claim");
         }
 
-        if (dto.action === "ACCEPTED") {
-            claim.status = "ACCEPTED";
+        if (dto.action === "UNDER_VERIFICATION") {
+            claim.status = "UNDER_VERIFICATION";
+            await claim.save();
+        } else if (dto.action === "SUCCESSFUL") {
+            claim.status = "SUCCESSFUL";
             await claim.save();
 
-            await this.itemModel.findByIdAndUpdate(claim.item_id, {
-                status: "MATCHED",
+            await this.postModel.findByIdAndUpdate(claim.post_id, {
+                status: "RETURNED",
             });
-        } else {
-            claim.status = "REJECTED";
+        } else if (dto.action === "REJECTED" || dto.action === "CANCELLED") {
+            claim.status = dto.action;
             await claim.save();
 
-            await this.itemModel.findByIdAndUpdate(claim.item_id, {
-                $inc: { activeClaimCount: -1 },
+            await this.postModel.findByIdAndUpdate(claim.post_id, {
+                $inc: { active_claim_count: -1 },
             });
         }
 
         return claim;
     }
 
-    async findByItem(itemId: string) {
+    async findByPost(postId: string) {
         return this.claimModel
-            .find({ item_id: new Types.ObjectId(itemId) })
+            .find({ post_id: new Types.ObjectId(postId) })
             .sort({ createdAt: -1 });
     }
 

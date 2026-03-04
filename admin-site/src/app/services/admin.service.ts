@@ -23,7 +23,7 @@ export class AdminService {
    * fetch items that currently have status PENDING_ADMIN
    */
   getPendingItems(): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.baseUrl}/items`, {
+    return this.http.get<Item[]>(`${this.baseUrl}/posts`, {
       params: { status: 'PENDING_ADMIN' }
     });
   }
@@ -40,6 +40,6 @@ export class AdminService {
     if (reason && reason.trim()) {
       body.reject_reason = reason.trim();
     }
-    return this.http.patch(`${this.baseUrl}/items/${id}`, body);
+    return this.http.patch(`${this.baseUrl}/posts/${id}`, body);
   }
 }
