@@ -21,32 +21,12 @@ const routes: Routes = [
         loadComponent: () => import('./demo/dashboard/dash-analytics.component').then((c) => c.DashAnalyticsComponent)
       },
       {
-        path: 'component',
-        loadChildren: () => import('./demo/ui-element/ui-basic.module').then((m) => m.UiBasicModule)
-      },
-      {
-        path: 'chart',
-        loadComponent: () => import('./demo/chart-maps/core-apex.component').then((c) => c.CoreApexComponent)
-      },
-      {
-        path: 'forms',
-        loadComponent: () => import('./demo/forms/form-elements/form-elements.component').then((c) => c.FormElementsComponent)
-      },
-      {
-        path: 'tables',
-        loadComponent: () => import('./demo/tables/tbl-bootstrap/tbl-bootstrap.component').then((c) => c.TblBootstrapComponent)
+        path: 'users',
+        loadComponent: () => import('./demo/users/users.component').then((c) => c.UsersComponent)
       },
       {
         path: 'moderation',
         loadComponent: () => import('./demo/admin-moderation/moderation.component').then((c) => c.ModerationComponent)
-      },
-      {
-        path: 'sample-page',
-        loadComponent: () => import('./demo/other/sample-page/sample-page.component').then((c) => c.SamplePageComponent)
-      },
-      {
-        path: 'shared-components-demo',
-        loadComponent: () => import('./theme/shared-components-demo.component').then((c) => c.SharedComponentsDemoComponent)
       }
     ]
   },

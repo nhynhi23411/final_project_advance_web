@@ -16,7 +16,7 @@ import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 
 const routes: Routes = [
-  // auth views
+  // auth views (login/register pages use auth layout)
   {
     path: "auth",
     component: AuthComponent,
@@ -26,12 +26,14 @@ const routes: Routes = [
       { path: "", redirectTo: "login", pathMatch: "full" },
     ],
   },
-  // no layout views
+  // application views
   { path: "profile", component: ProfileComponent },
-  { path: "landing", component: LandingComponent },
   { path: "post-item", component: PostItemComponent },
   { path: "items/:id", component: ItemDetailComponent },
-  { path: "", component: IndexComponent },
+  // landing page becomes home
+  { path: "", component: LandingComponent },
+  // keep a redirect from the old landing path for backward compatibility
+  { path: "landing", redirectTo: "", pathMatch: "full" },
   { path: "**", redirectTo: "", pathMatch: "full" },
 ];
 

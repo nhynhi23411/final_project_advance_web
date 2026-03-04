@@ -48,21 +48,21 @@
                     role="status"
                     aria-hidden="true"
                   ></span>
-                  Approve
+                  APPROVED
                 </button>
                 <button
                   class="btn btn-danger btn-sm me-1"
                   (click)="reject(item)"
                   [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
                 >
-                  Reject
+                  REJECTED
                 </button>
                 <button
                   class="btn btn-warning btn-sm"
                   (click)="requestUpdate(item)"
                   [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
                 >
-                  Request Update
+                  NEEDS UPDATE
                 </button>
               </td>
             </tr>
@@ -76,5 +76,25 @@
         </div>
       </div>
     </app-card>
+  </div>
+</div>
+
+<!-- Reason modal -->
+<div *ngIf="showReasonModal" class="modal d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nhập lý do</h5>
+        <button type="button" class="btn-close" aria-label="Close" (click)="cancelReasonModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Vui lòng nhập lý do cho hành động này (bắt buộc):</p>
+        <textarea class="form-control" rows="4" [(ngModel)]="modalReason"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelReasonModal()">Hủy</button>
+        <button type="button" class="btn btn-primary" (click)="confirmReasonModal()" [disabled]="!(modalReason && modalReason.trim())">Xác nhận</button>
+      </div>
+    </div>
   </div>
 </div>

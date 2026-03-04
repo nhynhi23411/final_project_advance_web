@@ -14,7 +14,6 @@ import { LoginComponent } from "./views/auth/login/login.component";
 import { RegisterComponent } from "./views/auth/register/register.component";
 
 // no layouts views
-import { IndexComponent } from "./views/index/index.component";
 import { LandingComponent } from "./views/landing/landing.component";
 import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
@@ -23,25 +22,21 @@ import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
 import { ClaimModalComponent } from "./components/claim-modal/claim-modal.component";
+import { AuthNavbarComponent } from "./components/navbars/auth-navbar/auth-navbar.component";
 
 // components for views and layouts
 
 import { FooterComponent } from "./components/footers/footer/footer.component";
 import { FooterSmallComponent } from "./components/footers/footer-small/footer-small.component";
 import { HeaderStatsComponent } from "./components/headers/header-stats/header-stats.component";
-import { IndexNavbarComponent } from "./components/navbars/index-navbar/index-navbar.component";
 import { MapExampleComponent } from "./components/maps/map-example/map-example.component";
-import { IndexDropdownComponent } from "./components/dropdowns/index-dropdown/index-dropdown.component";
 import { TableDropdownComponent } from "./components/dropdowns/table-dropdown/table-dropdown.component";
-import { PagesDropdownComponent } from "./components/dropdowns/pages-dropdown/pages-dropdown.component";
 import { NotificationDropdownComponent } from "./components/dropdowns/notification-dropdown/notification-dropdown.component";
 import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user-dropdown.component";
 
 @NgModule({
   declarations: [
     AppComponent,
-    IndexDropdownComponent,
-    PagesDropdownComponent,
     TableDropdownComponent,
     NotificationDropdownComponent,
     UserDropdownComponent,
@@ -50,10 +45,9 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
     HeaderStatsComponent,
     MapExampleComponent,
     AuthComponent,
-    IndexNavbarComponent,
+    AuthNavbarComponent,
     LoginComponent,
     RegisterComponent,
-    IndexComponent,
     LandingComponent,
     ProfileComponent,
     PostItemComponent,

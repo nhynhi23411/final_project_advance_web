@@ -17,6 +17,11 @@ export class ModerationComponent implements OnInit {
   pendingItems: Item[] = [];
   loading = false;
   searchTerm = '';
+  // modal state for entering reject_reason when needed
+  showReasonModal = false;
+  modalReason = '';
+  modalItem: Item | null = null;
+  modalStatus: PostStatus | null = null;
 
   constructor(private adminService: AdminService) {}
 
@@ -55,13 +60,13 @@ export class ModerationComponent implements OnInit {
     );
   }
 
-  private updateStatus(item: Item, status: PostStatus) {
+  private updateStatus(item: Item, status: PostStatus, reason?: string) {
     if (!item || !item.id && !item._id) {
       return;
     }
 
     item.isUpdating = true;
-    this.adminService.changeStatus(item._id || item.id!, status).subscribe({
+    this.adminService.changeStatus(item._id || item.id!, status, reason).subscribe({
       next: () => {
         item.status = status;
       },
@@ -79,11 +84,38 @@ export class ModerationComponent implements OnInit {
     this.updateStatus(item, 'APPROVED');
   }
 
+  // open modal to require a reason before rejecting
   reject(item: Item) {
-    this.updateStatus(item, 'REJECTED');
+    this.openReasonModal(item, 'REJECTED');
   }
 
+  // open modal to require a reason before requesting update
   requestUpdate(item: Item) {
-    this.updateStatus(item, 'NEEDS_UPDATE');
+    this.openReasonModal(item, 'NEEDS_UPDATE');
+  }
+
+  openReasonModal(item: Item, status: PostStatus) {
+    this.modalItem = item;
+    this.modalStatus = status;
+    this.modalReason = '';
+    this.showReasonModal = true;
+  }
+
+  cancelReasonModal() {
+    this.showReasonModal = false;
+    this.modalItem = null;
+    this.modalStatus = null;
+    this.modalReason = '';
+  }
+
+  confirmReasonModal() {
+    if (!this.modalItem || !this.modalStatus) return;
+    const reason = (this.modalReason || '').trim();
+    if (!reason) {
+      alert('Vui lòng nhập lý do từ chối.');
+      return;
+    }
+    this.updateStatus(this.modalItem, this.modalStatus, reason);
+    this.cancelReasonModal();
   }
 }

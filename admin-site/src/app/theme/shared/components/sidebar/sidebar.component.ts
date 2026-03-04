@@ -31,45 +31,14 @@ export class SidebarComponent {
       route: '/analytics'
     },
     {
-      label: 'Users',
+      label: 'Quản lý Người Dùng',
       icon: 'users',
       route: '/users'
     },
     {
-      label: 'Products',
-      icon: 'shopping-cart',
-      route: '/products'
-    },
-    {
-      label: 'Components',
-      icon: 'box',
-      route: '/component'
-    },
-    {
-      label: 'Charts',
-      icon: 'bar-chart-2',
-      route: '/chart'
-    },
-    {
-      label: 'Forms',
-      icon: 'edit',
-      route: '/forms'
-    },
-    {
-      label: 'Tables',
-      icon: 'grid',
-      route: '/tables'
-    },
-    {
-      label: 'Pages',
-      icon: 'file',
-      children: [
-        {
-          label: 'Sample Page',
-          icon: 'arrow-right',
-          route: '/sample-page'
-        }
-      ]
+      label: 'Quản lý Bài Đăng',
+      icon: 'file-text',
+      route: '/moderation'
     }
   ];
 

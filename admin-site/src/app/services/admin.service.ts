@@ -31,7 +31,15 @@ export class AdminService {
   /**
    * change status of a single item
    */
-  changeStatus(id: string | number, status: PostStatus): Observable<any> {
-    return this.http.patch(`${this.baseUrl}/items/${id}`, { status });
+  changeStatus(
+    id: string | number,
+    status: PostStatus,
+    reason?: string
+  ): Observable<any> {
+    const body: any = { status };
+    if (reason && reason.trim()) {
+      body.reject_reason = reason.trim();
+    }
+    return this.http.patch(`${this.baseUrl}/items/${id}`, body);
   }
 }

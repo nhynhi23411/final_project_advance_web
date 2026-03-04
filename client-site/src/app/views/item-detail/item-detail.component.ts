@@ -122,7 +122,8 @@ export class ItemDetailComponent implements OnInit {
     }
 
     goBack(): void {
-        this.router.navigate(['/landing']);
+        // new homepage is root
+        this.router.navigate(['/']);
     }
 
     getItemTypeLabel(): string {
