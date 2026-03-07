@@ -11,6 +11,7 @@ import { CreateClaimDto } from "./dto/create-claim.dto";
 import { ReviewClaimDto } from "./dto/review-claim.dto";
 import { Post, PostDocument } from "../posts/schemas/post.schema";
 import { KeywordService } from "../keyword/keyword.service";
+import { MAX_CLAIMS_LIMIT } from "../common/config/constants";
 
 @Injectable()
 export class ClaimsService {
@@ -34,17 +35,26 @@ export class ClaimsService {
         }
 
         const existingClaim = await this.claimModel.findOne({
-            post_id: new Types.ObjectId(dto.post_id),
-            claimer_id: new Types.ObjectId(claimerId),
+            target_post_id: new Types.ObjectId(dto.post_id),
+            claimant_user_id: new Types.ObjectId(claimerId),
             status: "PENDING",
         });
         if (existingClaim) {
             throw new BadRequestException("Bạn đã gửi claim cho post này rồi");
         }
 
+        const activePendingClaimsCount = await this.claimModel.countDocuments({
+            claimant_user_id: new Types.ObjectId(claimerId),
+            status: "PENDING",
+        });
+
+        if (activePendingClaimsCount >= MAX_CLAIMS_LIMIT) {
+            throw new BadRequestException(`Bạn đã đạt giới hạn ${MAX_CLAIMS_LIMIT} claims đang chờ xử lý.`);
+        }
+
         const claim = await this.claimModel.create({
-            post_id: new Types.ObjectId(dto.post_id),
-            claimer_id: new Types.ObjectId(claimerId),
+            target_post_id: new Types.ObjectId(dto.post_id),
+            claimant_user_id: new Types.ObjectId(claimerId),
             message: dto.message || "",
         });
 
@@ -64,19 +74,55 @@ export class ClaimsService {
 
         const post = await this.postModel.findById(claim.post_id);
         if (!post) throw new NotFoundException("Post không tồn tại");
-        if (post.created_by_user_id.toString() !== userId) {
-            throw new ForbiddenException("Chỉ người đăng tin mới được duyệt claim");
+
+        if (dto.action === "CANCELLED") {
+            if (claim.claimer_id.toString() !== userId) {
+                throw new ForbiddenException("Chỉ người tạo claim mới được hủy claim của mình");
+            }
+        } else {
+            if (post.created_by_user_id.toString() !== userId) {
+                throw new ForbiddenException("Chỉ người đăng tin mới được duyệt claim");
+            }
         }
 
         if (dto.action === "UNDER_VERIFICATION") {
             claim.status = "UNDER_VERIFICATION";
             await claim.save();
+
+            // Set all other pending claims for this post to REJECTED
+            const rejectedClaimsResponse = await this.claimModel.updateMany({
+                target_post_id: claim.target_post_id,
+                _id: { $ne: claim._id },
+                status: "PENDING"
+            }, {
+                $set: { status: "REJECTED" }
+            });
+            const rejectedCount = rejectedClaimsResponse.modifiedCount;
+
+            if (rejectedCount > 0) {
+                await this.postModel.findByIdAndUpdate(claim.post_id, {
+                    $inc: { active_claim_count: -rejectedCount },
+                });
+            }
+
         } else if (dto.action === "SUCCESSFUL") {
             claim.status = "SUCCESSFUL";
             await claim.save();
 
+            // Also set any remaining pending claims to REJECTED just in case
+            const rejectedClaimsResponse = await this.claimModel.updateMany({
+                target_post_id: claim.target_post_id,
+                _id: { $ne: claim._id },
+                status: "PENDING"
+            }, {
+                $set: { status: "REJECTED" }
+            });
+
+            const rejectedCount = rejectedClaimsResponse.modifiedCount;
+
             await this.postModel.findByIdAndUpdate(claim.post_id, {
                 status: "RETURNED",
+                $inc: { active_claim_count: -rejectedCount },
             });
         } else if (dto.action === "REJECTED" || dto.action === "CANCELLED") {
             claim.status = dto.action;
@@ -92,13 +138,13 @@ export class ClaimsService {
 
     async findByPost(postId: string) {
         return this.claimModel
-            .find({ post_id: new Types.ObjectId(postId) })
+            .find({ target_post_id: new Types.ObjectId(postId) })
             .sort({ createdAt: -1 });
     }
 
     async findByUser(userId: string) {
         return this.claimModel
-            .find({ claimer_id: new Types.ObjectId(userId) })
+            .find({ claimant_user_id: new Types.ObjectId(userId) })
             .sort({ createdAt: -1 });
     }
 }
