@@ -35,4 +35,13 @@ export class UsersService {
     const created = new this.userModel(dataWithTimestamps);
     return await created.save();
   }
+
+  async updateStatus(
+    userId: string,
+    status: "ACTIVE" | "INACTIVE" | "BANNED",
+  ): Promise<void> {
+    await this.userModel
+      .findByIdAndUpdate(userId, { status, updated_at: new Date() })
+      .exec();
+  }
 }
