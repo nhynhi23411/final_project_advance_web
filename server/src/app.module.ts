@@ -11,6 +11,8 @@ import { PostsModule } from "./posts/posts.module";
 import { ClaimsModule } from "./claims/claims.module";
 import { MeController } from "./me/me.controller";
 import { KeywordModule } from "./keyword/keyword.module";
+import { AuditLogModule } from "./audit-log/audit-log.module";
+import { AdminModule } from "./admin/admin.module";
 
 @Module({
   imports: [
@@ -33,6 +35,8 @@ import { KeywordModule } from "./keyword/keyword.module";
     AuthModule,
     PostsModule,
     ClaimsModule,
+    AuditLogModule,
+    AdminModule,
   ],
   controllers: [AppController, MeController],
   providers: [],
