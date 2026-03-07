@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-badge.component';
@@ -17,14 +17,20 @@ export interface Item {
 export class AdminService {
   private baseUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
+
+  private authHeaders(): HttpHeaders {
+    const token = localStorage.getItem('access_token') || '';
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+  }
 
   /**
    * fetch items that currently have status PENDING_ADMIN
    */
   getPendingItems(): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.baseUrl}/posts`, {
-      params: { status: 'PENDING_ADMIN' }
+    return this.http.get<Item[]>(`${this.baseUrl}/items`, {
+      params: { status: 'PENDING_ADMIN' },
+      headers: this.authHeaders()
     });
   }
 
@@ -40,6 +46,8 @@ export class AdminService {
     if (reason && reason.trim()) {
       body.reject_reason = reason.trim();
     }
-    return this.http.patch(`${this.baseUrl}/posts/${id}`, body);
+    return this.http.patch(`${this.baseUrl}/admin/posts/${id}/status`, body, {
+      headers: this.authHeaders()
+    });
   }
 }

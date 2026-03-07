@@ -32,8 +32,12 @@ export class PostsService extends BaseCrudService<
       throw new BadRequestException('Nội dung vi phạm chính sách!');
     }
 
+    const postType = dto.post_type || dto.type;
+
     let locationData = dto.location;
-    // Format location to GeoJSON Point if lat and lng exist
+    if (!locationData && dto.location_text) {
+      locationData = { type: "Point", coordinates: [0, 0], address: dto.location_text };
+    }
     if (locationData && typeof locationData.lat === "number" && typeof locationData.lng === "number") {
       locationData = {
         type: "Point",
@@ -42,13 +46,23 @@ export class PostsService extends BaseCrudService<
       };
     }
 
+    const metadata: Record<string, any> = { ...(dto.metadata || {}) };
+    if (dto.color) metadata.color = dto.color;
+    if (dto.brand) metadata.brand = dto.brand;
+    if (dto.distinctive_marks) metadata.distinctive_marks = dto.distinctive_marks;
+    if (dto.lost_found_date) metadata.lost_found_date = dto.lost_found_date;
+
+    const { type, location_text, lost_found_date, color, brand, distinctive_marks, ...rest } = dto as any;
+
     const payload = {
-      ...dto,
+      ...rest,
+      post_type: postType,
       location: locationData,
+      metadata,
       created_by_user_id: new Types.ObjectId(userId),
       images: dto.images ?? [],
       image_public_ids: dto.image_public_ids ?? [],
-      status: "PENDING_SYSTEM",
+      status: manualStatus || "PENDING_SYSTEM",
     };
 
     const created = new this.model(payload);

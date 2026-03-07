@@ -10,8 +10,13 @@ import {
 import { POST_TYPE, POST_STATUS } from "../schemas/post.schema";
 
 export class CreatePostDto {
+  @IsOptional()
   @IsEnum(POST_TYPE)
-  post_type!: "LOST" | "FOUND";
+  post_type?: "LOST" | "FOUND";
+
+  @IsOptional()
+  @IsEnum(POST_TYPE)
+  type?: "LOST" | "FOUND";
 
   @IsNotEmpty()
   @IsString()
@@ -30,15 +35,33 @@ export class CreatePostDto {
   location?: Record<string, any>;
 
   @IsOptional()
+  @IsString()
+  location_text?: string;
+
+  @IsOptional()
   metadata?: Record<string, any>;
 
-  /** URL ảnh (sau khi gọi POST /posts/upload-image) */
+  @IsOptional()
+  @IsString()
+  lost_found_date?: string;
+
+  @IsOptional()
+  @IsString()
+  color?: string;
+
+  @IsOptional()
+  @IsString()
+  brand?: string;
+
+  @IsOptional()
+  @IsString()
+  distinctive_marks?: string;
+
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   images?: string[];
 
-  /** public_id từ Cloudinary (để xóa ảnh khi xóa bài) */
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
@@ -50,16 +73,16 @@ export class CreatePostDto {
 
   @IsOptional()
   dedupe_hash?: string;
-  
+
   @IsOptional()
   scoring_value?: number;
-  
+
   @IsOptional()
   approved_at?: Date;
-  
+
   @IsOptional()
   reject_reason?: string;
-  
+
   @IsOptional()
   archived_reason?: string;
 

@@ -22,6 +22,6 @@ export class PostsModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AutoModerationMiddleware)
-      .forRoutes({ path: "posts", method: RequestMethod.POST });
+      .forRoutes({ path: "items", method: RequestMethod.POST });
   }
 }
