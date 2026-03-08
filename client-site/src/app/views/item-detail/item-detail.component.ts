@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ItemService, Item } from '../../services/item.service';
 import { ClaimService, MAX_CLAIMS_LIMIT } from '../../services/claim.service';
+import { AuthService } from '../../services/auth.service';
 import { SAMPLE_ITEMS } from '../../shared/sample-items';
 
 @Component({
@@ -11,8 +12,7 @@ import { SAMPLE_ITEMS } from '../../shared/sample-items';
 })
 export class ItemDetailComponent implements OnInit {
     item: Item | null = null;
-    currentUserId: string | null = null;
-    activeClaimsCount: number = 0;
+    activeClaimsCount = 0;
     isLoading = true;
     error: string | null = null;
     successMessage: string | null = null;
@@ -20,18 +20,15 @@ export class ItemDetailComponent implements OnInit {
     showClaimModal = false;
     selectedImage: string | null = null;
 
-    // when the backend has no real posts the landing page uses this same sample list
     private sampleItems: Item[] = SAMPLE_ITEMS;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private itemService: ItemService,
-        private claimService: ClaimService
-    ) {
-        // try to read user id if available; even if absent we just use isLoggedIn() later
-        this.currentUserId = localStorage.getItem('user_id') || null;
-    }
+        private claimService: ClaimService,
+        public authService: AuthService
+    ) {}
 
     ngOnInit(): void {
         this.loadItemDetail();
@@ -87,17 +84,19 @@ export class ItemDetailComponent implements OnInit {
         });
     }
 
-    // convenience getter used by template to determine login state
-    get isLoggedIn(): boolean {
-        return !!(localStorage.getItem('access_token') || localStorage.getItem('user_id'));
-    }
-
     /**
-     * Button should appear on every approved item page.  
-     * Users will either be asked to log in or will submit a claim.
+     * Button should appear on approved items, but hide if current user is the post owner.
      */
     isClaimButtonVisible(): boolean {
-        return !!this.item && this.item.status === 'APPROVED';
+        if (!this.item || this.item.status !== 'APPROVED') return false;
+        const ownerId = this.item.created_by_user_id || this.item.created_by;
+        const myId = this.authService.currentUserId;
+        if (myId && ownerId && String(ownerId) === String(myId)) return false;
+        return true;
+    }
+
+    goToLogin(): void {
+        this.router.navigate(['/auth/login']);
     }
 
     isClaimButtonDisabled(): boolean {

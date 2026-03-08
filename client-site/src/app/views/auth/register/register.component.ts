@@ -1,7 +1,7 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { AuthService } from "../../../services/auth.service";
+import { ToastService } from "../../../services/toast.service";
 import { Router } from "@angular/router";
-import { environment } from "../../../../environments/environment";
 
 @Component({
   selector: "app-register",
@@ -15,7 +15,8 @@ export class RegisterComponent implements OnInit {
   password = "";
 
   constructor(
-    private http: HttpClient,
+    private authService: AuthService,
+    private toastService: ToastService,
     private router: Router,
   ) {}
 
@@ -29,23 +30,18 @@ export class RegisterComponent implements OnInit {
       phone: this.phone,
       password: this.password,
     };
-    this.http
-      .post<any>(`${environment.apiUrl}/auth/register`, payload)
-      .subscribe({
-        next: (res) => {
-          const token = res?.accessToken || res?.access_token;
-          if (token) {
-            localStorage.setItem("access_token", token);
-            if (res.user) {
-              localStorage.setItem("user_info", JSON.stringify(res.user));
-            }
-          }
-          this.router.navigate(["/"]);
-        },
-        error: (err) => {
-          console.error("Register error", err);
-          alert(err?.error?.message || "Lỗi khi đăng ký");
-        },
-      });
+    this.authService.register(payload).subscribe({
+      next: (res: any) => {
+        const token = res?.accessToken || res?.access_token;
+        if (token) {
+          this.authService.setAuth(token, res.user);
+        }
+        this.router.navigate(["/"]);
+      },
+      error: (err) => {
+        console.error("Register error", err);
+        this.toastService.error(err?.error?.message || "Lỗi khi đăng ký");
+      },
+    });
   }
 }

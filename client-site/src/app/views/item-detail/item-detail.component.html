@@ -151,11 +151,11 @@
             Nếu bạn nghĩ đây là đồ của mình, hãy gửi chứng cứ.
           </p>
           <button
-            (click)="isLoggedIn ? openClaimModal() : router.navigate(['/login'])"
+            (click)="authService.isLoggedIn ? openClaimModal() : goToLogin()"
             [disabled]="isClaimButtonDisabled()"
             class="w-full bg-blueGray-700 hover:bg-blueGray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase px-4 py-2 rounded text-sm"
           >
-            {{ isLoggedIn ? 'Gửi yêu cầu' : 'Đăng nhập để xác minh' }}
+            {{ authService.isLoggedIn ? 'Gửi yêu cầu' : 'Đăng nhập để xác minh' }}
           </button>
           <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="mt-2 text-xs text-yellow-700">
             Bạn đã đạt giới hạn yêu cầu
