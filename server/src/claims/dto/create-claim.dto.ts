@@ -8,4 +8,12 @@ export class CreateClaimDto {
     @IsOptional()
     @IsString()
     message?: string;
+
+    @IsOptional()
+    @IsString()
+    secret_info?: string;
+
+    @IsOptional()
+    @IsString()
+    image_proof_url?: string;
 }

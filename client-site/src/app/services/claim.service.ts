@@ -6,9 +6,10 @@ import { environment } from '../../environments/environment';
 export const MAX_CLAIMS_LIMIT = 5;
 
 export interface ClaimPayload {
-    item_id: string;
-    evidence_text: string;
-    evidence_images: string[];
+    post_id: string;
+    message?: string;
+    secret_info?: string;
+    image_proof_url?: string;
 }
 
 export interface Claim {
@@ -33,12 +34,12 @@ export class ClaimService {
         return new HttpHeaders({ Authorization: `Bearer ${token}` });
     }
 
-    /** Upload evidence image. */
+    /** Upload evidence image via items/upload-image endpoint. */
     uploadEvidenceImage(file: File): Observable<{ url: string; publicId: string }> {
         const fd = new FormData();
         fd.append('file', file, file.name);
         return this.http.post<{ url: string; publicId: string }>(
-            `${this.base}/claims/upload-image`,
+            `${this.base}/items/upload-image`,
             fd,
             { headers: this.authHeaders() }
         );

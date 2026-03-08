@@ -23,6 +23,12 @@ export class Claim {
     @Prop({ default: "" })
     message!: string;
 
+    @Prop({ default: "" })
+    secret_info!: string;
+
+    @Prop({ default: "" })
+    image_proof_url!: string;
+
     @Prop({ enum: CLAIM_STATUS, default: "PENDING" })
     status!: ClaimStatus;
 

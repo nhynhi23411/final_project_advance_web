@@ -14,6 +14,8 @@ import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 
+import { AuthGuard } from "./guards/auth.guard";
+
 const routes: Routes = [
   // auth views (login/register pages use auth layout)
   {
@@ -26,7 +28,7 @@ const routes: Routes = [
     ],
   },
   // application views
-  { path: "profile", component: ProfileComponent },
+  { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent },
   { path: "items/:id", component: ItemDetailComponent },
   // landing page becomes home

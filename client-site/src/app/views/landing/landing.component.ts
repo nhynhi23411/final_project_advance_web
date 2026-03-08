@@ -27,7 +27,7 @@ export class LandingComponent implements OnInit {
     this.itemsError = null;
     this.isUsingSample = false;
     // Optionally pass filters such as limit or status
-    this.itemService.getItems({ limit: '4' }).subscribe({
+    this.itemService.getItems({ status: 'APPROVED', limit: '4' }).subscribe({
       next: (data) => {
         if (data && data.length) {
           this.items = data;
