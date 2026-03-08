@@ -1,8 +1,7 @@
-// angular imports
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
-// project imports
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { AdminService, AdminUser } from 'src/app/services/admin.service';
 
@@ -18,12 +17,48 @@ export class UsersComponent implements OnInit {
   loading = false;
   searchTerm = '';
 
+  showAddModal = false;
+  addForm!: FormGroup;
+  addSubmitting = false;
+  addError = '';
+
+  showEditModal = false;
+  editForm!: FormGroup;
+  editTarget: AdminUser | null = null;
+  editSubmitting = false;
+  editError = '';
+
+  showStatusModal = false;
+  statusTarget: AdminUser | null = null;
+  statusSubmitting = false;
+  statusError = '';
+
+  showDeleteModal = false;
+  deleteTarget: AdminUser | null = null;
+  deleteSubmitting = false;
+  deleteError = '';
+
   constructor(
     private adminService: AdminService,
+    private fb: FormBuilder,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
+    this.addForm = this.fb.group({
+      name: ['', Validators.required],
+      username: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      phone: ['', Validators.required],
+      role: ['FINDER'],
+    });
+    this.editForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      role: ['FINDER'],
+    });
     this.loadUsers();
   }
 
@@ -70,5 +105,154 @@ export class UsersComponent implements OnInit {
       FINDER: 'Finder'
     };
     return map[role || ''] || role || '-';
+  }
+
+  private getApiMessage(err: any): string {
+    const body = err?.error;
+    if (body && typeof body === 'object' && body.message) {
+      const m = body.message;
+      return Array.isArray(m) ? m.join('. ') : String(m);
+    }
+    return err?.message || 'Có lỗi xảy ra. Vui lòng thử lại.';
+  }
+
+  openAddModal(): void {
+    this.addForm.reset({ name: '', username: '', email: '', password: '', phone: '', role: 'FINDER' });
+    this.addError = '';
+    this.showAddModal = true;
+  }
+
+  closeAddModal(): void {
+    this.showAddModal = false;
+    this.addError = '';
+  }
+
+  submitAdd(): void {
+    if (this.addForm.invalid) return;
+    this.addSubmitting = true;
+    this.addError = '';
+    const v = this.addForm.value;
+    this.adminService.createUser({
+      name: v.name.trim(),
+      username: v.username.trim().toLowerCase(),
+      email: v.email.trim().toLowerCase(),
+      password: v.password,
+      phone: v.phone.trim(),
+      role: v.role,
+    }).subscribe({
+      next: () => {
+        this.closeAddModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.addError = this.getApiMessage(err);
+      }
+    }).add(() => {
+      this.addSubmitting = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  openEditModal(u: AdminUser): void {
+    this.editTarget = u;
+    this.editForm.patchValue({
+      name: u.name,
+      email: u.email,
+      phone: u.phone || '',
+      role: u.role || 'FINDER',
+    });
+    this.editError = '';
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    this.showEditModal = false;
+    this.editTarget = null;
+    this.editError = '';
+  }
+
+  submitEdit(): void {
+    if (!this.editTarget || this.editForm.invalid) return;
+    this.editSubmitting = true;
+    this.editError = '';
+    const v = this.editForm.value;
+    this.adminService.updateUser(this.editTarget._id, {
+      name: v.name.trim(),
+      email: v.email.trim().toLowerCase(),
+      phone: v.phone.trim(),
+      role: v.role,
+    }).subscribe({
+      next: () => {
+        this.closeEditModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.editError = this.getApiMessage(err);
+      }
+    }).add(() => {
+      this.editSubmitting = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  openStatusModal(u: AdminUser): void {
+    this.statusTarget = u;
+    this.statusError = '';
+    this.showStatusModal = true;
+  }
+
+  closeStatusModal(): void {
+    this.showStatusModal = false;
+    this.statusTarget = null;
+    this.statusError = '';
+  }
+
+  confirmStatus(): void {
+    if (!this.statusTarget) return;
+    this.statusSubmitting = true;
+    this.statusError = '';
+    const newStatus = this.statusTarget.status === 'BANNED' ? 'ACTIVE' : 'BANNED';
+    this.adminService.updateUserStatus(this.statusTarget._id, newStatus).subscribe({
+      next: () => {
+        this.closeStatusModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.statusError = this.getApiMessage(err);
+      }
+    }).add(() => {
+      this.statusSubmitting = false;
+      this.cdr.markForCheck();
+    });
+  }
+
+  openDeleteModal(u: AdminUser): void {
+    this.deleteTarget = u;
+    this.deleteError = '';
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.deleteTarget = null;
+    this.deleteError = '';
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) return;
+    this.deleteSubmitting = true;
+    this.deleteError = '';
+    this.adminService.deleteUser(this.deleteTarget._id).subscribe({
+      next: () => {
+        this.closeDeleteModal();
+        this.loadUsers();
+      },
+      error: (err) => {
+        this.deleteError = this.getApiMessage(err);
+      }
+    }).add(() => {
+      this.deleteSubmitting = false;
+      this.cdr.markForCheck();
+    });
   }
 }
