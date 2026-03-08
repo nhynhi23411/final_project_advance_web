@@ -8,7 +8,7 @@
               <img src="assets/images/logo-dark.png" alt="logo" class="img-fluid mb-4" />
               <h4 class="mb-3 f-w-400">Signin</h4>
               <div class="input-group mb-3">
-                <input type="email" class="form-control" id="floatingInput"
+                <input type="email" class="form-control" id="floatingInput" autofocus
                   [class.is-invalid]="submitted() && loginForm.email().invalid()" placeholder="Email Address"
                   [field]="loginForm.email" />
                 @if (submitted() && loginForm.email().invalid()) {
@@ -40,7 +40,14 @@
 
               <div *ngIf="error()" class="alert alert-danger mb-3">{{ error() }}</div>
               <div class="d-grid">
-                <button class="btn btn-block btn-primary mb-4">Signin</button>
+                <button type="submit" class="btn btn-block btn-primary mb-4" [disabled]="loading()">
+                  @if (loading()) {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Đang đăng nhập...
+                  } @else {
+                    Đăng nhập
+                  }
+                </button>
               </div>
 
             </form>

@@ -6,19 +6,19 @@ const BASE = "http://localhost:3000/api/auth";
 
 const accounts = [
     {
-        name: "Admin",
-        username: "admin",
+        name: "Admin1",
+        username: "admin1",
         email: "admin@lostfound.com",
         password: "admin123",
-        phone: "0900000001",
+        phone: "0900000002",
         role: "ADMIN",
     },
     {
-        name: "Test User",
-        username: "testuser",
-        email: "testuser@lostfound.com",
+        name: "Test User11",
+        username: "testuser11",
+        email: "testuser11@lostfound.com",
         password: "test123456",
-        phone: "0900000002",
+        phone: "0900000003",
         role: "ADMIN",
     },
 ];

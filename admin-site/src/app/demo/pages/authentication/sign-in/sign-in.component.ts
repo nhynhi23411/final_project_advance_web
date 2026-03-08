@@ -23,6 +23,7 @@ export class SignInComponent {
   submitted = signal(false);
   error = signal('');
   showPassword = signal(false);
+  loading = signal(false);
 
   loginModal = signal<{ email: string; password: string }>({
     email: '',
@@ -39,11 +40,13 @@ export class SignInComponent {
   onSubmit(event: Event) {
     this.submitted.set(true);
     this.error.set('');
+    this.loading.set(true);
     event.preventDefault();
 
     const credentials = this.loginModal();
     this.http.post<{ accessToken: string; user: any }>(`${environment.apiUrl}/auth/login`, credentials).subscribe({
       next: (res) => {
+        this.loading.set(false);
         const token = res.accessToken;
         try {
           const payload = JSON.parse(atob(token.split('.')[1]));
@@ -64,6 +67,7 @@ export class SignInComponent {
         this.router.navigate(['/moderation']);
       },
       error: (err) => {
+        this.loading.set(false);
         const msg = err?.error?.message || 'Login failed';
         this.error.set(msg);
         this.cd.detectChanges();

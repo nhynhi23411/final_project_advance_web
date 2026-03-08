@@ -1,8 +1,10 @@
 import {
   Controller,
+  Get,
   Patch,
   Param,
   Body,
+  Query,
   UseGuards,
   Request,
   BadRequestException,
@@ -22,6 +24,11 @@ function isValidObjectId(id: string): boolean {
 @Roles("ADMIN")
 export class AdminPostsController {
   constructor(private readonly adminPostsService: AdminPostsService) {}
+
+  @Get()
+  findPosts(@Query("status") status?: string) {
+    return this.adminPostsService.getPosts(status || "PENDING_ADMIN");
+  }
 
   @Patch(":id/status")
   async updateStatus(

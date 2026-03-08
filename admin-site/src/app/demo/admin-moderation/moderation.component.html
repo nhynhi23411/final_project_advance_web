@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-xl-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">Moderation - Pending Admin Items</h5>
+      <h5 class="mb-0">Danh sách bài đăng chờ duyệt</h5>
       <div class="d-flex align-items-center">
         <input
           type="text"
@@ -10,11 +10,12 @@
           [(ngModel)]="searchTerm"
         />
         <button
+          type="button"
           class="btn btn-primary btn-sm"
           (click)="loadPending()"
           [disabled]="loading"
         >
-          Reload
+          Tải lại
         </button>
       </div>
     </div>
@@ -24,9 +25,9 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th>Title</th>
-              <th>Status</th>
-              <th>Action</th>
+              <th>Tiêu đề</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -69,26 +70,44 @@
           </tbody>
         </table>
         <div *ngIf="loading" class="text-center p-3">
-          Loading...
+          <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+          Đang tải...
         </div>
-        <div *ngIf="!loading && filteredItems.length === 0" class="text-center p-3">
-          No pending items found.
+        <div *ngIf="!loading && filteredItems.length === 0" class="text-center p-3 text-muted">
+          Không có bài đăng nào chờ duyệt.
         </div>
       </div>
     </app-card>
   </div>
 </div>
-<!-- Reason modal -->
-<div *ngIf="showReasonModal" class="modal d-block" tabindex="-1" role="dialog" style="background: rgba(0,0,0,0.5);">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<!-- Reason modal: backdrop click không đóng, bắt buộc Hủy hoặc nhập lý do + Xác nhận -->
+<div
+  *ngIf="showReasonModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="reasonModalTitle"
+  aria-describedby="reasonModalDesc"
+  style="background: rgba(0,0,0,0.5);"
+  (keydown.escape)="cancelReasonModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Nhập lý do</h5>
-        <button type="button" class="btn-close" aria-label="Close" (click)="cancelReasonModal()"></button>
+        <h5 class="modal-title" id="reasonModalTitle">Nhập lý do</h5>
+        <button type="button" class="btn-close" aria-label="Đóng" (click)="cancelReasonModal()"></button>
       </div>
       <div class="modal-body">
-        <p>Vui lòng nhập lý do cho hành động này (bắt buộc):</p>
-        <textarea class="form-control" rows="4" [(ngModel)]="modalReason"></textarea>
+        <p id="reasonModalDesc">Vui lòng nhập lý do cho hành động này (bắt buộc):</p>
+        <textarea
+          class="form-control"
+          rows="4"
+          [(ngModel)]="modalReason"
+          placeholder="Nhập lý do..."
+          #reasonInput
+          (keydown.escape)="$event.preventDefault(); cancelReasonModal()"
+        ></textarea>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="cancelReasonModal()">Hủy</button>

@@ -13,14 +13,42 @@ export interface Item {
   [key: string]: any;
 }
 
+export interface DashboardStats {
+  totalUsers: number;
+  activePosts: number;
+  resolvedClaims: number;
+  pendingAdmin: number;
+}
+
+export interface AdminUser {
+  _id: string;
+  username: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: string;
+  status?: string;
+  created_at?: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private baseUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) { }
 
+  getDashboardStats(): Observable<DashboardStats> {
+    return this.http.get<DashboardStats>(`${this.baseUrl}/admin/dashboard-stats`);
+  }
+
+  getUsers(skip = 0, limit = 50): Observable<AdminUser[]> {
+    return this.http.get<AdminUser[]>(`${this.baseUrl}/admin/users`, {
+      params: { skip: String(skip), limit: String(limit) }
+    });
+  }
+
   getPendingItems(): Observable<Item[]> {
-    return this.http.get<Item[]>(`${this.baseUrl}/items`, {
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
       params: { status: 'PENDING_ADMIN' }
     });
   }

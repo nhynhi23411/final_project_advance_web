@@ -7,42 +7,19 @@ import { NgbDropdownConfig } from '@ng-bootstrap/ng-bootstrap';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
-import { ChatUserListComponent } from './chat-user-list/chat-user-list.component';
-import { ChatMsgComponent } from './chat-msg/chat-msg.component';
+import { AuthHelperService } from 'src/app/services/auth-helper.service';
 
 @Component({
   selector: 'app-nav-right',
-  imports: [SharedModule, ChatUserListComponent, ChatMsgComponent],
+  imports: [SharedModule],
   templateUrl: './nav-right.component.html',
   styleUrls: ['./nav-right.component.scss'],
-  providers: [NgbDropdownConfig],
-  animations: [
-    trigger('slideInOutLeft', [
-      transition(':enter', [style({ transform: 'translateX(100%)' }), animate('300ms ease-in', style({ transform: 'translateX(0%)' }))]),
-      transition(':leave', [animate('300ms ease-in', style({ transform: 'translateX(100%)' }))])
-    ]),
-    trigger('slideInOutRight', [
-      transition(':enter', [style({ transform: 'translateX(-100%)' }), animate('300ms ease-in', style({ transform: 'translateX(0%)' }))]),
-      transition(':leave', [animate('300ms ease-in', style({ transform: 'translateX(-100%)' }))])
-    ])
-  ]
+  providers: [NgbDropdownConfig]
 })
 export class NavRightComponent {
-  // public props
-  visibleUserList: boolean;
-  chatMessage: boolean;
-  friendId!: number;
+  constructor(public authHelper: AuthHelperService) {}
 
-  // constructor
-  constructor() {
-    this.visibleUserList = false;
-    this.chatMessage = false;
-  }
-
-  // public method
-  // eslint-disable-next-line
-  onChatToggle(friendID: any) {
-    this.friendId = friendID;
-    this.chatMessage = !this.chatMessage;
+  logout(): void {
+    this.authHelper.logout();
   }
 }

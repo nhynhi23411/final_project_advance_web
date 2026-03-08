@@ -47,11 +47,17 @@ export class PostsController {
     @Query("location") location?: string,
     @Query("status") status?: string,
   ) {
+    const effectiveStatus = status || "APPROVED";
+    if (effectiveStatus === "PENDING_ADMIN") {
+      throw new BadRequestException(
+        "Chỉ admin mới xem được bài chờ duyệt. Dùng endpoint /api/admin/posts.",
+      );
+    }
     return this.postsService.findAllByFilter({
       type,
       category,
       location,
-      status: status || "APPROVED",
+      status: effectiveStatus,
     });
   }
 

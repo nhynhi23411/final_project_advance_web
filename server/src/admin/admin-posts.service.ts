@@ -4,6 +4,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Post, PostDocument } from "../posts/schemas/post.schema";
+import { Claim, ClaimDocument } from "../claims/schemas/claim.schema";
 import { AuditLogService } from "../audit-log/audit-log.service";
 import { UsersService } from "../users/users.service";
 import { UpdatePostStatusDto } from "./dto/update-post-status.dto";
@@ -12,11 +13,32 @@ import { UpdatePostStatusDto } from "./dto/update-post-status.dto";
 export class AdminPostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    @InjectModel(Claim.name) private readonly claimModel: Model<ClaimDocument>,
     private readonly auditLogService: AuditLogService,
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
   ) {}
+
+  async getPosts(status: string = "PENDING_ADMIN"): Promise<PostDocument[]> {
+    return this.postModel.find({ status }).sort({ createdAt: -1 }).exec();
+  }
+
+  async getDashboardStats(): Promise<{
+    totalUsers: number;
+    activePosts: number;
+    resolvedClaims: number;
+    pendingAdmin: number;
+  }> {
+    const [totalUsers, activePosts, resolvedClaims, pendingAdmin] =
+      await Promise.all([
+        this.usersService.countAll(),
+        this.postModel.countDocuments({ status: "APPROVED" }).exec(),
+        this.claimModel.countDocuments({ status: "SUCCESSFUL" }).exec(),
+        this.postModel.countDocuments({ status: "PENDING_ADMIN" }).exec(),
+      ]);
+    return { totalUsers, activePosts, resolvedClaims, pendingAdmin };
+  }
 
   async updatePostStatus(
     postId: string,
