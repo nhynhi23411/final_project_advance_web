@@ -1,5 +1,6 @@
 // angular import
 import { Component, OnInit, viewChild, ChangeDetectorRef } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 
 // project import
@@ -12,7 +13,7 @@ import { ApexOptions, ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
   selector: 'app-dash-analytics',
-  imports: [SharedModule, NgApexchartsModule, ProductSaleComponent],
+  imports: [SharedModule, RouterModule, NgApexchartsModule, ProductSaleComponent],
   templateUrl: './dash-analytics.component.html',
   styleUrls: ['./dash-analytics.component.scss']
 })
@@ -26,7 +27,7 @@ export class DashAnalyticsComponent implements OnInit {
   chartOptions_3!: Partial<ApexOptions>;
 
   statsLoading = true;
-  cards: Array<{ background: string; title: string; icon: string; text: string; number: string; no?: string }> = [];
+  cards: Array<{ background: string; title: string; icon: string; text: string; number: string; no?: string; url?: string }> = [];
 
   constructor(
     private adminService: AdminService,
@@ -233,28 +234,32 @@ export class DashAnalyticsComponent implements OnInit {
             title: 'Tổng người dùng',
             icon: 'feather icon-users',
             text: 'User',
-            number: String(stats.totalUsers)
+            number: String(stats.totalUsers),
+            url: '/users'
           },
           {
             background: 'bg-c-green',
             title: 'Bài đăng đã duyệt',
             icon: 'feather icon-check-circle',
             text: 'Approved',
-            number: String(stats.activePosts)
+            number: String(stats.activePosts),
+            url: '/moderation'
           },
           {
             background: 'bg-c-yellow',
             title: 'Bài chờ duyệt',
             icon: 'feather icon-clock',
             text: 'Pending',
-            number: String(stats.pendingAdmin)
+            number: String(stats.pendingAdmin),
+            url: '/moderation'
           },
           {
             background: 'bg-c-red',
             title: 'Yêu cầu đã giải quyết',
             icon: 'feather icon-award',
             text: 'Claims',
-            number: String(stats.resolvedClaims)
+            number: String(stats.resolvedClaims),
+            url: '/moderation'
           }
         ];
       },

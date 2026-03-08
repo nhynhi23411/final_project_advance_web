@@ -6,6 +6,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { AdminComponent } from './theme/layout/admin/admin.component';
 import { GuestComponent } from './theme/layout/guest/guest.component';
 import { AdminAuthGuard } from './guards/admin-auth.guard';
+import { GuestGuard } from './guards/guest.guard';
 
 const routes: Routes = [
   {
@@ -35,11 +36,8 @@ const routes: Routes = [
   {
     path: '',
     component: GuestComponent,
+    canActivate: [GuestGuard],
     children: [
-      {
-        path: 'register',
-        loadComponent: () => import('./demo/pages/authentication/sign-up/sign-up.component').then((c) => c.SignUpComponent)
-      },
       {
         path: 'login',
         loadComponent: () => import('./demo/pages/authentication/sign-in/sign-in.component').then((c) => c.SignInComponent)
