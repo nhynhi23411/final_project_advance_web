@@ -71,7 +71,7 @@ export class AuthService {
     this.isLoggedInSubject.next(true);
   }
 
-  logout(redirectTo = '/'): void {
+  logout(redirectTo = '/auth/login'): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userInfoKey);
     localStorage.removeItem('user_id');

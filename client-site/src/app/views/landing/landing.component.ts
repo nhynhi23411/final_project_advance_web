@@ -6,6 +6,7 @@ import { SAMPLE_ITEMS } from '../../shared/sample-items';
 @Component({
   selector: "app-landing",
   templateUrl: "./landing.component.html",
+  styleUrls: ["./landing.component.scss"],
 })
 export class LandingComponent implements OnInit {
   items: Item[] = [];

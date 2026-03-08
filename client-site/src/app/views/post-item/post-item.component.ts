@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CATEGORIES, CATEGORY_METADATA, MetadataField } from '../../config/category-metadata.config';
 import { ItemService, ItemPayload } from '../../services/item.service';
 import { ImageUploaderComponent } from '../../components/image-uploader/image-uploader.component';
@@ -26,11 +26,14 @@ export class PostItemComponent implements OnInit {
         private fb: FormBuilder,
         private itemService: ItemService,
         private router: Router,
+        private route: ActivatedRoute,
     ) { }
 
     ngOnInit(): void {
+        const typeParam = this.route.snapshot.queryParamMap.get('type');
+        const initialType = (typeParam === 'LOST' || typeParam === 'FOUND') ? typeParam : '';
         this.form = this.fb.group({
-            type: ['', Validators.required],
+            type: [initialType, Validators.required],
             title: ['', [Validators.required, Validators.maxLength(200)]],
             category: ['', Validators.required],
             location_text: ['', Validators.required],

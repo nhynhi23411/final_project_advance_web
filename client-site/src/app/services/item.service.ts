@@ -36,7 +36,7 @@ export interface Item {
     distinctive_marks?: string;
     images: string[];
     image_public_ids: string[];
-    status: 'PENDING' | 'APPROVED' | 'MATCHED' | 'COMPLETED' | 'REJECTED';
+    status?: string;
     created_by?: string;
     created_by_user_id?: string;
     created_at: Date;
