@@ -96,21 +96,8 @@ export class PostsController {
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(@Body() dto: CreatePostDto, @Request() req: any) {
-    console.log("POST /api/posts incoming body:", JSON.stringify(req.body));
-
-
-
-    try {
-      const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
-      console.log("Created post result:", JSON.stringify(created));
-      return { message: 'Bài đăng đang được kiểm duyệt', data: created };
-    } catch (err: any) {
-      console.error("Create post error:", err);
-      if (err.errInfo && err.errInfo.details) {
-        console.error("Validation Details:", JSON.stringify(err.errInfo.details, null, 2));
-      }
-      throw err;
-    }
+    const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
+    return { message: 'Bài đăng đang được kiểm duyệt', data: created };
   }
 
   @Patch(":id")
