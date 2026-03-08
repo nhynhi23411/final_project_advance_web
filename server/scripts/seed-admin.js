@@ -19,7 +19,7 @@ const accounts = [
         email: "testuser@lostfound.com",
         password: "test123456",
         phone: "0900000002",
-        role: "FINDER",
+        role: "ADMIN",
     },
 ];
 

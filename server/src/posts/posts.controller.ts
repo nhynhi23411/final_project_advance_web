@@ -51,7 +51,7 @@ export class PostsController {
       type,
       category,
       location,
-      status,
+      status: status || "APPROVED",
     });
   }
 
