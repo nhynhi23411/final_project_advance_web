@@ -1,6 +1,15 @@
 .navbar {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  
+  overflow: visible;
+
+  .container-fluid {
+    overflow: visible;
+  }
+
+  .ml-auto {
+    overflow: visible;
+  }
+
   .nav-link {
     position: relative;
     margin: 0 8px;
@@ -19,16 +28,38 @@
     }
   }
 
+  .nav-item.dropdown {
+    position: relative;
+  }
+
   .dropdown-menu {
-    min-width: 150px;
+    min-width: 200px;
+    white-space: nowrap;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    
-    a {
+    right: 0;
+    left: auto;
+
+    .dropdown-header {
+      padding: 8px 16px;
+      font-weight: 600;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    a, button.dropdown-item {
       transition: all 0.3s ease;
-      
+      cursor: pointer;
+      border: none;
+      background: none;
+      width: 100%;
+      min-width: 100%;
+      text-align: left;
+      padding: 8px 16px;
+      white-space: nowrap;
+      overflow: visible;
+
       &:hover {
         background-color: #f5f5f5;
-        pAdding-left: 20px;
       }
     }
   }

@@ -1,7 +1,6 @@
-// angular imports
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { finalize } from 'rxjs';
 
-// project imports
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { AdminService, Item } from 'src/app/services/admin.service';
 import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-badge.component';
@@ -13,20 +12,32 @@ import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-
   templateUrl: './moderation.component.html',
   styleUrls: ['./moderation.component.scss']
 })
-export class ModerationComponent implements OnInit {
+export class ModerationComponent implements OnInit, AfterViewChecked {
+  @ViewChild('reasonInput') reasonInput?: ElementRef<HTMLTextAreaElement>;
+
   pendingItems: Item[] = [];
   loading = false;
   searchTerm = '';
-  // modal state for entering reject_reason when needed
   showReasonModal = false;
   modalReason = '';
   modalItem: Item | null = null;
   modalStatus: PostStatus | null = null;
+  private focusReasonNextCheck = false;
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private cdr: ChangeDetectorRef
+  ) { }
 
   ngOnInit() {
     this.loadPending();
+  }
+
+  ngAfterViewChecked() {
+    if (this.focusReasonNextCheck && this.showReasonModal && this.reasonInput?.nativeElement) {
+      this.focusReasonNextCheck = false;
+      this.reasonInput.nativeElement.focus();
+    }
   }
 
   get filteredItems(): Item[] {
@@ -44,20 +55,20 @@ export class ModerationComponent implements OnInit {
 
   loadPending() {
     this.loading = true;
-    this.adminService.getPendingItems().subscribe(
-      (items) => {
-        this.pendingItems = items;
+    this.adminService.getPendingItems().pipe(
+      finalize(() => {
         this.loading = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (items) => {
+        this.pendingItems = items;
       },
-      (err) => {
-        // fall back to mock data if server isn't available yet
-        console.warn('Could not fetch pending items from API, using mock data', err);
-        import('src/app/theme/shared/mock-data/items.mock').then((m) => {
-          this.pendingItems = m.getItemsByStatus('PENDING_ADMIN');
-          this.loading = false;
-        });
+      error: (err) => {
+        console.error('Failed to fetch pending items', err);
+        this.pendingItems = [];
       }
-    );
+    });
   }
 
   private updateStatus(item: Item, status: PostStatus, reason?: string) {
@@ -68,13 +79,11 @@ export class ModerationComponent implements OnInit {
     item.isUpdating = true;
     this.adminService.changeStatus(item._id || item.id!, status, reason).subscribe({
       next: () => {
-        item.status = status;
+        this.loadPending();
       },
       error: (err) => {
         console.error('Failed to update status', err);
         alert('Không thể cập nhật trạng thái. Vui lòng thử lại.');
-      },
-      complete: () => {
         item.isUpdating = false;
       }
     });
@@ -84,12 +93,10 @@ export class ModerationComponent implements OnInit {
     this.updateStatus(item, 'APPROVED');
   }
 
-  // open modal to require a reason before rejecting
   reject(item: Item) {
     this.openReasonModal(item, 'REJECTED');
   }
 
-  // open modal to require a reason before requesting update
   requestUpdate(item: Item) {
     this.openReasonModal(item, 'NEEDS_UPDATE');
   }
@@ -99,6 +106,7 @@ export class ModerationComponent implements OnInit {
     this.modalStatus = status;
     this.modalReason = '';
     this.showReasonModal = true;
+    this.focusReasonNextCheck = true;
   }
 
   cancelReasonModal() {
@@ -112,10 +120,11 @@ export class ModerationComponent implements OnInit {
     if (!this.modalItem || !this.modalStatus) return;
     const reason = (this.modalReason || '').trim();
     if (!reason) {
-      alert('Vui lòng nhập lý do từ chối.');
+      alert('Vui lòng nhập lý do.');
       return;
     }
     this.updateStatus(this.modalItem, this.modalStatus, reason);
     this.cancelReasonModal();
   }
 }
+

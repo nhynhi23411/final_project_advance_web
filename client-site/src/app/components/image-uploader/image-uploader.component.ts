@@ -19,6 +19,7 @@ export class ImageUploaderComponent {
     @Input() maxSize = 5 * 1024 * 1024; // 5MB
 
     images: ImagePreview[] = [];
+    sizeError = '';
     dragOver = false;
 
     @Output() filesSelected = new EventEmitter<File[]>();
@@ -53,13 +54,20 @@ export class ImageUploaderComponent {
     }
 
     private handleFiles(files: FileList): void {
+        this.sizeError = '';
         const remaining = this.maxImages - this.images.length;
         if (remaining <= 0) return;
 
         const validFiles: File[] = [];
 
         Array.from(files).slice(0, remaining).forEach(file => {
-            if (!file.type.startsWith('image/') || file.size > this.maxSize) return;
+            if (!file.type.startsWith('image/')) return;
+
+            if (file.size > this.maxSize) {
+                const sizeMB = (file.size / 1024 / 1024).toFixed(1);
+                this.sizeError = `Ảnh "${file.name}" (${sizeMB}MB) vượt quá 5MB. Vui lòng chọn ảnh nhỏ hơn.`;
+                return;
+            }
 
             const img: ImagePreview = {
                 file,

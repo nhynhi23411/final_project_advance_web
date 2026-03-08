@@ -4,7 +4,7 @@ import { KeywordService } from "../../keyword/keyword.service";
 
 @Injectable()
 export class AutoModerationMiddleware implements NestMiddleware {
-  constructor(private readonly keywordService: KeywordService) {}
+  constructor(private readonly keywordService: KeywordService) { }
 
   async use(req: Request, _res: Response, next: NextFunction) {
     const body = (req as any).body || {};

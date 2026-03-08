@@ -32,7 +32,7 @@ function isValidObjectId(id: string): boolean {
   return /^[a-fA-F0-9]{24}$/.test(id);
 }
 
-@Controller("posts")
+@Controller("items")
 export class PostsController {
   constructor(
     private readonly postsService: PostsService,
@@ -47,11 +47,17 @@ export class PostsController {
     @Query("location") location?: string,
     @Query("status") status?: string,
   ) {
+    const effectiveStatus = status || "APPROVED";
+    if (effectiveStatus === "PENDING_ADMIN") {
+      throw new BadRequestException(
+        "Chỉ admin mới xem được bài chờ duyệt. Dùng endpoint /api/admin/posts.",
+      );
+    }
     return this.postsService.findAllByFilter({
       type,
       category,
       location,
-      status,
+      status: effectiveStatus,
     });
   }
 

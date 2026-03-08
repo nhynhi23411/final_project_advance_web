@@ -1,19 +1,46 @@
 <div class="row">
-  <!-- order-card start -->
-  @for (card of cards; track card) {
-    <div class="col-md-6 col-xl-3">
-      <app-card [hidHeader]="true" cardClass="{{ card.background }} order-card">
-        <h6 class="text-white">{{ card.title }}</h6>
-        <h2 class="text-end text-white">
-          <i class="feather {{ card.icon }} float-start"></i>
-          <span>{{ card.number }}</span>
-        </h2>
-        <p class="m-b-0">
-          {{ card.text }}
-          <span class="float-end">{{ card.no }}</span>
-        </p>
-      </app-card>
+  <!-- stats cards from API -->
+  @if (statsLoading) {
+    <div class="col-12 text-center py-4">
+      <span class="spinner-border text-primary" role="status"></span>
+      <p class="mt-2 mb-0">Đang tải thống kê...</p>
     </div>
+  } @else {
+    @for (card of cards; track card.title) {
+      <div class="col-md-6 col-xl-3">
+        @if (card.url) {
+          <a [routerLink]="card.url" class="text-decoration-none d-block">
+            <app-card [hidHeader]="true" cardClass="{{ card.background }} order-card card-clickable">
+              <h6 class="text-white">{{ card.title }}</h6>
+              <h2 class="text-end text-white">
+                <i class="feather {{ card.icon }} float-start"></i>
+                <span>{{ card.number }}</span>
+              </h2>
+              <p class="m-b-0">
+                {{ card.text }}
+                @if (card.no) {
+                  <span class="float-end">{{ card.no }}</span>
+                }
+              </p>
+            </app-card>
+          </a>
+        } @else {
+          <app-card [hidHeader]="true" cardClass="{{ card.background }} order-card">
+            <h6 class="text-white">{{ card.title }}</h6>
+            <h2 class="text-end text-white">
+              <i class="feather {{ card.icon }} float-start"></i>
+              <span>{{ card.number }}</span>
+            </h2>
+            <p class="m-b-0">
+              {{ card.text }}
+              @if (card.no) {
+                <span class="float-end">{{ card.no }}</span>
+              }
+            </p>
+          </app-card>
+        }
+      </div>
+    }
   }
   <!-- order-card end -->
 

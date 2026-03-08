@@ -44,4 +44,18 @@ export class UsersService {
       .findByIdAndUpdate(userId, { status, updated_at: new Date() })
       .exec();
   }
+
+  async findAll(skip = 0, limit = 100): Promise<User[]> {
+    return this.userModel
+      .find()
+      .select("-password")
+      .sort({ created_at: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  }
+
+  async countAll(): Promise<number> {
+    return this.userModel.countDocuments().exec();
+  }
 }

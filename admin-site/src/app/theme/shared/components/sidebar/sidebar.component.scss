@@ -54,8 +54,11 @@
 
       &.active {
         > .nav-link {
-          background-color: #f0f0f0;
-          color: #007bff;
+          background-color: #e7f1ff;
+          color: #0066cc;
+          font-weight: 600;
+          border-left: 3px solid #0066cc;
+          padding-left: 12px;
         }
       }
 

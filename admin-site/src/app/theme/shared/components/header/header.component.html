@@ -27,38 +27,23 @@
 
     <!-- Right Side Items -->
     <div class="ml-auto d-flex align-items-center">
-      <!-- Notifications -->
-      <div class="nav-item dropdown">
-        <a class="nav-link" href="#" role="button">
-          <i class="feather icon-bell"></i>
-          <span class="badge badge-danger">5</span>
-        </a>
-      </div>
-
-      <!-- Messages -->
-      <div class="nav-item dropdown">
-        <a class="nav-link" href="#" role="button">
-          <i class="feather icon-mail"></i>
-          <span class="badge badge-warning">3</span>
-        </a>
-      </div>
-
       <!-- User Menu -->
       <div class="nav-item dropdown">
         <a
           class="nav-link dropdown-toggle"
-          href="#"
+          href="javascript:void(0)"
           role="button"
-          (click)="toggleUserMenu()"
-          [class.show]="isUserMenuOpen"
+          (click)="toggleUserMenu(); $event.stopPropagation()"
+          [attr.aria-expanded]="isUserMenuOpen"
         >
           <i class="feather icon-user"></i>
+          <span class="ms-1 d-none d-sm-inline">{{ authHelper.getDisplayName() }}</span>
         </a>
-        <div class="dropdown-menu" [class.show]="isUserMenuOpen">
-          <a class="dropdown-item" href="#"> Profile </a>
-          <a class="dropdown-item" href="#"> Settings </a>
-          <hr />
-          <a class="dropdown-item" href="#" (click)="logout()"> Logout </a>
+        <div class="dropdown-menu dropdown-menu-end" [class.show]="isUserMenuOpen">
+          <div class="dropdown-header">{{ authHelper.getDisplayName() }}</div>
+          <button type="button" class="dropdown-item" (click)="logout()">
+            <i class="feather icon-log-out me-2"></i>Đăng xuất
+          </button>
         </div>
       </div>
     </div>
