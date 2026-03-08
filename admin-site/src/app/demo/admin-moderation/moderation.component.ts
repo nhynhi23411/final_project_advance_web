@@ -15,7 +15,9 @@ import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-
 export class ModerationComponent implements OnInit, AfterViewChecked {
   @ViewChild('reasonInput') reasonInput?: ElementRef<HTMLTextAreaElement>;
 
+  activeTab: 'pending' | 'approved' = 'pending';
   pendingItems: Item[] = [];
+  approvedItems: Item[] = [];
   loading = false;
   searchTerm = '';
   showReasonModal = false;
@@ -41,12 +43,11 @@ export class ModerationComponent implements OnInit, AfterViewChecked {
   }
 
   get filteredItems(): Item[] {
+    const list = this.activeTab === 'pending' ? this.pendingItems : this.approvedItems;
     const term = this.searchTerm.trim().toLowerCase();
-    if (!term) {
-      return this.pendingItems;
-    }
+    if (!term) return list;
 
-    return this.pendingItems.filter((item) => {
+    return list.filter((item) => {
       const id = String(item.id || item._id || '').toLowerCase();
       const title = (item.title || '').toLowerCase();
       return id.includes(term) || title.includes(term);
@@ -67,6 +68,24 @@ export class ModerationComponent implements OnInit, AfterViewChecked {
       error: (err) => {
         console.error('Failed to fetch pending items', err);
         this.pendingItems = [];
+      }
+    });
+  }
+
+  loadApproved() {
+    this.loading = true;
+    this.adminService.getApprovedItems().pipe(
+      finalize(() => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (items) => {
+        this.approvedItems = items;
+      },
+      error: (err) => {
+        console.error('Failed to fetch approved items', err);
+        this.approvedItems = [];
       }
     });
   }

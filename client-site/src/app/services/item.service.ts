@@ -76,7 +76,7 @@ export class ItemService {
         }).pipe(
             catchError((err: HttpErrorResponse) => {
                 const msg = this.getApiErrorMessage(err);
-                return throwError(() => ({ message: msg } as ApiError));
+                return throwError({ message: msg } as ApiError);
             }),
         );
     }

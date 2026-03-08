@@ -69,6 +69,12 @@ export class AdminService {
     });
   }
 
+  getApprovedItems(): Observable<Item[]> {
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
+      params: { status: 'APPROVED' }
+    });
+  }
+
   changeStatus(
     id: string | number,
     status: PostStatus,

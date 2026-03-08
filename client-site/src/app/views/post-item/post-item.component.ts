@@ -127,14 +127,15 @@ export class PostItemComponent implements OnInit {
             error: (err: any) => {
                 this.submitting = false;
                 // Log chi tiết lỗi ra console để debug
-                console.error('[Đăng tin] Lỗi API:', err);
-                if (err?.error) {
-                    console.error('[Đăng tin] Response body:', err.error);
-                }
-                // Ưu tiên message từ API (err.message từ ItemService đã chuẩn hóa, hoặc err.error.message từ response gốc)
+                console.error('[Đăng tin] Lỗi API — full object:', JSON.stringify(err));
+                console.error('[Đăng tin] err.message:', err?.message);
+                console.error('[Đăng tin] err.error:', err?.error);
+                console.error('[Đăng tin] err.error?.message:', err?.error?.message);
+                // ItemService đã chuẩn hóa lỗi thành { message: string } qua catchError
+                // Nếu không qua catchError (err vẫn là HttpErrorResponse), fallback đọc err.error.message
                 const apiMessage = err?.message
                     || err?.error?.message
-                    || (Array.isArray(err?.error?.message) ? err.error.message.join('. ') : null);
+                    || (typeof err?.error === 'string' ? err.error : null);
                 this.submitError = apiMessage || 'Đăng tin thất bại. Vui lòng thử lại.';
             },
         });

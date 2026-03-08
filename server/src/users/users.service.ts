@@ -58,4 +58,24 @@ export class UsersService {
   async countAll(): Promise<number> {
     return this.userModel.countDocuments().exec();
   }
+
+  async update(
+    userId: string,
+    data: Partial<Pick<User, "name" | "email" | "phone" | "role">>,
+  ): Promise<User | null> {
+    const updated = await this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { ...data, updated_at: new Date() },
+        { new: true },
+      )
+      .select("-password")
+      .exec();
+    return updated;
+  }
+
+  async delete(userId: string): Promise<boolean> {
+    const result = await this.userModel.findByIdAndDelete(userId).exec();
+    return !!result;
+  }
 }

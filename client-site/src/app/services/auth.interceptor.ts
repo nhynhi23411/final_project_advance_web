@@ -16,7 +16,7 @@ export class AuthInterceptor implements HttpInterceptor {
     constructor(
         private authService: AuthService,
         private toastService: ToastService
-    ) {}
+    ) { }
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(req).pipe(
@@ -28,7 +28,7 @@ export class AuthInterceptor implements HttpInterceptor {
                         this.toastService.error('Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.');
                     }
                 }
-                return throwError(() => error);
+                return throwError(error);
             }),
         );
     }
