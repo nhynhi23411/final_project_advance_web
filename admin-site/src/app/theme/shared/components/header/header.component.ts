@@ -1,7 +1,8 @@
 // Angular Import
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { AuthHelperService } from 'src/app/services/auth-helper.service';
 
 @Component({
   selector: 'app-header',
@@ -14,10 +15,10 @@ export class HeaderComponent {
   @Output() toggleSidebar = new EventEmitter<void>();
   @Output() toggleMobileSidebar = new EventEmitter<void>();
 
-  // public props
   isUserMenuOpen = false;
 
-  // public method
+  constructor(public authHelper: AuthHelperService) {}
+
   onToggleSidebar(): void {
     this.toggleSidebar.emit();
   }
@@ -31,7 +32,15 @@ export class HeaderComponent {
   }
 
   logout(): void {
-    // Implement logout logic here
-    console.log('Logout');
+    this.isUserMenuOpen = false;
+    this.authHelper.logout();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    const target = event.target as HTMLElement;
+    if (this.isUserMenuOpen && !target.closest('.nav-item.dropdown')) {
+      this.isUserMenuOpen = false;
+    }
   }
 }

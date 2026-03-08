@@ -20,10 +20,9 @@
     <ul class="pcoded-navbar-nav">
       <ng-container *ngFor="let item of menuItems">
         <!-- Single Menu Item -->
-        <li *ngIf="!item.children" class="nav-item">
+        <li *ngIf="!item.children" class="nav-item" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
           <a
             [routerLink]="item.route"
-            routerLinkActive="active"
             class="nav-link"
             (click)="onMenuItemClick()"
           >
@@ -52,10 +51,9 @@
 
           <!-- Submenu -->
           <ul class="pcoded-submenu" *ngIf="item.isOpen">
-            <li *ngFor="let child of item.children">
+            <li *ngFor="let child of item.children" routerLinkActive="active" [routerLinkActiveOptions]="{exact: false}">
               <a
                 [routerLink]="child.route"
-                routerLinkActive="active"
                 class="nav-link"
                 (click)="onMenuItemClick()"
               >
