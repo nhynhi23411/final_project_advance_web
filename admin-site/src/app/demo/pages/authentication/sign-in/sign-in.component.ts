@@ -1,8 +1,10 @@
 // angular import
 import { ChangeDetectorRef, Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { email, Field, form, minLength, required } from '@angular/forms/signals';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
@@ -15,6 +17,8 @@ import { SharedModule } from 'src/app/theme/shared/shared.module';
 })
 export class SignInComponent {
   private cd = inject(ChangeDetectorRef);
+  private http = inject(HttpClient);
+  private router = inject(Router);
 
   submitted = signal(false);
   error = signal('');
@@ -36,9 +40,35 @@ export class SignInComponent {
     this.submitted.set(true);
     this.error.set('');
     event.preventDefault();
+
     const credentials = this.loginModal();
-    console.log('login user logged in with:', credentials);
-    this.cd.detectChanges();
+    this.http.post<{ accessToken: string; user: any }>(`${environment.apiUrl}/auth/login`, credentials).subscribe({
+      next: (res) => {
+        const token = res.accessToken;
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.role !== 'ADMIN') {
+            this.error.set('Tài khoản không có quyền truy cập Admin.');
+            this.cd.detectChanges();
+            return;
+          }
+        } catch {
+          this.error.set('Token không hợp lệ.');
+          this.cd.detectChanges();
+          return;
+        }
+        localStorage.setItem('access_token', token);
+        if (res.user) {
+          localStorage.setItem('admin_user', JSON.stringify(res.user));
+        }
+        this.router.navigate(['/moderation']);
+      },
+      error: (err) => {
+        const msg = err?.error?.message || 'Login failed';
+        this.error.set(msg);
+        this.cd.detectChanges();
+      }
+    });
   }
 
   togglePasswordVisibility() {
