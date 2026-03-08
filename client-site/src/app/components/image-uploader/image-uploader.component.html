@@ -1,6 +1,4 @@
-<div class="border border-blueGray-300 rounded-lg p-3 transition-all duration-200"
-    [class.border-lightBlue-400]="dragOver" [class.bg-lightBlue-50]="dragOver" (dragover)="onDragOver($event)"
-    (dragleave)="onDragLeave($event)" (drop)="onDrop($event)">
+<div class="border border-blueGray-300 rounded-lg p-3">
     <input #fileInput type="file" accept="image/*" multiple class="hidden" (change)="onFileSelected($event)" />
 
     <div *ngIf="images.length === 0" class="flex items-center justify-center gap-3 py-1">
@@ -22,30 +20,37 @@
             </button>
         </div>
 
-        <div class="grid grid-cols-3 sm:grid-cols-5 gap-3">
+        <div class="flex flex-wrap gap-2">
             <div *ngFor="let img of images; let i = index"
-                class="relative group rounded-lg overflow-hidden shadow-sm border border-blueGray-200"
-                style="aspect-ratio: 1 / 1;">
+                class="relative group rounded-md overflow-hidden shadow-sm border border-blueGray-200"
+                style="width: 72px; height: 72px;">
                 <img *ngIf="img.preview" [src]="img.preview" alt="Preview" class="w-full h-full object-cover" />
                 <div *ngIf="img.uploading"
                     class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
-                    <i class="fas fa-spinner fa-spin text-white text-lg"></i>
+                    <i class="fas fa-spinner fa-spin text-white text-sm"></i>
                 </div>
                 <div *ngIf="img.error"
                     class="absolute inset-0 bg-red-500 bg-opacity-60 flex items-center justify-center">
-                    <span class="text-white text-xs font-semibold px-1 text-center">{{ img.error }}</span>
+                    <span class="text-white text-xs font-semibold px-1 text-center leading-tight"
+                        style="font-size: 9px;">{{ img.error }}</span>
                 </div>
                 <div *ngIf="img.done && !img.error"
-                    class="absolute top-1 left-1 bg-emerald-500 rounded-full w-5 h-5 flex items-center justify-center">
-                    <i class="fas fa-check text-white text-xs"></i>
+                    class="absolute top-0.5 left-0.5 bg-emerald-500 rounded-full w-4 h-4 flex items-center justify-center">
+                    <i class="fas fa-check text-white" style="font-size: 8px;"></i>
                 </div>
                 <button type="button"
-                    class="absolute top-1 right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    class="absolute top-0.5 right-0.5 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
                     (click)="$event.stopPropagation(); removeImage(i)">
-                    <i class="fas fa-times text-xs"></i>
+                    <i class="fas fa-times" style="font-size: 8px;"></i>
                 </button>
             </div>
         </div>
+    </div>
+
+    <div *ngIf="sizeError"
+        class="mt-2 p-2 bg-red-50 border border-red-300 rounded text-red-600 text-xs font-semibold flex items-center">
+        <i class="fas fa-exclamation-triangle mr-1.5"></i>
+        {{ sizeError }}
     </div>
 
     <p class="text-xs text-blueGray-400 text-center mt-2">Tối đa {{ maxImages }} ảnh, mỗi ảnh ≤ 5MB</p>

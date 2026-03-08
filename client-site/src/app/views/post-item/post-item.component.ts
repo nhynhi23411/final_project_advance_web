@@ -115,7 +115,11 @@ export class PostItemComponent implements OnInit {
             next: () => {
                 this.submitting = false;
                 this.submitSuccess = true;
-                setTimeout(() => this.resetForm(), 2000);
+                this.submitError = '';
+                // Redirect to home page after 3 seconds
+                setTimeout(() => {
+                    this.router.navigate(['/']);
+                }, 3000);
             },
             error: (err) => {
                 this.submitting = false;
