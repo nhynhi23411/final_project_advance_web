@@ -24,7 +24,8 @@ export interface ItemPayload {
 
 export interface Item {
     _id: string;
-    type: 'LOST' | 'FOUND';
+    type?: 'LOST' | 'FOUND';
+    post_type?: 'LOST' | 'FOUND';
     title: string;
     category: string;
     location_text: string;
@@ -36,7 +37,8 @@ export interface Item {
     images: string[];
     image_public_ids: string[];
     status: 'PENDING' | 'APPROVED' | 'MATCHED' | 'COMPLETED' | 'REJECTED';
-    created_by: string;
+    created_by?: string;
+    created_by_user_id?: string;
     created_at: Date;
     updated_at: Date;
 }
@@ -84,6 +86,13 @@ export class ItemService {
     /** Fetch a single item by ID. */
     getItemById(id: string): Observable<Item> {
         return this.http.get<Item>(`${this.base}/items/${id}`, {
+            headers: this.authHeaders(),
+        });
+    }
+
+    /** Fetch current user's posts (requires auth). */
+    getMyItems(): Observable<Item[]> {
+        return this.http.get<Item[]>(`${this.base}/items/my`, {
             headers: this.authHeaders(),
         });
     }

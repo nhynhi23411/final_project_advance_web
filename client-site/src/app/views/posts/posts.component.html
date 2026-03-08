@@ -1,0 +1,78 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="min-h-screen bg-blueGray-50">
+  <section class="relative pt-16 pb-32">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap items-center justify-between mb-8">
+        <div>
+          <h1 class="text-3xl font-bold text-blueGray-800">Tất cả bài đăng</h1>
+          <p class="mt-1 text-blueGray-600">Danh sách đồ thất lạc đã được duyệt</p>
+        </div>
+      </div>
+
+      <div *ngIf="error" class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
+        {{ error }}
+      </div>
+
+      <div class="flex flex-wrap items-stretch -mx-4">
+        <ng-container *ngIf="!isLoading; else loadingTpl">
+          <ng-container *ngIf="items.length > 0; else emptyTpl">
+            <div *ngFor="let item of items" class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
+              <article class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]">
+                <div class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]">
+                  <div class="flex justify-between items-center w-full">
+                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase"
+                          [ngClass]="getItemTypeClass(item.type || item.post_type)">
+                      {{ getItemTypeLabel(item.type || item.post_type) }}
+                    </span>
+                    <span class="text-[10px] text-blueGray-400 font-medium">
+                      {{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'short' }}
+                    </span>
+                  </div>
+                  <span class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1">{{ item.title }}</span>
+                </div>
+                <div class="w-full overflow-hidden flex-shrink-0">
+                  <div class="relative w-full" style="padding-top:56.25%;">
+                    <img [src]="(item.images && item.images.length) ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'"
+                         [alt]="item.title" class="absolute top-0 left-0 w-full h-full object-cover" />
+                  </div>
+                </div>
+                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
+                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
+                    <p class="flex items-start">
+                      <i class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"></i>
+                      <span class="line-clamp-2">{{ item.location_text || item.location?.address || '—' }}</span>
+                    </p>
+                    <p class="flex items-center">
+                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
+                      {{ item.category }} - {{ item.color || item.metadata?.color || '—' }}
+                    </p>
+                  </div>
+                  <button type="button" (click)="viewItemDetail(item._id)"
+                          class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors">
+                    Xem chi tiết
+                  </button>
+                </div>
+              </article>
+            </div>
+          </ng-container>
+        </ng-container>
+
+        <ng-template #loadingTpl>
+          <div class="w-full text-center py-16">
+            <i class="fas fa-spinner fa-spin text-3xl text-blueGray-400"></i>
+            <p class="mt-2 text-blueGray-600">Đang tải bài đăng...</p>
+          </div>
+        </ng-template>
+
+        <ng-template #emptyTpl>
+          <div class="w-full text-center py-16 text-blueGray-500">
+            <p>Chưa có bài đăng nào.</p>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>

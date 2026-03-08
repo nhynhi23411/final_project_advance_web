@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { AuthService } from "../../../services/auth.service";
 import { Router } from "@angular/router";
 
 @Component({
@@ -7,50 +7,44 @@ import { Router } from "@angular/router";
   templateUrl: "./login.component.html",
 })
 export class LoginComponent implements OnInit {
-  email: string = "";
-  password: string = "";
-  errorMessage: string = "";
+  email = "";
+  password = "";
+  errorMessage = "";
 
   constructor(
-    private http: HttpClient,
+    private authService: AuthService,
     private router: Router,
-  ) { }
+  ) {}
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   handleLogin(): void {
     this.errorMessage = "";
-    const payload = { email: this.email, password: this.password };
-    this.http
-      .post<any>("http://localhost:3000/api/auth/login", payload)
-      .subscribe({
-        next: (res) => {
-          const token = res?.accessToken || res?.access_token;
-          if (!res || !token) {
-            this.errorMessage = "Đăng nhập thất bại";
-            return;
-          }
+    this.authService.login(this.email, this.password).subscribe({
+      next: (res) => {
+        const token = res?.accessToken || (res as any)?.access_token;
+        if (!res || !token) {
+          this.errorMessage = "Đăng nhập thất bại";
+          return;
+        }
 
-          if (res.user?.status === "BANNED") {
-            this.errorMessage = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.";
-            return;
-          }
+        if (res.user?.status === "BANNED") {
+          this.errorMessage = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.";
+          return;
+        }
 
-          localStorage.setItem("access_token", token);
-          if (res.user) {
-            localStorage.setItem("user_info", JSON.stringify(res.user));
-          }
-          this.router.navigate(["/"]);
-        },
-        error: (err) => {
-          console.error("Login error", err);
-          if (err?.status === 403) {
-            this.errorMessage = err?.error?.message || "Tài khoản của bạn đã bị khóa.";
-          } else {
-            this.errorMessage = err?.error?.message || "Lỗi khi đăng nhập";
-          }
-        },
-      });
+        this.authService.setAuth(token, res.user);
+        this.router.navigate(["/"]);
+      },
+      error: (err) => {
+        console.error("Login error", err);
+        if (err?.status === 403) {
+          this.errorMessage = err?.error?.message || "Tài khoản của bạn đã bị khóa.";
+        } else {
+          this.errorMessage = err?.error?.message || "Lỗi khi đăng nhập";
+        }
+      },
+    });
   }
 }
 

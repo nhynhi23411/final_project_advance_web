@@ -64,7 +64,7 @@ export class SignInComponent {
         if (res.user) {
           localStorage.setItem('admin_user', JSON.stringify(res.user));
         }
-        this.router.navigate(['/moderation']);
+        this.router.navigate(['/analytics']);
       },
       error: (err) => {
         this.loading.set(false);
