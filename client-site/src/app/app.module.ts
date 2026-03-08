@@ -19,10 +19,13 @@ import { LandingComponent } from "./views/landing/landing.component";
 import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
+import { PostsComponent } from "./views/posts/posts.component";
+import { SuggestionsComponent } from "./views/suggestions/suggestions.component";
 
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
 import { ClaimModalComponent } from "./components/claim-modal/claim-modal.component";
+import { ToastComponent } from "./components/toast/toast.component";
 import { AuthNavbarComponent } from "./components/navbars/auth-navbar/auth-navbar.component";
 import { IndexNavbarComponent } from "./components/navbars/index-navbar/index-navbar.component";
 
@@ -57,6 +60,9 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
     ImageUploaderComponent,
     ItemDetailComponent,
     ClaimModalComponent,
+    ToastComponent,
+    PostsComponent,
+    SuggestionsComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, FormsModule, ReactiveFormsModule, HttpClientModule],
   providers: [

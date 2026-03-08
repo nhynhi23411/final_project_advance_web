@@ -7,7 +7,10 @@ import { Post, PostDocument } from "./schemas/post.schema";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post.dto";
 import { KeywordService } from "../keyword/keyword.service";
+import { UsersService } from "../users/users.service";
 import { BadRequestException } from "@nestjs/common";
+
+const DUPLICATE_SIMILARITY_THRESHOLD = 0.85;
 
 @Injectable()
 export class PostsService extends BaseCrudService<
@@ -18,18 +21,33 @@ export class PostsService extends BaseCrudService<
   constructor(
     @InjectModel(Post.name) protected override readonly model: Model<PostDocument>,
     private readonly keywordService: KeywordService,
+    private readonly usersService: UsersService,
     private readonly eventEmitter: EventEmitter2
   ) {
     super(model);
   }
 
   async createPostWithUser(dto: CreatePostDto, userId: string, manualStatus?: string): Promise<PostDocument> {
-    console.log('DỮ LIỆU NHẬN ĐƯỢC:', dto.title, dto.description);
-    const hasProfanity = this.keywordService.checkProfanity(dto.title) ||
-      this.keywordService.checkProfanity(dto.description || '');
-    if (hasProfanity) {
-      console.log('PHÁT HIỆN TỪ CẤM - CHUẨN BỊ THROW LỖI');
-      throw new BadRequestException('Nội dung vi phạm chính sách!');
+
+    if (this.keywordService.checkProfanity(dto.title)) {
+      throw new BadRequestException('Tiêu đề chứa từ ngữ không phù hợp');
+    }
+    if (this.keywordService.checkProfanity(dto.description || '')) {
+      throw new BadRequestException('Mô tả chứa từ ngữ không phù hợp');
+    }
+
+    const newText = `${dto.title} ${dto.description || ''}`.trim();
+    const recentPosts = await this.findRecentByUser(userId, 24);
+    for (const old of recentPosts) {
+      const oldText = `${(old as any).title} ${(old as any).description || ''}`.trim();
+      if (this.textSimilarity(newText, oldText) >= DUPLICATE_SIMILARITY_THRESHOLD) {
+        throw new BadRequestException('Bài đăng trùng lặp (spam). Vui lòng không đăng lại nội dung tương tự.');
+      }
+    }
+
+    const user = await this.usersService.findById(userId);
+    if (user && (user as any).status === 'BANNED') {
+      throw new BadRequestException('Tài khoản của bạn đã bị khóa. Liên hệ quản trị viên để được hỗ trợ.');
     }
 
     const postType = dto.post_type || dto.type;
@@ -76,12 +94,28 @@ export class PostsService extends BaseCrudService<
     category?: string;
     location?: string;
     status?: string;
+    q?: string;
   }): Promise<PostDocument[]> {
     const filter: Record<string, unknown> = {};
     if (query.type) filter.post_type = query.type as "LOST" | "FOUND";
     if (query.category) filter.category = new RegExp(query.category, "i");
     if (query.status) filter.status = query.status as Post["status"];
+
+    if (query.q) {
+      const regex = new RegExp(this.escapeRegex(query.q), "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { category: regex },
+        { "location.address": regex },
+      ];
+    }
+
     return this.findAll(filter);
+  }
+
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   async findByUser(userId: string): Promise<PostDocument[]> {
@@ -89,5 +123,27 @@ export class PostsService extends BaseCrudService<
       .find({ created_by_user_id: userId })
       .sort({ createdAt: -1 })
       .exec();
+  }
+
+  private async findRecentByUser(userId: string, hoursAgo: number): Promise<PostDocument[]> {
+    const since = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
+    return this.model
+      .find({
+        created_by_user_id: new Types.ObjectId(userId),
+        createdAt: { $gte: since },
+      })
+      .select('title description')
+      .lean()
+      .exec() as Promise<PostDocument[]>;
+  }
+
+  private textSimilarity(a: string, b: string): number {
+    const toWords = (s: string) =>
+      new Set(s.toLowerCase().replace(/\s+/g, ' ').trim().split(' ').filter(Boolean));
+    const wordsA = toWords(a);
+    const wordsB = toWords(b);
+    if (wordsA.size === 0 && wordsB.size === 0) return 0;
+    const intersection = [...wordsA].filter((w) => wordsB.has(w)).length;
+    return (2 * intersection) / (wordsA.size + wordsB.size);
   }
 }

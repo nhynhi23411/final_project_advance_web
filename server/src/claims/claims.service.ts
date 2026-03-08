@@ -33,6 +33,9 @@ export class ClaimsService {
         if (dto.message && this.keywordService.checkProfanity(dto.message)) {
             throw new BadRequestException("Lời nhắn chứa từ ngữ không phù hợp!");
         }
+        if (dto.secret_info && this.keywordService.checkProfanity(dto.secret_info)) {
+            throw new BadRequestException("Thông tin bí mật chứa từ ngữ không phù hợp!");
+        }
 
         const existingClaim = await this.claimModel.findOne({
             target_post_id: new Types.ObjectId(dto.post_id),
@@ -56,6 +59,8 @@ export class ClaimsService {
             target_post_id: new Types.ObjectId(dto.post_id),
             claimant_user_id: new Types.ObjectId(claimerId),
             message: dto.message || "",
+            secret_info: dto.secret_info || "",
+            image_proof_url: dto.image_proof_url || "",
         });
 
         await this.postModel.findByIdAndUpdate(dto.post_id, {

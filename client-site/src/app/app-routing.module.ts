@@ -13,6 +13,10 @@ import { LandingComponent } from "./views/landing/landing.component";
 import { ProfileComponent } from "./views/profile/profile.component";
 import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
+import { PostsComponent } from "./views/posts/posts.component";
+import { SuggestionsComponent } from "./views/suggestions/suggestions.component";
+
+import { AuthGuard } from "./guards/auth.guard";
 
 const routes: Routes = [
   // auth views (login/register pages use auth layout)
@@ -26,8 +30,10 @@ const routes: Routes = [
     ],
   },
   // application views
-  { path: "profile", component: ProfileComponent },
+  { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent },
+  { path: "posts", component: PostsComponent },
+  { path: "suggestions", component: SuggestionsComponent },
   { path: "items/:id", component: ItemDetailComponent },
   // landing page becomes home
   { path: "", component: LandingComponent },

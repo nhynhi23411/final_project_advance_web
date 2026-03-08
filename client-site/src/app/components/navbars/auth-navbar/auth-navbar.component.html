@@ -35,7 +35,15 @@
             Tạo Bài Đăng
           </a>
         </li>
-        <li class="flex items-center" *ngIf="isLoggedIn">
+        <li class="flex items-center" *ngIf="authService.isLoggedIn">
+          <a
+            [routerLink]="['/suggestions']"
+            class="lg:text-white lg:hover:text-blueGray-200 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
+          >
+            Gợi ý
+          </a>
+        </li>
+        <li class="flex items-center" *ngIf="authService.isLoggedIn">
           <a
             [routerLink]="['/profile']"
             class="lg:text-white lg:hover:text-blueGray-200 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
@@ -45,7 +53,7 @@
         </li>
       </ul>
       <ul class="flex flex-col lg:flex-row list-none lg:ml-auto">
-        <li class="flex items-center" *ngIf="!isLoggedIn">
+        <li class="flex items-center" *ngIf="!authService.isLoggedIn">
           <a
             [routerLink]="['/auth/login']"
             class="lg:text-white lg:hover:text-blueGray-200 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
@@ -53,7 +61,7 @@
             Đăng nhập
           </a>
         </li>
-        <li class="flex items-center" *ngIf="!isLoggedIn">
+        <li class="flex items-center" *ngIf="!authService.isLoggedIn">
           <a
             [routerLink]="['/auth/register']"
             class="lg:text-white lg:hover:text-blueGray-200 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold"
@@ -61,7 +69,7 @@
             Đăng ký
           </a>
         </li>
-        <li class="flex items-center" *ngIf="isLoggedIn">
+        <li class="flex items-center" *ngIf="authService.isLoggedIn">
           <a
             (click)="logout()"
             class="lg:text-white lg:hover:text-blueGray-200 text-blueGray-700 px-3 py-4 lg:py-2 flex items-center text-xs uppercase font-bold cursor-pointer"

@@ -47,9 +47,31 @@ export class AdminService {
     });
   }
 
+  createUser(dto: { name: string; username: string; email: string; password: string; phone: string; role?: string }): Observable<{ message: string; user: AdminUser }> {
+    return this.http.post<{ message: string; user: AdminUser }>(`${this.baseUrl}/admin/users`, dto);
+  }
+
+  updateUser(id: string, dto: { name?: string; email?: string; phone?: string; role?: string }): Observable<{ message: string; user: AdminUser }> {
+    return this.http.patch<{ message: string; user: AdminUser }>(`${this.baseUrl}/admin/users/${id}`, dto);
+  }
+
+  updateUserStatus(id: string, status: 'ACTIVE' | 'INACTIVE' | 'BANNED'): Observable<{ message: string; status: string }> {
+    return this.http.patch<{ message: string; status: string }>(`${this.baseUrl}/admin/users/${id}/status`, { status });
+  }
+
+  deleteUser(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/admin/users/${id}`);
+  }
+
   getPendingItems(): Observable<Item[]> {
     return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
       params: { status: 'PENDING_ADMIN' }
+    });
+  }
+
+  getApprovedItems(): Observable<Item[]> {
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
+      params: { status: 'APPROVED' }
     });
   }
 

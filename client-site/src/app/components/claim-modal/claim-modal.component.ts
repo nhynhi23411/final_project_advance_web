@@ -1,7 +1,6 @@
 import { Component, OnInit, Input, Output, EventEmitter, Inject, LOCALE_ID } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClaimService } from '../../services/claim.service';
-import { ItemService } from '../../services/item.service';
 
 @Component({
     selector: 'app-claim-modal',
@@ -10,19 +9,21 @@ import { ItemService } from '../../services/item.service';
 })
 export class ClaimModalComponent implements OnInit {
     @Input() item: any = null;
+    /** Nếu true thì bắt buộc phải tải ảnh bằng chứng */
+    @Input() requireImage = false;
     @Output() close = new EventEmitter<void>();
     @Output() success = new EventEmitter<void>();
 
     form!: FormGroup;
     isSubmitting = false;
     error: string | null = null;
-    evidenceImages: { url: string; publicId: string; preview: string }[] = [];
+    evidenceImageUrl: string | null = null;
+    evidenceImagePreview: string | null = null;
     uploadingImage = false;
 
     constructor(
         private fb: FormBuilder,
         private claimService: ClaimService,
-        private itemService: ItemService,
         @Inject(LOCALE_ID) public localeId: string
     ) {}
 
@@ -32,7 +33,8 @@ export class ClaimModalComponent implements OnInit {
 
     initForm(): void {
         this.form = this.fb.group({
-            evidence_text: ['', [Validators.required, Validators.minLength(20)]],
+            message: ['', [Validators.required, Validators.minLength(20)]],
+            secret_info: [''],
         });
     }
 
@@ -42,7 +44,6 @@ export class ClaimModalComponent implements OnInit {
 
         const file = files[0];
 
-        // Validate file
         const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
         if (!validTypes.includes(file.type)) {
             this.error = 'Chỉ chấp nhận hình ảnh (JPEG, PNG, GIF, WebP)';
@@ -50,7 +51,6 @@ export class ClaimModalComponent implements OnInit {
         }
 
         if (file.size > 5 * 1024 * 1024) {
-            // 5MB limit
             this.error = 'Kích thước hình ảnh không được vượt quá 5MB';
             return;
         }
@@ -60,14 +60,10 @@ export class ClaimModalComponent implements OnInit {
 
         this.claimService.uploadEvidenceImage(file).subscribe({
             next: (result) => {
-                // Create preview
                 const reader = new FileReader();
                 reader.onload = (e: any) => {
-                    this.evidenceImages.push({
-                        url: result.url,
-                        publicId: result.publicId,
-                        preview: e.target.result,
-                    });
+                    this.evidenceImageUrl = result.url;
+                    this.evidenceImagePreview = e.target.result;
                     this.uploadingImage = false;
                 };
                 reader.readAsDataURL(file);
@@ -80,8 +76,9 @@ export class ClaimModalComponent implements OnInit {
         });
     }
 
-    removeImage(index: number): void {
-        this.evidenceImages.splice(index, 1);
+    removeImage(): void {
+        this.evidenceImageUrl = null;
+        this.evidenceImagePreview = null;
     }
 
     onSubmit(): void {
@@ -95,13 +92,19 @@ export class ClaimModalComponent implements OnInit {
             return;
         }
 
+        if (this.requireImage && !this.evidenceImageUrl) {
+            this.error = 'Vui lòng tải lên ảnh bằng chứng (bắt buộc)';
+            return;
+        }
+
         this.isSubmitting = true;
         this.error = null;
 
         const payload = {
-            item_id: this.item._id,
-            evidence_text: this.form.get('evidence_text')?.value,
-            evidence_images: this.evidenceImages.map((img) => img.url),
+            post_id: this.item._id,
+            message: this.form.get('message')?.value,
+            secret_info: this.form.get('secret_info')?.value || undefined,
+            image_proof_url: this.evidenceImageUrl || undefined,
         };
 
         this.claimService.submitClaim(payload).subscribe({
@@ -123,8 +126,8 @@ export class ClaimModalComponent implements OnInit {
         this.close.emit();
     }
 
-    get evidenceTextError(): string | null {
-        const ctrl = this.form.get('evidence_text');
+    get messageError(): string | null {
+        const ctrl = this.form.get('message');
         if (!ctrl || !ctrl.touched) return null;
         if (ctrl.hasError('required')) return 'Vui lòng nhập nội dung bằng chứng';
         if (ctrl.hasError('minlength'))

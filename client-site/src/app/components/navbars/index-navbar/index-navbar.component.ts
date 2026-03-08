@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { Router } from "@angular/router";
+import { AuthService } from "../../../services/auth.service";
 
 @Component({
   selector: "app-index-navbar",
@@ -8,7 +8,7 @@ import { Router } from "@angular/router";
 export class IndexNavbarComponent implements OnInit {
   navbarOpen = false;
 
-  constructor(private router: Router) {}
+  constructor(public authService: AuthService) {}
 
   ngOnInit(): void {}
 
@@ -16,16 +16,7 @@ export class IndexNavbarComponent implements OnInit {
     this.navbarOpen = !this.navbarOpen;
   }
 
-  get isLoggedIn(): boolean {
-    return !!(
-      localStorage.getItem("access_token") ||
-      localStorage.getItem("user_id")
-    );
-  }
-
   logout(): void {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("user_id");
-    this.router.navigate(["/"]);
+    this.authService.logout();
   }
 }

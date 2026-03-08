@@ -2,21 +2,22 @@
   <div class="col-xl-12">
     <div class="d-flex justify-content-between align-items-center mb-3">
       <h5 class="mb-0">Quản lý Người Dùng</h5>
-      <div class="d-flex align-items-center">
+      <div class="d-flex align-items-center gap-2">
         <input
           type="text"
-          class="form-control form-control-sm me-2"
+          class="form-control form-control-sm"
+          style="width: 220px;"
           placeholder="Tìm theo tên, email, username..."
           [(ngModel)]="searchTerm"
         />
-        <!-- <button
+        <button
           type="button"
           class="btn btn-primary btn-sm"
-          (click)="loadUsers()"
+          (click)="openAddModal()"
           [disabled]="loading"
         >
-          Tải lại
-        </button> -->
+          <i class="feather icon-plus"></i> Thêm user
+        </button>
       </div>
     </div>
     <app-card blockClass="table-border-style">
@@ -30,6 +31,7 @@
               <th>Điện thoại</th>
               <th>Vai trò</th>
               <th>Trạng thái</th>
+              <th style="width: 80px;">Thao tác</th>
             </tr>
           </thead>
           <tbody>
@@ -41,6 +43,34 @@
               <td>{{ getRoleLabel(u.role) }}</td>
               <td>
                 <span [ngClass]="getStatusBadgeClass(u.status)">{{ u.status || 'ACTIVE' }}</span>
+              </td>
+              <td>
+                <div class="dropdown" ngbDropdown placement="bottom-end">
+                  <button
+                    class="btn btn-light btn-sm dropdown-toggle py-1 px-2"
+                    ngbDropdownToggle
+                    aria-label="Thao tác"
+                  >
+                    <i class="feather icon-more-vertical"></i>
+                  </button>
+                  <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                    <button class="dropdown-item" (click)="openEditModal(u)">
+                      <i class="feather icon-edit-2 me-2"></i>Sửa
+                    </button>
+                    <button
+                      class="dropdown-item"
+                      (click)="openStatusModal(u)"
+                    >
+                      <i class="feather icon-user-x me-2" *ngIf="u.status !== 'BANNED'"></i>
+                      <i class="feather icon-user-check me-2" *ngIf="u.status === 'BANNED'"></i>
+                      {{ u.status === 'BANNED' ? 'Bỏ khóa' : 'Khóa' }}
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item text-danger" (click)="openDeleteModal(u)">
+                      <i class="feather icon-trash-2 me-2"></i>Xóa
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -54,5 +84,180 @@
         </div>
       </div>
     </app-card>
+  </div>
+</div>
+
+<!-- Modal Thêm user -->
+<div
+  *ngIf="showAddModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  style="background: rgba(0,0,0,0.5);"
+  (keydown.escape)="closeAddModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Thêm user</h5>
+        <button type="button" class="btn-close" aria-label="Đóng" (click)="closeAddModal()"></button>
+      </div>
+      <form (ngSubmit)="submitAdd()" [formGroup]="addForm">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" formControlName="name" placeholder="Nguyễn Văn A" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Username <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" formControlName="username" placeholder="nguyenvana" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control form-control-sm" formControlName="email" placeholder="a@example.com" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Mật khẩu <span class="text-danger">*</span></label>
+            <input type="password" class="form-control form-control-sm" formControlName="password" placeholder="Tối thiểu 6 ký tự" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" formControlName="phone" placeholder="0901234567" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Vai trò</label>
+            <select class="form-select form-select-sm" formControlName="role">
+              <option value="FINDER">Finder</option>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+          <p *ngIf="addError" class="text-danger small mb-0">{{ addError }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeAddModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary" [disabled]="addForm.invalid || addSubmitting">
+            <span *ngIf="addSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+            Thêm
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Sửa user -->
+<div
+  *ngIf="showEditModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  style="background: rgba(0,0,0,0.5);"
+  (keydown.escape)="closeEditModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sửa user</h5>
+        <button type="button" class="btn-close" aria-label="Đóng" (click)="closeEditModal()"></button>
+      </div>
+      <form (ngSubmit)="submitEdit()" [formGroup]="editForm">
+        <div class="modal-body">
+          <div class="mb-2">
+            <label class="form-label">Họ tên <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" formControlName="name" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Email <span class="text-danger">*</span></label>
+            <input type="email" class="form-control form-control-sm" formControlName="email" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Số điện thoại <span class="text-danger">*</span></label>
+            <input type="text" class="form-control form-control-sm" formControlName="phone" />
+          </div>
+          <div class="mb-2">
+            <label class="form-label">Vai trò</label>
+            <select class="form-select form-select-sm" formControlName="role">
+              <option value="FINDER">Finder</option>
+              <option value="USER">User</option>
+              <option value="ADMIN">Admin</option>
+            </select>
+          </div>
+          <p *ngIf="editError" class="text-danger small mb-0">{{ editError }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeEditModal()">Hủy</button>
+          <button type="submit" class="btn btn-primary" [disabled]="editForm.invalid || editSubmitting">
+            <span *ngIf="editSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+            Lưu
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Xác nhận Khóa/Bỏ khóa -->
+<div
+  *ngIf="showStatusModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  style="background: rgba(0,0,0,0.5);"
+  (keydown.escape)="closeStatusModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ statusTarget?.status === 'BANNED' ? 'Bỏ khóa user' : 'Khóa user' }}</h5>
+        <button type="button" class="btn-close" aria-label="Đóng" (click)="closeStatusModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="statusTarget">
+          Bạn có chắc muốn {{ statusTarget.status === 'BANNED' ? 'bỏ khóa' : 'khóa' }} user
+          <strong>{{ statusTarget.username }}</strong> ({{ statusTarget.name }})?
+        </p>
+        <p *ngIf="statusError" class="text-danger small mb-0">{{ statusError }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeStatusModal()">Hủy</button>
+        <button type="button" class="btn btn-primary" (click)="confirmStatus()" [disabled]="statusSubmitting">
+          <span *ngIf="statusSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+          Xác nhận
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Xác nhận Xóa -->
+<div
+  *ngIf="showDeleteModal"
+  class="modal d-block"
+  tabindex="-1"
+  role="dialog"
+  style="background: rgba(0,0,0,0.5);"
+  (keydown.escape)="closeDeleteModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xóa user</h5>
+        <button type="button" class="btn-close" aria-label="Đóng" (click)="closeDeleteModal()"></button>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="deleteTarget">
+          Bạn có chắc muốn xóa user <strong>{{ deleteTarget.username }}</strong> ({{ deleteTarget.name }})? Hành động này không thể hoàn tác.
+        </p>
+        <p *ngIf="deleteError" class="text-danger small mb-0">{{ deleteError }}</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleteSubmitting">
+          <span *ngIf="deleteSubmitting" class="spinner-border spinner-border-sm me-1"></span>
+          Xóa
+        </button>
+      </div>
+    </div>
   </div>
 </div>

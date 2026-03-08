@@ -1,0 +1,8 @@
+/* Viền rõ khi hover - chỉ hiện lúc di chuột vào */
+.card-lost:hover {
+  border: 2px solid #dc2626 !important; /* red-600 */
+}
+
+.card-found:hover {
+  border: 2px solid #0284c7 !important; /* sky-600 */
+}

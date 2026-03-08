@@ -12,7 +12,7 @@ export class GuestGuard implements CanActivate {
     try {
       const payload = JSON.parse(atob(token.split('.')[1]));
       if (payload.role === 'ADMIN') {
-        this.router.navigate(['/moderation']);
+        this.router.navigate(['/analytics']);
         return false;
       }
     } catch {

@@ -46,6 +46,7 @@ export class PostsController {
     @Query("category") category?: string,
     @Query("location") location?: string,
     @Query("status") status?: string,
+    @Query("q") q?: string,
   ) {
     const effectiveStatus = status || "APPROVED";
     if (effectiveStatus === "PENDING_ADMIN") {
@@ -58,6 +59,7 @@ export class PostsController {
       category,
       location,
       status: effectiveStatus,
+      q: q?.trim() || undefined,
     });
   }
 
@@ -127,11 +129,11 @@ export class PostsController {
     }
 
     // profanity check when updating
-    if (
-      (dto.title && this.keywordService.checkProfanity(dto.title)) ||
-      (dto.description && this.keywordService.checkProfanity(dto.description))
-    ) {
-      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    if (dto.title && this.keywordService.checkProfanity(dto.title)) {
+      throw new BadRequestException("Tiêu đề chứa từ ngữ không phù hợp");
+    }
+    if (dto.description && this.keywordService.checkProfanity(dto.description)) {
+      throw new BadRequestException("Mô tả chứa từ ngữ không phù hợp");
     }
 
     return this.postsService.update(id, dto);

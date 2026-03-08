@@ -2,7 +2,17 @@
     <div class="container mx-auto px-4">
         <div class="max-w-xl mx-auto">
 
-            <h1 class="text-3xl font-extrabold text-blueGray-800 mb-6">Đăng tin</h1>
+            <div class="flex items-center justify-between mb-6">
+                <h1 class="text-3xl font-extrabold text-blueGray-800">Đăng tin</h1>
+                <button
+                    type="button"
+                    (click)="goBack()"
+                    class="flex items-center text-blueGray-600 hover:text-blueGray-800 transition-colors"
+                >
+                    <i class="fas fa-arrow-left mr-2"></i>
+                    <span>Quay lại</span>
+                </button>
+            </div>
 
             <div *ngIf="submitSuccess"
                 class="mb-6 p-6 bg-emerald-50 border border-emerald-300 rounded-lg text-center shadow-md">
@@ -98,6 +108,7 @@
                         Thời điểm<span class="text-red-500">*</span>
                     </label>
                     <input type="date" formControlName="lost_found_date"
+                        [max]="maxDate"
                         class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition"
                         [class.border-red-400]="isInvalid('lost_found_date')" />
                     <p *ngIf="isInvalid('lost_found_date')" class="text-red-500 text-xs mt-1">{{

@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { CATEGORIES, CATEGORY_METADATA, MetadataField } from '../../config/category-metadata.config';
 import { ItemService, ItemPayload } from '../../services/item.service';
 import { ImageUploaderComponent } from '../../components/image-uploader/image-uploader.component';
@@ -26,15 +26,18 @@ export class PostItemComponent implements OnInit {
         private fb: FormBuilder,
         private itemService: ItemService,
         private router: Router,
+        private route: ActivatedRoute,
     ) { }
 
     ngOnInit(): void {
+        const typeParam = this.route.snapshot.queryParamMap.get('type');
+        const initialType = (typeParam === 'LOST' || typeParam === 'FOUND') ? typeParam : '';
         this.form = this.fb.group({
-            type: ['', Validators.required],
+            type: [initialType, Validators.required],
             title: ['', [Validators.required, Validators.maxLength(200)]],
             category: ['', Validators.required],
             location_text: ['', Validators.required],
-            lost_found_date: ['', Validators.required],
+            lost_found_date: ['', [Validators.required, this.maxDateValidator]],
             description: [''],
         });
 
@@ -121,9 +124,19 @@ export class PostItemComponent implements OnInit {
                     this.router.navigate(['/']);
                 }, 3000);
             },
-            error: (err) => {
+            error: (err: any) => {
                 this.submitting = false;
-                this.submitError = err?.error?.message || 'Đăng tin thất bại. Vui lòng thử lại.';
+                // Log chi tiết lỗi ra console để debug
+                console.error('[Đăng tin] Lỗi API — full object:', JSON.stringify(err));
+                console.error('[Đăng tin] err.message:', err?.message);
+                console.error('[Đăng tin] err.error:', err?.error);
+                console.error('[Đăng tin] err.error?.message:', err?.error?.message);
+                // ItemService đã chuẩn hóa lỗi thành { message: string } qua catchError
+                // Nếu không qua catchError (err vẫn là HttpErrorResponse), fallback đọc err.error.message
+                const apiMessage = err?.message
+                    || err?.error?.message
+                    || (typeof err?.error === 'string' ? err.error : null);
+                this.submitError = apiMessage || 'Đăng tin thất bại. Vui lòng thử lại.';
             },
         });
     }
@@ -148,6 +161,21 @@ export class PostItemComponent implements OnInit {
         if (!ctrl || !ctrl.errors) return '';
         if (ctrl.errors.required) return 'Trường này không được để trống';
         if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
+        if (ctrl.errors.maxDate) return 'Chỉ được chọn ngày hôm nay hoặc trước đó';
         return '';
+    }
+
+    get maxDate(): string {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    private maxDateValidator = (control: { value: string }) => {
+        if (!control.value) return null;
+        const today = new Date().toISOString().split('T')[0];
+        return control.value > today ? { maxDate: true } : null;
+    };
+
+    goBack(): void {
+        this.router.navigate(['/']);
     }
 }

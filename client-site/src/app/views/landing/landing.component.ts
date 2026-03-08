@@ -6,12 +6,14 @@ import { SAMPLE_ITEMS } from '../../shared/sample-items';
 @Component({
   selector: "app-landing",
   templateUrl: "./landing.component.html",
+  styleUrls: ["./landing.component.scss"],
 })
 export class LandingComponent implements OnInit {
   items: Item[] = [];
   isLoadingItems = false;
   itemsError: string | null = null;
   isUsingSample = false;
+  searchTerm = '';
 
   constructor(
     private router: Router,
@@ -27,7 +29,7 @@ export class LandingComponent implements OnInit {
     this.itemsError = null;
     this.isUsingSample = false;
     // Optionally pass filters such as limit or status
-    this.itemService.getItems({ limit: '4' }).subscribe({
+    this.itemService.getItems({ status: 'APPROVED', limit: '4' }).subscribe({
       next: (data) => {
         if (data && data.length) {
           this.items = data;
@@ -51,5 +53,10 @@ export class LandingComponent implements OnInit {
 
   viewItemDetail(itemId: string): void {
     this.router.navigate(['/items', itemId]);
+  }
+
+  onSearch(): void {
+    const q = this.searchTerm?.trim();
+    this.router.navigate(['/posts'], { queryParams: q ? { q } : {} });
   }
 }
