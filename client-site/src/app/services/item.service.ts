@@ -1,7 +1,13 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+
+/** Lỗi đã chuẩn hóa từ API, luôn có message */
+export interface ApiError {
+    message: string;
+}
 
 export interface UploadResult {
     url: string;
@@ -67,7 +73,26 @@ export class ItemService {
     createItem(data: ItemPayload): Observable<any> {
         return this.http.post(`${this.base}/items`, data, {
             headers: this.authHeaders(),
-        });
+        }).pipe(
+            catchError((err: HttpErrorResponse) => {
+                const msg = this.getApiErrorMessage(err);
+                return throwError(() => ({ message: msg } as ApiError));
+            }),
+        );
+    }
+
+    /** Trích message từ HttpErrorResponse (NestJS trả { message, error, statusCode }) */
+    private getApiErrorMessage(err: HttpErrorResponse): string {
+        const body = err?.error;
+        if (body != null && typeof body === 'object' && !Array.isArray(body)) {
+            const m = body.message ?? body.msg;
+            if (m != null && m !== '') {
+                return Array.isArray(m) ? m.join('. ') : String(m);
+            }
+        }
+        if (typeof body === 'string' && body.length < 300) return body;
+        if (err?.status === 400) return 'Yêu cầu không hợp lệ (400).';
+        return err?.message || 'Đăng tin thất bại. Vui lòng thử lại.';
     }
 
     /** Fetch items with optional filters. */

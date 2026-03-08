@@ -29,10 +29,11 @@ export class PostsService extends BaseCrudService<
 
   async createPostWithUser(dto: CreatePostDto, userId: string, manualStatus?: string): Promise<PostDocument> {
 
-    const hasProfanity = this.keywordService.checkProfanity(dto.title) ||
-      this.keywordService.checkProfanity(dto.description || '');
-    if (hasProfanity) {
-      throw new BadRequestException('Nội dung vi phạm chính sách!');
+    if (this.keywordService.checkProfanity(dto.title)) {
+      throw new BadRequestException('Tiêu đề chứa từ ngữ không phù hợp');
+    }
+    if (this.keywordService.checkProfanity(dto.description || '')) {
+      throw new BadRequestException('Mô tả chứa từ ngữ không phù hợp');
     }
 
     const newText = `${dto.title} ${dto.description || ''}`.trim();

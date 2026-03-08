@@ -14,8 +14,11 @@ export class AutoModerationMiddleware implements NestMiddleware {
 
     const reasons: string[] = [];
 
-    if (this.keywordService.checkProfanity(fullText)) {
-      throw new BadRequestException("Nội dung chứa từ ngữ không phù hợp");
+    if (this.keywordService.checkProfanity(title)) {
+      throw new BadRequestException("Tiêu đề chứa từ ngữ không phù hợp");
+    }
+    if (this.keywordService.checkProfanity(description)) {
+      throw new BadRequestException("Mô tả chứa từ ngữ không phù hợp");
     }
 
     // REGEX CHECKS: Giữ nguyên logic nhận diện số và link

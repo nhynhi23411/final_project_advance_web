@@ -37,7 +37,7 @@ export class PostItemComponent implements OnInit {
             title: ['', [Validators.required, Validators.maxLength(200)]],
             category: ['', Validators.required],
             location_text: ['', Validators.required],
-            lost_found_date: ['', Validators.required],
+            lost_found_date: ['', [Validators.required, this.maxDateValidator]],
             description: [''],
         });
 
@@ -124,9 +124,18 @@ export class PostItemComponent implements OnInit {
                     this.router.navigate(['/']);
                 }, 3000);
             },
-            error: (err) => {
+            error: (err: any) => {
                 this.submitting = false;
-                this.submitError = err?.error?.message || 'Đăng tin thất bại. Vui lòng thử lại.';
+                // Log chi tiết lỗi ra console để debug
+                console.error('[Đăng tin] Lỗi API:', err);
+                if (err?.error) {
+                    console.error('[Đăng tin] Response body:', err.error);
+                }
+                // Ưu tiên message từ API (err.message từ ItemService đã chuẩn hóa, hoặc err.error.message từ response gốc)
+                const apiMessage = err?.message
+                    || err?.error?.message
+                    || (Array.isArray(err?.error?.message) ? err.error.message.join('. ') : null);
+                this.submitError = apiMessage || 'Đăng tin thất bại. Vui lòng thử lại.';
             },
         });
     }
@@ -151,6 +160,21 @@ export class PostItemComponent implements OnInit {
         if (!ctrl || !ctrl.errors) return '';
         if (ctrl.errors.required) return 'Trường này không được để trống';
         if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
+        if (ctrl.errors.maxDate) return 'Chỉ được chọn ngày hôm nay hoặc trước đó';
         return '';
+    }
+
+    get maxDate(): string {
+        return new Date().toISOString().split('T')[0];
+    }
+
+    private maxDateValidator = (control: { value: string }) => {
+        if (!control.value) return null;
+        const today = new Date().toISOString().split('T')[0];
+        return control.value > today ? { maxDate: true } : null;
+    };
+
+    goBack(): void {
+        this.router.navigate(['/']);
     }
 }
