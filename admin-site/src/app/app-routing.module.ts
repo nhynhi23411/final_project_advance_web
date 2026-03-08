@@ -16,7 +16,7 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: '/moderation',
+        redirectTo: '/analytics',
         pathMatch: 'full'
       },
       {
