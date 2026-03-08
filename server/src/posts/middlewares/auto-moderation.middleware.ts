@@ -33,14 +33,10 @@ export class AutoModerationMiddleware implements NestMiddleware {
     if (securityRe.test(fullText)) reasons.push("regex:security");
     if (phishingRe.test(fullText)) reasons.push("regex:phishing");
 
-    // DUPLICATE CHECK
-    const userId = (req as any).user?.userId || body.userId || null;
-    const isDuplicate = await this.checkDuplicate(userId, title);
-    if (isDuplicate) reasons.push("duplicate:recent");
-
     // DECISION GATEWAY
     if (reasons.length > 0) {
       body.status = "PENDING_ADMIN";
+      const userId = (req as any).user?.userId || null;
       console.log(
         "AuditLog:",
         JSON.stringify({
@@ -63,9 +59,7 @@ export class AutoModerationMiddleware implements NestMiddleware {
     return (input || "").toString().toLowerCase().trim().replace(/\s+/g, " ");
   }
 
-  private async checkDuplicate(_userId: any, _title: string): Promise<boolean> {
-    return false;
-  }
+
 }
 
 export default AutoModerationMiddleware;

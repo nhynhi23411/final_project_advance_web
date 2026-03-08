@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, BadRequestException } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
@@ -6,9 +6,7 @@ import { BaseCrudService } from "../common/base-crud.service";
 import { Post, PostDocument } from "./schemas/post.schema";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post.dto";
-import { KeywordService } from "../keyword/keyword.service";
 import { UsersService } from "../users/users.service";
-import { BadRequestException } from "@nestjs/common";
 
 const DUPLICATE_SIMILARITY_THRESHOLD = 0.85;
 
@@ -20,7 +18,6 @@ export class PostsService extends BaseCrudService<
 > {
   constructor(
     @InjectModel(Post.name) protected override readonly model: Model<PostDocument>,
-    private readonly keywordService: KeywordService,
     private readonly usersService: UsersService,
     private readonly eventEmitter: EventEmitter2
   ) {
@@ -28,13 +25,6 @@ export class PostsService extends BaseCrudService<
   }
 
   async createPostWithUser(dto: CreatePostDto, userId: string, manualStatus?: string): Promise<PostDocument> {
-
-    if (this.keywordService.checkProfanity(dto.title)) {
-      throw new BadRequestException('Tiêu đề chứa từ ngữ không phù hợp');
-    }
-    if (this.keywordService.checkProfanity(dto.description || '')) {
-      throw new BadRequestException('Mô tả chứa từ ngữ không phù hợp');
-    }
 
     const newText = `${dto.title} ${dto.description || ''}`.trim();
     const recentPosts = await this.findRecentByUser(userId, 24);
