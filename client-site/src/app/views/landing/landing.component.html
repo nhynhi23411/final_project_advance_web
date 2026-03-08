@@ -27,25 +27,28 @@
               đối soát và hẹn trả một cách an toàn, minh bạch.
             </p>
 
-            <!-- THÊM SEARCH BAR (không xoá gì, chỉ bổ sung) -->
-            <div class="mt-8 w-full">
+            <!-- SEARCH BAR -->
+            <form (ngSubmit)="onSearch()" class="mt-8 w-full">
               <div
                 class="relative flex w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden"
               >
                 <input
                   type="text"
+                  [(ngModel)]="searchTerm"
+                  name="searchTerm"
                   placeholder="Tìm ví, điện thoại, balo... theo tên, loại, địa điểm"
                   class="w-full px-4 py-3 text-blueGray-700 placeholder-blueGray-300 focus:outline-none"
+                  aria-label="Tìm kiếm bài đăng"
                 />
                 <button
                   class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 flex items-center justify-center"
-                  type="button"
+                  type="submit"
                 >
                   <i class="fas fa-search mr-2"></i>
                   <span class="hidden sm:inline">Tìm kiếm</span>
                 </button>
               </div>
-            </div>
+            </form>
             <!-- END SEARCH BAR -->
           </div>
         </div>

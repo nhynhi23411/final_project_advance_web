@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { ItemService, Item } from '../../services/item.service';
 import { SAMPLE_ITEMS } from '../../shared/sample-items';
 
@@ -12,21 +12,28 @@ export class PostsComponent implements OnInit {
   isLoading = false;
   error: string | null = null;
   isUsingSample = false;
+  searchQuery = '';
 
   constructor(
     private router: Router,
+    private route: ActivatedRoute,
     private itemService: ItemService
   ) {}
 
   ngOnInit(): void {
-    this.loadItems();
+    this.route.queryParams.subscribe((params) => {
+      this.searchQuery = params['q'] || '';
+      this.loadItems();
+    });
   }
 
   loadItems(): void {
     this.isLoading = true;
     this.error = null;
     this.isUsingSample = false;
-    this.itemService.getItems({ status: 'APPROVED' }).subscribe({
+    const filters: Record<string, string> = { status: 'APPROVED' };
+    if (this.searchQuery?.trim()) filters['q'] = this.searchQuery.trim();
+    this.itemService.getItems(filters).subscribe({
       next: (data) => {
         const list = Array.isArray(data) ? data : [];
         if (list.length) {
@@ -59,6 +66,13 @@ export class PostsComponent implements OnInit {
 
   viewItemDetail(itemId: string): void {
     this.router.navigate(['/items', itemId]);
+  }
+
+  onSearch(): void {
+    this.router.navigate(['/posts'], {
+      queryParams: this.searchQuery?.trim() ? { q: this.searchQuery.trim() } : {},
+      queryParamsHandling: '',
+    });
   }
 
   getItemTypeLabel(type: string): string {

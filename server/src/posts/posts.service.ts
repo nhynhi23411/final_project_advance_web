@@ -76,12 +76,28 @@ export class PostsService extends BaseCrudService<
     category?: string;
     location?: string;
     status?: string;
+    q?: string;
   }): Promise<PostDocument[]> {
     const filter: Record<string, unknown> = {};
     if (query.type) filter.post_type = query.type as "LOST" | "FOUND";
     if (query.category) filter.category = new RegExp(query.category, "i");
     if (query.status) filter.status = query.status as Post["status"];
+
+    if (query.q) {
+      const regex = new RegExp(this.escapeRegex(query.q), "i");
+      filter.$or = [
+        { title: regex },
+        { description: regex },
+        { category: regex },
+        { "location.address": regex },
+      ];
+    }
+
     return this.findAll(filter);
+  }
+
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   }
 
   async findByUser(userId: string): Promise<PostDocument[]> {

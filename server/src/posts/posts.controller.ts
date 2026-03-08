@@ -46,6 +46,7 @@ export class PostsController {
     @Query("category") category?: string,
     @Query("location") location?: string,
     @Query("status") status?: string,
+    @Query("q") q?: string,
   ) {
     const effectiveStatus = status || "APPROVED";
     if (effectiveStatus === "PENDING_ADMIN") {
@@ -58,6 +59,7 @@ export class PostsController {
       category,
       location,
       status: effectiveStatus,
+      q: q?.trim() || undefined,
     });
   }
 

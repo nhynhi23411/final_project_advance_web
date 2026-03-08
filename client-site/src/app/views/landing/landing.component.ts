@@ -13,6 +13,7 @@ export class LandingComponent implements OnInit {
   isLoadingItems = false;
   itemsError: string | null = null;
   isUsingSample = false;
+  searchTerm = '';
 
   constructor(
     private router: Router,
@@ -52,5 +53,10 @@ export class LandingComponent implements OnInit {
 
   viewItemDetail(itemId: string): void {
     this.router.navigate(['/items', itemId]);
+  }
+
+  onSearch(): void {
+    const q = this.searchTerm?.trim();
+    this.router.navigate(['/posts'], { queryParams: q ? { q } : {} });
   }
 }
