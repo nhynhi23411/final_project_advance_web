@@ -65,11 +65,14 @@ export class ProfileComponent implements OnInit {
   loadMyPosts(): void {
     this.loadingPosts = true;
     this.itemService.getMyItems().subscribe({
-      next: (data) => {
-        this.myPosts = Array.isArray(data) ? data : [];
+      next: (data: any) => {
+        // Xử lý trường hợp API trả về mảng hoặc object bọc { data: [...] }
+        const list = Array.isArray(data) ? data : (data?.data || []);
+        this.myPosts = list;
         this.loadingPosts = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error("Lỗi khi tải danh sách tin:", err);
         this.myPosts = [];
         this.loadingPosts = false;
       },

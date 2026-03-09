@@ -34,6 +34,18 @@ export class ClaimsController {
         return this.claimsService.review(id, dto, req.user.userId);
     }
 
+    @Get("count/active")
+    @UseGuards(AuthGuard("jwt"))
+    countActive(@Request() req: any) {
+        return this.claimsService.countActive(req.user.userId);
+    }
+
+    @Get("item/:id")
+    @UseGuards(AuthGuard("jwt"))
+    getMyClaimsForItem(@Param("id") itemId: string, @Request() req: any) {
+        return this.claimsService.getMyClaimsForItem(itemId, req.user.userId);
+    }
+
     @Get()
     @UseGuards(AuthGuard("jwt"))
     findAll(@Query("post_id") postId?: string, @Request() req?: any) {

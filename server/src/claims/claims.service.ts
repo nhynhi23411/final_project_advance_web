@@ -144,12 +144,30 @@ export class ClaimsService {
     async findByPost(postId: string) {
         return this.claimModel
             .find({ target_post_id: new Types.ObjectId(postId) })
+            .populate("claimant_user_id", "username name email phone")
             .sort({ createdAt: -1 });
     }
 
     async findByUser(userId: string) {
         return this.claimModel
             .find({ claimant_user_id: new Types.ObjectId(userId) })
+            .sort({ createdAt: -1 });
+    }
+
+    async countActive(userId: string) {
+        const count = await this.claimModel.countDocuments({
+            claimant_user_id: new Types.ObjectId(userId),
+            status: { $in: ["PENDING", "UNDER_VERIFICATION"] },
+        });
+        return { count };
+    }
+
+    async getMyClaimsForItem(itemId: string, userId: string) {
+        return this.claimModel
+            .find({
+                target_post_id: new Types.ObjectId(itemId),
+                claimant_user_id: new Types.ObjectId(userId),
+            })
             .sort({ createdAt: -1 });
     }
 }

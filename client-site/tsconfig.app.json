@@ -4,16 +4,14 @@
     "outDir": "./out-tsc/app",
     "types": []
   },
-  "files": [
-    "src/main.ts",
-    "src/polyfills.ts"
-  ],
-  "include": [
-    "src/**/*.ts"
-  ],
+  "files": ["src/main.ts", "src/polyfills.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": [
     "src/test.ts",
     "src/**/*.spec.ts",
-    "src/environments/environment.prod.ts"
+    "src/environments/environment.prod.ts",
+    "src/app/services/modal.service.ts",
+    "src/app/shared/sample-items.ts",
+    "src/app/views/index/index.component.ts"
   ]
 }
