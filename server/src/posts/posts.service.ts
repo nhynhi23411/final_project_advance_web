@@ -9,58 +9,90 @@ import { UpdatePostDto } from "./dto/update-post.dto";
 import { UsersService } from "../users/users.service";
 
 const DUPLICATE_SIMILARITY_THRESHOLD = 0.85;
+type RecentPostText = Pick<Post, "title" | "description">;
 
 @Injectable()
 export class PostsService extends BaseCrudService<
   PostDocument,
-  CreatePostDto & { created_by_user_id: string; images?: string[]; image_public_ids?: string[] },
+  CreatePostDto & {
+    created_by_user_id: string;
+    images?: string[];
+    image_public_ids?: string[];
+  },
   UpdatePostDto
 > {
   constructor(
-    @InjectModel(Post.name) protected override readonly model: Model<PostDocument>,
+    @InjectModel(Post.name)
+    protected override readonly model: Model<PostDocument>,
     private readonly usersService: UsersService,
-    private readonly eventEmitter: EventEmitter2
+    private readonly eventEmitter: EventEmitter2,
   ) {
     super(model);
   }
 
-  async createPostWithUser(dto: CreatePostDto, userId: string, manualStatus?: string): Promise<PostDocument> {
-
-    const newText = `${dto.title} ${dto.description || ''}`.trim();
+  async createPostWithUser(
+    dto: CreatePostDto,
+    userId: string,
+    manualStatus?: string,
+  ): Promise<PostDocument> {
+    const newText = `${dto.title} ${dto.description || ""}`.trim();
     const recentPosts = await this.findRecentByUser(userId, 24);
     for (const old of recentPosts) {
-      const oldText = `${(old as any).title} ${(old as any).description || ''}`.trim();
-      if (this.textSimilarity(newText, oldText) >= DUPLICATE_SIMILARITY_THRESHOLD) {
-        throw new BadRequestException('Bài đăng trùng lặp (spam). Vui lòng không đăng lại nội dung tương tự.');
+      const oldText = `${old.title} ${old.description || ""}`.trim();
+      if (
+        this.textSimilarity(newText, oldText) >= DUPLICATE_SIMILARITY_THRESHOLD
+      ) {
+        throw new BadRequestException(
+          "Bài đăng trùng lặp (spam). Vui lòng không đăng lại nội dung tương tự.",
+        );
       }
     }
 
     const user = await this.usersService.findById(userId);
-    if (user && (user as any).status === 'BANNED') {
-      throw new BadRequestException('Tài khoản của bạn đã bị khóa. Liên hệ quản trị viên để được hỗ trợ.');
+    if (user && (user as any).status === "BANNED") {
+      throw new BadRequestException(
+        "Tài khoản của bạn đã bị khóa. Liên hệ quản trị viên để được hỗ trợ.",
+      );
     }
 
     const postType = dto.post_type || dto.type;
 
     let locationData = dto.location;
     if (!locationData && dto.location_text) {
-      locationData = { type: "Point", coordinates: [0, 0], address: dto.location_text };
+      locationData = {
+        type: "Point",
+        coordinates: [0, 0],
+        address: dto.location_text,
+      };
     }
-    if (locationData && typeof locationData.lat === "number" && typeof locationData.lng === "number") {
+    if (
+      locationData &&
+      typeof locationData.lat === "number" &&
+      typeof locationData.lng === "number"
+    ) {
       locationData = {
         type: "Point",
         coordinates: [locationData.lng, locationData.lat],
-        address: locationData.address || ""
+        address: locationData.address || "",
       };
     }
 
     const metadata: Record<string, any> = { ...(dto.metadata || {}) };
     if (dto.color) metadata.color = dto.color;
     if (dto.brand) metadata.brand = dto.brand;
-    if (dto.distinctive_marks) metadata.distinctive_marks = dto.distinctive_marks;
+    if (dto.distinctive_marks)
+      metadata.distinctive_marks = dto.distinctive_marks;
     if (dto.lost_found_date) metadata.lost_found_date = dto.lost_found_date;
 
-    const { type, location_text, lost_found_date, color, brand, distinctive_marks, ...rest } = dto as any;
+    const {
+      type,
+      location_text,
+      lost_found_date,
+      color,
+      brand,
+      distinctive_marks,
+      ...rest
+    } = dto as any;
 
     const payload = {
       ...rest,
@@ -74,8 +106,8 @@ export class PostsService extends BaseCrudService<
     };
 
     const created = new this.model(payload);
-    const saved = await created.save() as PostDocument;
-    this.eventEmitter.emit('item.created', { itemId: saved._id });
+    const saved = (await created.save()) as PostDocument;
+    this.eventEmitter.emit("item.created", { itemId: saved._id });
     return saved;
   }
 
@@ -110,26 +142,31 @@ export class PostsService extends BaseCrudService<
 
   async findByUser(userId: string): Promise<PostDocument[]> {
     return this.model
-      .find({ created_by_user_id: userId })
+      .find({ created_by_user_id: new Types.ObjectId(userId) })
       .sort({ createdAt: -1 })
       .exec();
   }
 
-  private async findRecentByUser(userId: string, hoursAgo: number): Promise<PostDocument[]> {
+  private async findRecentByUser(
+    userId: string,
+    hoursAgo: number,
+  ): Promise<RecentPostText[]> {
     const since = new Date(Date.now() - hoursAgo * 60 * 60 * 1000);
     return this.model
       .find({
         created_by_user_id: new Types.ObjectId(userId),
         createdAt: { $gte: since },
       })
-      .select('title description')
-      .lean()
-      .exec() as Promise<PostDocument[]>;
+      .select("title description")
+      .lean<RecentPostText[]>()
+      .exec();
   }
 
   private textSimilarity(a: string, b: string): number {
     const toWords = (s: string) =>
-      new Set(s.toLowerCase().replace(/\s+/g, ' ').trim().split(' ').filter(Boolean));
+      new Set(
+        s.toLowerCase().replace(/\s+/g, " ").trim().split(" ").filter(Boolean),
+      );
     const wordsA = toWords(a);
     const wordsB = toWords(b);
     if (wordsA.size === 0 && wordsB.size === 0) return 0;

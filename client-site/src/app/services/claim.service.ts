@@ -65,4 +65,18 @@ export class ClaimService {
             headers: this.authHeaders(),
         });
     }
+
+    /** Lấy danh sách claims của một post (Dành cho chủ bài đăng). */
+    getClaimsForPost(postId: string): Observable<any[]> {
+        return this.http.get<any[]>(`${this.base}/claims?post_id=${postId}`, {
+            headers: this.authHeaders(),
+        });
+    }
+
+    /** Duyệt hoặc từ chối claim (Dành cho chủ bài đăng). */
+    reviewClaim(claimId: string, action: 'UNDER_VERIFICATION' | 'SUCCESSFUL' | 'REJECTED' | 'CANCELLED'): Observable<any> {
+        return this.http.patch<any>(`${this.base}/claims/${claimId}/review`, { action }, {
+            headers: this.authHeaders(),
+        });
+    }
 }

@@ -79,10 +79,15 @@
     <div class="container mx-auto px-4">
       <div class="flex flex-wrap">
         <div class="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
-          <a [routerLink]="['/post-item']" [queryParams]="{type: 'LOST'}"
-            class="card-lost block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer">
+          <a
+            [routerLink]="['/post-item']"
+            [queryParams]="{ type: 'LOST' }"
+            class="card-lost block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer"
+          >
             <div class="px-4 py-5 flex-auto">
-              <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400">
+              <div
+                class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400"
+              >
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
               </div>
               <h6 class="text-xl font-semibold">Đăng tin đồ bị mất</h6>
@@ -95,10 +100,15 @@
         </div>
 
         <div class="w-full md:w-4/12 px-4 text-center">
-          <a [routerLink]="['/post-item']" [queryParams]="{type: 'FOUND'}"
-            class="card-found block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer">
+          <a
+            [routerLink]="['/post-item']"
+            [queryParams]="{ type: 'FOUND' }"
+            class="card-found block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer"
+          >
             <div class="px-4 py-5 flex-auto">
-              <div class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400">
+              <div
+                class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400"
+              >
                 <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
               </div>
               <h6 class="text-xl font-semibold">Đăng tin đồ nhặt được</h6>
@@ -219,54 +229,94 @@
         <!-- dynamic generation of cards -->
         <ng-container *ngIf="!isLoadingItems; else loadingItems">
           <ng-container *ngIf="items.length > 0; else noItems">
-            <div *ngFor="let item of items" class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-              <article class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]">
-                <div class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]">
+            <div
+              *ngFor="let item of items"
+              class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex"
+            >
+              <article
+                class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
+              >
+                <div
+                  class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
+                >
                   <div class="flex justify-between items-center w-full">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                          [ngClass]="{
-                            'bg-red-100 text-red-600': item.type === 'LOST',
-                            'bg-emerald-100 text-emerald-600': item.type === 'FOUND'
-                          }">
-                      <i [ngClass]="{
+                    <span
+                      class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
+                      [ngClass]="{
+                        'bg-red-100 text-red-600': item.type === 'LOST',
+                        'bg-emerald-100 text-emerald-600':
+                          item.type === 'FOUND'
+                      }"
+                    >
+                      <i
+                        [ngClass]="{
                           'fas fa-exclamation-circle': item.type === 'LOST',
                           'fas fa-hand-holding-heart': item.type === 'FOUND'
-                        }" class="mr-1"></i>
-                      {{ item.type === 'LOST' ? 'Bị mất' : 'Nhặt được' }}
+                        }"
+                        class="mr-1"
+                      ></i>
+                      {{ item.type === "LOST" ? "Bị mất" : "Nhặt được" }}
                     </span>
                     <span class="text-[10px] text-blueGray-400 font-medium">
-                      {{ item.lost_found_date | date:'short' }}
+                      {{ item.lost_found_date | date: "short" }}
                     </span>
                   </div>
-                  <span class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1" [title]="item.title">
+                  <span
+                    class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
+                    [title]="item.title"
+                  >
                     {{ item.title }}
                   </span>
                 </div>
 
                 <div class="w-full overflow-hidden flex-shrink-0">
                   <!-- maintain 4:3 ratio with fixed height for uniformity -->
-                  <div class="relative w-full" style="padding-top:56.25%;">
-                    <img [src]="item.images && item.images.length ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'"
-                         [alt]="item.title" class="absolute top-0 left-0 w-full h-full object-cover" />
+                  <div class="relative w-full" style="padding-top: 56.25%">
+                    <ng-container
+                      *ngIf="getItemImage(item) as imageUrl; else noImageBlock"
+                    >
+                      <img
+                        [src]="imageUrl"
+                        [alt]="item.title"
+                        (error)="onImageError($event)"
+                        class="absolute top-0 left-0 w-full h-full object-cover"
+                      />
+                    </ng-container>
+                    <ng-template #noImageBlock>
+                      <div
+                        class="absolute top-0 left-0 w-full h-full bg-blueGray-100 flex items-center justify-center text-blueGray-500 text-xs font-semibold uppercase"
+                      >
+                        Chua co anh tu bai dang
+                      </div>
+                    </ng-template>
                   </div>
                 </div>
 
                 <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
                   <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
                     <p class="flex items-start">
-                      <i class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"></i>
-                      <span class="line-clamp-2 leading-snug">{{ item.location_text }}</span>
+                      <i
+                        class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
+                      ></i>
+                      <span class="line-clamp-2 leading-snug">{{
+                        item.location_text
+                      }}</span>
                     </p>
                     <p class="flex items-center">
                       <i class="far fa-clock text-blueGray-400 w-4"></i>
-                      {{ item.lost_found_date | date:'short' }}
+                      {{ item.lost_found_date | date: "short" }}
                     </p>
                     <p class="flex items-center">
                       <i class="fas fa-tag text-blueGray-400 w-4"></i>
-                      Màu: {{ item.color || 'Không xác định' }} - Loại: {{ item.category }}
+                      Màu: {{ item.color || "Không xác định" }} - Loại:
+                      {{ item.category }}
                     </p>
                   </div>
-                  <button type="button" (click)="viewItemDetail(item._id)" class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors">
+                  <button
+                    type="button"
+                    (click)="viewItemDetail(item._id)"
+                    class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
+                  >
                     Xem chi tiết
                   </button>
                 </div>
@@ -278,7 +328,9 @@
         <!-- loading and empty templates -->
         <ng-template #loadingItems>
           <div class="w-full text-center py-8">
-            <i class="fas fa-spinner animate-spin text-2xl text-blueGray-400"></i>
+            <i
+              class="fas fa-spinner animate-spin text-2xl text-blueGray-400"
+            ></i>
             <p class="mt-2 text-blueGray-600">Đang tải bài đăng...</p>
           </div>
         </ng-template>

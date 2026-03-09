@@ -1,131 +1,174 @@
-<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overscroll-contain">
-  <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto overscroll-contain">
-    <!-- Header -->
-    <div class="bg-blueGray-50 border-b border-blueGray-200 px-6 py-4 flex items-center justify-between sticky top-0">
-      <h2 class="text-xl font-bold text-blueGray-800">
-        <i class="fas fa-check-circle text-blueGray-500 mr-3"></i>
-        Gửi yêu cầu xác minh
-      </h2>
-      <button (click)="close.emit()" aria-label="Đóng" type="button"
-        class="text-blueGray-500 hover:text-blueGray-700 text-2xl leading-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 rounded">
-        <i class="fas fa-times" aria-hidden="true"></i>
-      </button>
+<div
+  class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto overscroll-contain"
+>
+  <div
+    class="bg-blueGray-50 border-b border-blueGray-200 px-6 py-4 flex items-center justify-between sticky top-0"
+  >
+    <h2 class="text-xl font-bold text-blueGray-800">
+      <i class="fas fa-check-circle text-blueGray-500 mr-3"></i>
+      Gửi yêu cầu xác minh
+    </h2>
+    <button
+      (click)="closeModal()"
+      aria-label="Đóng"
+      type="button"
+      class="text-blueGray-500 hover:text-blueGray-700 text-2xl leading-none transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 rounded"
+    >
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
+    <!-- Error Message -->
+    <div
+      *ngIf="error"
+      class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start"
+    >
+      <i class="fas fa-exclamation-circle mr-3 mt-1 text-lg flex-shrink-0"></i>
+      <span>{{ error }}</span>
     </div>
 
-    <!-- Content -->
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
-      <!-- Error Message -->
-      <div *ngIf="error" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-start">
-        <i class="fas fa-exclamation-circle mr-3 mt-1 text-lg flex-shrink-0"></i>
-        <span>{{ error }}</span>
-      </div>
+    <!-- Message (note) -->
+    <div>
+      <label class="block text-sm font-bold text-blueGray-700 mb-2">
+        Ghi chú hoàn cảnh (Tùy chọn)
+      </label>
+      <p class="text-xs text-blueGray-500 mb-2">
+        Mô tả hoàn cảnh mất/nhặt được đồ để giúp chủ bài đăng đối chiếu thêm.
+      </p>
+      <textarea
+        formControlName="note"
+        rows="4"
+        placeholder="Ví dụ: Tôi rơi ví này tối t2 ở bãi xe... bên trong có 2 vé xem phim."
+        class="w-full px-4 py-2 border border-blueGray-300 rounded-lg focus:outline-none focus:border-blueGray-500 focus:ring-1 focus:ring-blueGray-300 resize-none text-sm"
+      ></textarea>
+    </div>
 
-      <!-- Message (note) -->
-      <div>
-        <label class="block text-sm font-bold text-blueGray-700 mb-2">
-          <span class="text-red-600">*</span> Nội dung bằng chứng
-        </label>
-        <p class="text-xs text-blueGray-500 mb-2">
-          Mô tả chi tiết lý do bạn tin đây là đồ của mình (tối thiểu 20 ký tự)
-        </p>
-        <textarea
-          formControlName="message"
-          rows="5"
-          placeholder="Ví dụ: Tôi mất chiếc ví này tại siêu thị Coopmart vào ngày 24/02/2026 lúc 19h. Ví của tôi có các thẻ ATM của NH Vietcombank..."
-          class="w-full px-4 py-2 border border-blueGray-300 rounded-lg focus:outline-none focus:border-blueGray-500 focus:ring-1 focus:ring-blueGray-300 resize-none text-sm"
-        ></textarea>
-        <div *ngIf="messageError" class="text-red-600 text-xs mt-1">
-          <i class="fas fa-times-circle mr-1"></i>
-          {{ messageError }}
-        </div>
-        <div class="text-xs text-blueGray-500 mt-1">
-          {{ form.get('message')?.value?.length || 0 }}/500 ký tự
-        </div>
-      </div>
+    <!-- Secret info -->
+    <div>
+      <label class="block text-sm font-bold text-blueGray-700 mb-2">
+        <i class="fas fa-lock mr-2"></i>
+        Thông tin bí mật (Tùy chọn)
+      </label>
+      <input
+        type="text"
+        formControlName="secret_info"
+        placeholder="Ví dụ: Đồ có đặc điểm vệt xương cá ẩn, mã số riêng, pass điện thoại..."
+        class="w-full px-4 py-2 border border-blueGray-300 rounded-lg focus:outline-none focus:border-blueGray-500 focus:ring-1 focus:ring-blueGray-300 text-sm"
+      />
+    </div>
 
-      <!-- Secret info -->
-      <div>
-        <label class="block text-sm font-bold text-blueGray-700 mb-2">
-          <i class="fas fa-lock mr-2"></i>
-          Thông tin bí mật (chỉ chủ bài đăng xem)
-        </label>
-        <input
-          type="text"
-          formControlName="secret_info"
-          placeholder="Ví dụ: Mật khẩu ví, đặc điểm riêng để xác minh..."
-          class="w-full px-4 py-2 border border-blueGray-300 rounded-lg focus:outline-none focus:border-blueGray-500 focus:ring-1 focus:ring-blueGray-300 text-sm"
-        />
-      </div>
+    <!-- Image Upload -->
+    <div>
+      <label class="block text-sm font-bold text-blueGray-700 mb-2">
+        <i class="fas fa-image mr-2"></i>
+        <span class="text-red-500">*</span> Tải lên hình ảnh bằng chứng (Bắt
+        buộc)
+      </label>
+      <p class="text-xs text-blueGray-500 mb-3">
+        Hình ảnh xác nhận đồ vật, căn cước công dân hoặc giấy tờ liên quan (Tối
+        đa 5MB)
+      </p>
 
-      <!-- Image Upload -->
-      <div>
-        <label class="block text-sm font-bold text-blueGray-700 mb-2">
-          <i class="fas fa-image mr-2"></i>
-          Tải lên hình ảnh bằng chứng {{ requireImage ? '(bắt buộc)' : '(tùy chọn)' }}
-        </label>
-        <p class="text-xs text-blueGray-500 mb-3">
-          Tối đa 5MB cho mỗi file (JPEG, PNG, GIF, WebP)
-        </p>
+      <p *ngIf="selectedFileName" class="text-xs text-blueGray-600 mb-2">
+        Tep da chon: <span class="font-semibold">{{ selectedFileName }}</span>
+      </p>
 
-        <!-- Upload Input -->
-        <div class="mb-4">
-          <label
-            class="block border-2 border-dashed border-blueGray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blueGray-400 transition-colors"
-          >
-            <input
-              type="file"
-              accept="image/*"
-              (change)="onImageSelected($event)"
-              [disabled]="uploadingImage"
-              class="hidden"
-            />
-            <i
-              [class]="uploadingImage ? 'fas fa-spinner animate-spin' : 'fas fa-cloud-upload-alt'"
-              class="text-3xl text-blueGray-400 mb-2 block"
-            ></i>
-            <span class="text-sm font-medium text-blueGray-600">
-              {{ uploadingImage ? 'Đang tải lên…' : 'Nhấp để chọn hình ảnh hoặc kéo thả' }}
-            </span>
-          </label>
-        </div>
-
-        <!-- Image Preview -->
-        <div *ngIf="evidenceImagePreview" class="space-y-2">
-          <p class="text-sm font-medium text-blueGray-700">Hình ảnh đã chọn</p>
-          <div class="relative rounded-lg overflow-hidden border border-blueGray-200 inline-block">
-            <img [src]="evidenceImagePreview" alt="Preview" class="w-32 h-32 object-cover" />
-            <button
-              type="button"
-              (click)="removeImage()"
-              class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 flex items-center justify-center transition-all opacity-0 hover:opacity-100"
-            >
-              <i class="fas fa-trash-alt text-white text-lg"></i>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Footer -->
-      <div class="flex gap-3 pt-4 border-t border-blueGray-200">
-        <button
-          type="button"
-          (click)="close.emit()"
-          class="flex-1 px-4 py-2 rounded-lg border border-blueGray-300 text-blueGray-700 font-semibold hover:bg-blueGray-50 transition-colors"
+      <!-- Upload Input -->
+      <div class="mb-2">
+        <label
+          [ngClass]="
+            form.get('image_proof_file')?.invalid &&
+            (submitAttempted || form.get('image_proof_file')?.touched)
+              ? 'border-red-400 bg-red-50 hover:border-red-500 text-red-500'
+              : 'border-blueGray-300 hover:border-blueGray-400 hover:bg-blueGray-50 text-blueGray-600'
+          "
+          class="block border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors"
         >
-          Hủy
-        </button>
-        <button
-          type="submit"
-          [disabled]="!form.valid || isSubmitting || uploadingImage || (requireImage && !evidenceImageUrl)"
-          class="flex-1 px-4 py-2 bg-blueGray-700 hover:bg-blueGray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
-        >
+          <input
+            type="file"
+            accept="image/*"
+            (change)="onImageSelected($event)"
+            [disabled]="uploadingImage"
+            class="hidden"
+          />
           <i
-            [class]="isSubmitting ? 'fas fa-spinner animate-spin' : 'fas fa-paper-plane'"
-            class="mr-2"
+            [class]="
+              uploadingImage
+                ? 'fas fa-spinner animate-spin text-blueGray-400'
+                : 'fas fa-cloud-upload-alt'
+            "
+            class="text-3xl mb-2 block"
           ></i>
-          {{ isSubmitting ? 'Đang gửi…' : 'Gửi yêu cầu' }}
-        </button>
+          <span class="text-sm font-medium">
+            {{
+              uploadingImage
+                ? "Đang tải lên…"
+                : "Nhấp để chọn hình ảnh bằng chứng"
+            }}
+          </span>
+        </label>
       </div>
-    </form>
-  </div>
+
+      <p
+        *ngIf="
+          form.get('image_proof_file')?.invalid &&
+          (submitAttempted || form.get('image_proof_file')?.touched)
+        "
+        class="text-red-500 text-xs italic mt-1"
+      >
+        <i class="fas fa-exclamation-circle mr-1"></i> Bắt buộc phải có hình ảnh
+        chứng minh.
+      </p>
+
+      <!-- Image Preview -->
+      <div *ngIf="evidenceImagePreview" class="space-y-2 mt-4">
+        <p class="text-sm font-medium text-emerald-600">
+          <i class="fas fa-check-circle mr-1"></i> Ảnh đã tải lên thành công
+        </p>
+        <div
+          class="relative rounded-lg overflow-hidden border border-blueGray-200 inline-block shadow-sm"
+        >
+          <img
+            [src]="evidenceImagePreview"
+            alt="Preview"
+            class="w-48 h-48 object-cover"
+          />
+          <button
+            type="button"
+            (click)="removeImage()"
+            class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-50 flex items-center justify-center transition-all opacity-0 hover:opacity-100 cursor-pointer"
+          >
+            <i class="fas fa-trash-alt text-white text-3xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex gap-3 pt-4 border-t border-blueGray-200">
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="flex-1 px-4 py-2 rounded-lg border border-blueGray-300 text-blueGray-700 font-semibold hover:bg-blueGray-50 transition-colors"
+      >
+        Hủy
+      </button>
+      <button
+        type="submit"
+        [disabled]="
+          form.invalid || isSubmitting || uploadingImage || !evidenceImageUrl
+        "
+        class="flex-1 px-4 py-2 bg-blueGray-700 hover:bg-blueGray-800 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors flex items-center justify-center"
+      >
+        <i
+          [class]="
+            isSubmitting ? 'fas fa-spinner animate-spin' : 'fas fa-paper-plane'
+          "
+          class="mr-2"
+        ></i>
+        {{ isSubmitting ? "Đang gửi…" : "Gửi yêu cầu" }}
+      </button>
+    </div>
+  </form>
 </div>
