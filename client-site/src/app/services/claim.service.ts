@@ -34,12 +34,12 @@ export class ClaimService {
         return new HttpHeaders({ Authorization: `Bearer ${token}` });
     }
 
-    /** Upload evidence image via items/upload-image endpoint. */
+    /** Upload evidence image via claims/upload-proof endpoint. */
     uploadEvidenceImage(file: File): Observable<{ url: string; publicId: string }> {
         const fd = new FormData();
         fd.append('file', file, file.name);
         return this.http.post<{ url: string; publicId: string }>(
-            `${this.base}/items/upload-image`,
+            `${this.base}/claims/upload-proof`,
             fd,
             { headers: this.authHeaders() }
         );

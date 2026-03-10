@@ -18,6 +18,8 @@ export interface DashboardStats {
   activePosts: number;
   resolvedClaims: number;
   pendingAdmin: number;
+  postsByMonth?: Array<{ month: string; count: number }>;
+  claimsByStatus?: { PENDING: number; SUCCESSFUL: number; REJECTED: number; UNDER_VERIFICATION: number };
 }
 
 export interface AdminUser {

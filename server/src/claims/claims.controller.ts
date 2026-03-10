@@ -8,15 +8,42 @@ import {
     UseGuards,
     Request,
     Query,
+    UseInterceptors,
+    UploadedFile,
+    BadRequestException,
 } from "@nestjs/common";
+import { FileInterceptor } from "@nestjs/platform-express";
+import { memoryStorage, File } from "multer";
 import { AuthGuard } from "@nestjs/passport";
 import { ClaimsService } from "./claims.service";
+import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { CreateClaimDto } from "./dto/create-claim.dto";
 import { ReviewClaimDto } from "./dto/review-claim.dto";
 
+const uploadOpts = {
+    storage: memoryStorage(),
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+};
+
 @Controller("claims")
 export class ClaimsController {
-    constructor(private readonly claimsService: ClaimsService) { }
+    constructor(
+        private readonly claimsService: ClaimsService,
+        private readonly cloudinary: CloudinaryService,
+    ) { }
+
+    @Post("upload-proof")
+    @UseGuards(AuthGuard("jwt"))
+    @UseInterceptors(FileInterceptor("file", uploadOpts))
+    async uploadProofImage(
+        @UploadedFile() file: File | undefined,
+    ): Promise<{ url: string; publicId: string }> {
+        if (!file?.buffer) throw new BadRequestException("Chưa chọn ảnh");
+        const result = await this.cloudinary.uploadBuffer(file.buffer, {
+            folder: "claim-proofs",
+        });
+        return { url: result.secure_url, publicId: result.public_id };
+    }
 
     @Post()
     @UseGuards(AuthGuard("jwt"))

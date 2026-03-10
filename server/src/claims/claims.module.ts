@@ -4,6 +4,7 @@ import { Claim, ClaimSchema } from "./schemas/claim.schema";
 import { Post, PostSchema } from "../posts/schemas/post.schema";
 import { ClaimsService } from "./claims.service";
 import { ClaimsController } from "./claims.controller";
+import { CloudinaryModule } from "../cloudinary/cloudinary.module";
 
 @Module({
     imports: [
@@ -11,6 +12,7 @@ import { ClaimsController } from "./claims.controller";
             { name: Claim.name, schema: ClaimSchema },
             { name: Post.name, schema: PostSchema },
         ]),
+        CloudinaryModule,
     ],
     controllers: [ClaimsController],
     providers: [ClaimsService],

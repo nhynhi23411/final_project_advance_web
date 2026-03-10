@@ -228,6 +228,7 @@ export class DashAnalyticsComponent implements OnInit {
       })
     ).subscribe({
       next: (stats: DashboardStats) => {
+        // Update stat cards
         this.cards = [
           {
             background: 'bg-c-blue',
@@ -262,6 +263,36 @@ export class DashAnalyticsComponent implements OnInit {
             url: '/moderation'
           }
         ];
+
+        // Update line chart with monthly posts data
+        if (stats.postsByMonth && stats.postsByMonth.length > 0) {
+          this.chartOptions.series = [
+            {
+              name: 'Bài đăng',
+              data: stats.postsByMonth.map(pm => pm.count)
+            }
+          ];
+          this.chartOptions.xaxis = {
+            type: 'category',
+            categories: stats.postsByMonth.map(pm => pm.month),
+            axisBorder: {
+              show: false
+            }
+          };
+        }
+
+        // Update donut chart with claims status
+        if (stats.claimsByStatus) {
+          const claimsStatus = stats.claimsByStatus;
+          this.chartOptions_1.labels = ['Chưa xử lý', 'Thành công', 'Từ chối', 'Đang xác minh'];
+          this.chartOptions_1.series = [
+            claimsStatus.PENDING,
+            claimsStatus.SUCCESSFUL,
+            claimsStatus.REJECTED,
+            claimsStatus.UNDER_VERIFICATION
+          ];
+          this.chartOptions_1.colors = ['#4680ff', '#2ed8b6', '#ff5370', '#fdb450'];
+        }
       },
       error: () => {
         this.cards = [];
@@ -286,4 +317,18 @@ export class DashAnalyticsComponent implements OnInit {
       size: 'PNG-150KB'
     }
   ];
+
+  // Safe getter for claims rejected + under verification sum
+  getRejectedPlusVerifying(): number {
+    const series = this.chartOptions_1.series as number[] || [];
+    const rejected = typeof series[2] === 'number' ? series[2] : 0;
+    const verifying = typeof series[3] === 'number' ? series[3] : 0;
+    return rejected + verifying;
+  }
+
+  // Safe getter for individual claim status values
+  getClaimValue(index: number): number {
+    const series = this.chartOptions_1.series as number[] || [];
+    return typeof series[index] === 'number' ? series[index] : 0;
+  }
 }

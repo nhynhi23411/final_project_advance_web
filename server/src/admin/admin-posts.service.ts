@@ -18,7 +18,7 @@ export class AdminPostsService {
     private readonly usersService: UsersService,
     private readonly configService: ConfigService,
     private readonly eventEmitter: EventEmitter2,
-  ) {}
+  ) { }
 
   async getPosts(status: string = "PENDING_ADMIN"): Promise<PostDocument[]> {
     return this.postModel.find({ status }).sort({ createdAt: -1 }).exec();
@@ -29,15 +29,66 @@ export class AdminPostsService {
     activePosts: number;
     resolvedClaims: number;
     pendingAdmin: number;
+    postsByMonth?: Array<{ month: string; count: number }>;
+    claimsByStatus?: { PENDING: number; SUCCESSFUL: number; REJECTED: number; UNDER_VERIFICATION: number };
   }> {
-    const [totalUsers, activePosts, resolvedClaims, pendingAdmin] =
+    const [totalUsers, activePosts, resolvedClaims, pendingAdmin, postsByMonth, claimsByStatus] =
       await Promise.all([
         this.usersService.countAll(),
         this.postModel.countDocuments({ status: "APPROVED" }).exec(),
         this.claimModel.countDocuments({ status: "SUCCESSFUL" }).exec(),
         this.postModel.countDocuments({ status: "PENDING_ADMIN" }).exec(),
+        // Posts by month (last 6 months)
+        this.postModel.aggregate([
+          {
+            $match: {
+              created_at: { $gte: new Date(Date.now() - 6 * 30 * 24 * 60 * 60 * 1000) }
+            }
+          },
+          {
+            $group: {
+              _id: { $dateToString: { format: "%Y-%m", date: "$created_at" } },
+              count: { $sum: 1 }
+            }
+          },
+          { $sort: { _id: 1 } },
+          { $project: { _id: 0, month: "$_id", count: 1 } }
+        ]).exec(),
+        // Claims by status
+        this.claimModel.aggregate([
+          {
+            $group: {
+              _id: "$status",
+              count: { $sum: 1 }
+            }
+          }
+        ]).exec(),
       ]);
-    return { totalUsers, activePosts, resolvedClaims, pendingAdmin };
+
+    // Format claims count to object
+    const claimsMap = claimsByStatus.reduce((acc: any, item: any) => {
+      acc[item._id] = item.count;
+      return acc;
+    }, {});
+
+    const formattedClaimsByStatus = {
+      PENDING: claimsMap.PENDING || 0,
+      SUCCESSFUL: claimsMap.SUCCESSFUL || 0,
+      REJECTED: claimsMap.REJECTED || 0,
+      UNDER_VERIFICATION: claimsMap.UNDER_VERIFICATION || 0,
+    };
+
+    return {
+      totalUsers,
+      activePosts,
+      resolvedClaims,
+      pendingAdmin,
+      postsByMonth: (postsByMonth as any[]).map((item: any) => ({
+        month: item.month,
+        count: item.count
+      })),
+      claimsByStatus: formattedClaimsByStatus,
+    };
   }
 
   async updatePostStatus(
@@ -59,8 +110,16 @@ export class AdminPostsService {
           reject_reason: null,
         })
         .exec();
-      this.eventEmitter.emit("post.approved", { postId, userId });
+      await this.auditLogService.createApproveLog(postId, userId, adminUserId);
+      this.eventEmitter.emit("post.approved", { postId, userId });;
+      
     } else if (dto.status === "NEEDS_UPDATE") {
+      await this.auditLogService.createNeedsUpdateLog(
+        postId,
+        userId,
+        dto.reject_reason ?? "",
+        adminUserId,
+      );
       await this.postModel
         .findByIdAndUpdate(postId, {
           status: "NEEDS_UPDATE",
@@ -87,7 +146,8 @@ export class AdminPostsService {
       const maxRejects = appConfig?.maxRejects24h ?? 3;
       const count = await this.auditLogService.countRejectInLast24h(userId);
 
-      if (count >= maxRejects) {
+      // Đề bài: > 3 lần / 24h => lần thứ 4 mới ban
+      if (count > maxRejects) {
         await this.usersService.updateStatus(userId, "BANNED");
         this.eventEmitter.emit("user.banned", { userId, reason: "reject_limit" });
       }
