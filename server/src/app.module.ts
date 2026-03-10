@@ -3,6 +3,7 @@ import { EventEmitterModule } from "@nestjs/event-emitter";
 import { MongooseModule } from "@nestjs/mongoose";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import configuration from "./config/configuration";
+import { ScheduleModule } from "@nestjs/schedule";
 import { AppController } from "./app.controller";
 import { AuthModule } from "./auth/auth.module";
 import { UsersModule } from "./users/users.module";
@@ -13,10 +14,14 @@ import { MeController } from "./me/me.controller";
 import { KeywordModule } from "./keyword/keyword.module";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { AdminModule } from "./admin/admin.module";
+import { ModerationModule } from "./moderation/moderation.module";
+import { TasksModule } from "./tasks/tasks.module";
+import { MatchesModule } from "./matches/matches.module";
 
 @Module({
   imports: [
     EventEmitterModule.forRoot(),
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -34,9 +39,12 @@ import { AdminModule } from "./admin/admin.module";
     UsersModule,
     AuthModule,
     PostsModule,
+    ModerationModule,
+    MatchesModule,
     ClaimsModule,
     AuditLogModule,
     AdminModule,
+    TasksModule,
   ],
   controllers: [AppController, MeController],
   providers: [],

@@ -8,7 +8,6 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Post, PostSchema } from "./schemas/post.schema";
 import { PostsService } from "./posts.service";
 import { PostsController } from "./posts.controller";
-import { AutoModerationMiddleware } from "./middlewares/auto-moderation.middleware";
 import { UsersModule } from "../users/users.module";
 
 @Module({
@@ -20,10 +19,4 @@ import { UsersModule } from "../users/users.module";
   providers: [PostsService],
   exports: [PostsService],
 })
-export class PostsModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AutoModerationMiddleware)
-      .forRoutes({ path: "items", method: RequestMethod.POST });
-  }
-}
+export class PostsModule {}
