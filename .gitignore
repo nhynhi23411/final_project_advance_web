@@ -1,5 +1,9 @@
 # Dependencies
 node_modules/
+admin-site/node_modules/
+client-site/node_modules/
+server/node_modules/
+
 
 # Build output
 dist/
@@ -26,6 +30,7 @@ yarn-error.log
 .env
 .env.local
 .env.*.local
+*.env
 
 # Coverage / test
 coverage/
