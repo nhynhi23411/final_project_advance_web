@@ -2,8 +2,6 @@
 import { Component, ElementRef, OnInit, output, viewChild, input } from '@angular/core';
 
 // project import
-import { FriendsList } from 'src/app/fack-db/friends-list';
-import { UserChat } from 'src/app/fack-db/user-chat';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 
 @Component({
@@ -16,8 +14,8 @@ export class ChatMsgComponent implements OnInit {
   friendId = input.required<number>();
   ChatToggle = output();
   newChat = viewChild.required('newChat', { read: ElementRef });
-  friendsList = FriendsList.friends;
-  userChat = UserChat.chat;
+  friendsList: any[] = [];
+  userChat: any[] = [];
   // eslint-disable-next-line
   chatMessage: any;
   message!: string;
