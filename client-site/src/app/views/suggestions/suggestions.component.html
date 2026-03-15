@@ -1,145 +1,126 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen" style="background: #f5f7fa;">
-  <section class="py-10">
-    <div class="container mx-auto px-4" style="max-width: 960px;">
+<main class="suggestions-page">
 
-      <!-- Header Section -->
-      <div class="mb-10 text-center">
-        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-          <i class="fas fa-lightbulb text-2xl text-white"></i>
-        </div>
-        <h1 class="text-3xl font-extrabold mb-3" style="color: #1e293b; letter-spacing: -0.5px;">Gợi ý trùng khớp</h1>
-        <p class="text-base" style="color: #64748b;">
-          Các bài đăng có độ trùng khớp <span class="font-semibold" style="color: #334155;">&gt; 60%</span> với bài của bạn
-        </p>
-        <div *ngIf="!isLoading && suggestions.length > 0" class="mt-5">
-          <span class="inline-flex items-center gap-2 px-5 py-2 rounded-full text-sm font-semibold" 
-                style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); color: #047857; border: 1px solid #a7f3d0;">
-            <i class="fas fa-check-circle"></i>
-            Tìm thấy {{ suggestions.length }} gợi ý phù hợp
-          </span>
-        </div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Gợi ý trùng khớp của bạn</h1>
+    <p>Hệ thống đã phân tích và tìm thấy các bài đăng có khả năng là món đồ bạn đang tìm kiếm.</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="error-box">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
+    </div>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Not logged in -->
+  <div *ngIf="!authService.isLoggedIn" class="empty-state">
+    <div class="empty-state-icon">
+      <i class="fas fa-lock"></i>
+    </div>
+    <h2>Yêu cầu đăng nhập</h2>
+    <p>Vui lòng đăng nhập để xem gợi ý phù hợp cho bài đăng của bạn.</p>
+    <a routerLink="/auth/login" class="btn-login">
+      <i class="fas fa-sign-in-alt"></i>
+      Đăng nhập ngay
+    </a>
+  </div>
+
+  <div *ngIf="authService.isLoggedIn">
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="empty-state">
+      <div class="loading-spinner">
+        <i class="fas fa-circle-notch fa-spin"></i>
       </div>
+      <h2>Đang tìm kiếm...</h2>
+      <p>Vui lòng chờ trong giây lát</p>
+    </div>
 
-      <!-- Error -->
-      <div *ngIf="error" class="mb-8 p-5 rounded-xl flex items-center gap-4" style="background: #fef2f2; border: 1px solid #fecaca;">
-        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #fee2e2;">
-          <i class="fas fa-exclamation-triangle text-red-500"></i>
-        </div>
-        <p class="text-sm font-medium" style="color: #dc2626;">{{ error }}</p>
+    <!-- Empty -->
+    <div *ngIf="!isLoading && groupedSuggestions.length === 0 && !error" class="empty-state empty-state--dashed">
+      <div class="empty-state-icon">
+        <i class="fas fa-search"></i>
       </div>
+      <h2>Chưa có gợi ý</h2>
+      <p>Hệ thống chưa tìm thấy bài đăng nào giống bài của bạn.</p>
+    </div>
 
-      <!-- Not logged in -->
-      <div *ngIf="!authService.isLoggedIn" class="text-center py-16 rounded-2xl" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-        <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
-          <i class="fas fa-lock text-3xl" style="color: #94a3b8;"></i>
-        </div>
-        <h2 class="text-2xl font-bold mb-2" style="color: #1e293b;">Yêu cầu đăng nhập</h2>
-        <p class="mb-8" style="color: #64748b;">Vui lòng đăng nhập để xem gợi ý phù hợp cho bài đăng của bạn.</p>
-        <a routerLink="/auth/login" 
-           class="inline-flex items-center gap-2 px-8 py-3 rounded-xl text-white font-semibold transition-all"
-           style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); box-shadow: 0 4px 14px rgba(30,41,59,0.3);">
-          <i class="fas fa-sign-in-alt"></i>
-          Đăng nhập ngay
-        </a>
-      </div>
+    <!-- Grouped Suggestions -->
+    <ng-container *ngIf="!isLoading && groupedSuggestions.length > 0">
+      <section class="lost-item-group" *ngFor="let group of groupedSuggestions">
 
-      <div *ngIf="authService.isLoggedIn">
-
-        <!-- Loading -->
-        <div *ngIf="isLoading" class="text-center py-20 rounded-2xl" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <div class="inline-block mb-5">
-            <i class="fas fa-circle-notch fa-spin text-4xl" style="color: #10b981;"></i>
-          </div>
-          <p class="text-lg font-semibold mb-1" style="color: #1e293b;">Đang tìm kiếm...</p>
-          <p class="text-sm" style="color: #94a3b8;">Vui lòng chờ trong giây lát</p>
-        </div>
-
-        <!-- Empty -->
-        <div *ngIf="!isLoading && suggestions.length === 0 && !error" class="text-center py-20 rounded-2xl" style="background: white; border: 2px dashed #cbd5e1;">
-          <div class="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-5" style="background: #f8fafc;">
-            <i class="fas fa-search text-3xl" style="color: #cbd5e1;"></i>
-          </div>
-          <h2 class="text-2xl font-bold mb-2" style="color: #1e293b;">Chưa có gợi ý</h2>
-          <p style="color: #64748b;">Hệ thống chưa tìm thấy bài đăng nào giống bài của bạn.</p>
-        </div>
-
-        <!-- Suggestions List -->
-        <div *ngIf="!isLoading && suggestions.length > 0" class="space-y-5">
-          <div *ngFor="let s of suggestions" 
-               class="rounded-2xl overflow-hidden transition-all"
-               style="background: white; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1px solid #e2e8f0;"
-               onmouseover="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.08)'; this.style.transform='translateY(-2px)';"
-               onmouseout="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.04)'; this.style.transform='translateY(0)';">
-            
-            <!-- Card Layout -->
-            <div class="flex flex-row items-stretch" *ngIf="s.matched_post">
-              
-              <!-- Left: Thumbnail -->
-              <div class="flex-shrink-0 relative" style="width: 160px; min-height: 160px;">
-                <div class="absolute inset-0 flex items-center justify-center" style="background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
-                  <img *ngIf="s.matched_post.images?.length" 
-                       [src]="s.matched_post.images[0]" 
-                       [alt]="s.matched_post.title"
-                       class="absolute inset-0 w-full h-full object-cover" />
-                  <i *ngIf="!s.matched_post.images?.length" class="fas fa-image text-4xl" style="color: #cbd5e1;"></i>
-                </div>
-                <!-- Badge Type -->
-                <span class="absolute top-3 left-3 px-3 py-1.5 text-xs font-bold uppercase rounded-lg"
-                      style="letter-spacing: 0.5px;"
-                      [ngClass]="getTypeClass(s.matched_post.post_type)">
-                  {{ getTypeLabel(s.matched_post.post_type) }}
-                </span>
-              </div>
-
-              <!-- Center: Content -->
-              <div class="flex-1 p-5 flex flex-col justify-center min-w-0">
-                <h3 class="text-xl font-bold mb-3 truncate" style="color: #1e293b; letter-spacing: -0.3px;">
-                  {{ s.matched_post.title }}
-                </h3>
-                <div class="flex flex-wrap items-center gap-4">
-                  <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium" 
-                        style="background: #f8fafc; color: #475569;">
-                    <i class="fas fa-tag text-xs" style="color: #94a3b8;"></i>
-                    {{ s.matched_post.category }}
-                  </span>
-                  <span *ngIf="s.matched_post.color" 
-                        class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium"
-                        style="background: #f8fafc; color: #475569;">
-                    <i class="fas fa-palette text-xs" style="color: #94a3b8;"></i>
-                    {{ s.matched_post.color }}
-                  </span>
-                  <span *ngIf="s.distance_km != null" 
-                        class="inline-flex items-center gap-2 text-sm"
-                        style="color: #94a3b8;">
-                    <i class="fas fa-map-marker-alt text-xs"></i>
-                    Cách {{ s.distance_km }} km
-                  </span>
-                </div>
-              </div>
-
-              <!-- Right: Score + Button -->
-              <div class="flex-shrink-0 p-5 flex flex-col items-center justify-center" 
-                   style="width: 150px; border-left: 1px solid #f1f5f9; background: #fafbfc;">
-                <span class="text-xs font-bold uppercase tracking-wider mb-2" style="color: #94a3b8;">Độ khớp</span>
-                <span class="text-4xl font-black mb-4" [ngClass]="getScoreClass(s.score)">
-                  {{ scorePercent(s.score) }}%
-                </span>
-                <button (click)="goToPost(s.matched_post?._id)"
-                        class="w-full text-center text-sm font-bold px-4 py-3 rounded-xl text-white transition-all"
-                        style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); box-shadow: 0 4px 12px rgba(30,41,59,0.25);">
-                  Xem bài <i class="fas fa-arrow-right ml-1 text-xs"></i>
-                </button>
-              </div>
-
+        <!-- Parent Item (món đồ bị mất) -->
+        <div class="parent-item">
+          <img [src]="group.myPost.images?.length ? group.myPost.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=e2e8f0&color=94a3b8&size=200'"
+               [alt]="group.myPost.title"
+               class="parent-img">
+          <div class="parent-info">
+            <span class="parent-label">Bạn đã báo mất</span>
+            <h2>{{ group.myPost.title }}</h2>
+            <p class="parent-desc" *ngIf="group.myPost.description">{{ group.myPost.description }}</p>
+            <div class="parent-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Ngày đăng: {{ group.myPost.created_at | date:'dd/MM/yyyy' }}
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
+                {{ group.myPost.category }}
+              </span>
             </div>
           </div>
+          <div class="badge-results">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Tìm thấy {{ group.matches.length }} gợi ý
+          </div>
         </div>
 
-      </div>
-    </div>
-  </section>
+        <hr class="divider">
+
+        <!-- Match List -->
+        <div class="match-list">
+          <div class="match-card" *ngFor="let s of group.matches">
+
+            <img [src]="s.matched_post?.images?.length ? s.matched_post!.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=f1f5f9&color=94a3b8&size=150'"
+                 [alt]="s.matched_post?.title"
+                 class="match-img">
+
+            <div class="match-details">
+              <h3>{{ s.matched_post?.title }}</h3>
+              <div class="match-tags">
+                <span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
+                  {{ s.matched_post?.category }}
+                </span>
+                <span *ngIf="s.distance_km != null">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"></circle><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                  Cách {{ s.distance_km }} km
+                </span>
+              </div>
+            </div>
+
+            <div class="match-action">
+              <div class="score-label">Độ khớp</div>
+              <div class="score-value" [style]="getScoreColorStyle(s.score)">
+                {{ scorePercent(s.score) }}%
+              </div>
+              <button class="btn-view" (click)="goToPost(s.matched_post?._id)">
+                Xem bài
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+    </ng-container>
+
+  </div>
 </main>
 
 <app-footer></app-footer>

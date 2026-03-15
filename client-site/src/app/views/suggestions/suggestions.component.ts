@@ -1,14 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ItemService, MatchSuggestion } from '../../services/item.service';
+import { ItemService, Item, MatchSuggestion } from '../../services/item.service';
 import { AuthService } from '../../services/auth.service';
+
+export interface GroupedSuggestion {
+  myPost: Item;
+  matches: MatchSuggestion[];
+}
 
 @Component({
   selector: 'app-suggestions',
   templateUrl: './suggestions.component.html',
+  styleUrls: ['./suggestions.component.css'],
 })
 export class SuggestionsComponent implements OnInit {
   suggestions: MatchSuggestion[] = [];
+  groupedSuggestions: GroupedSuggestion[] = [];
   isLoading = false;
   error: string | null = null;
 
@@ -33,6 +40,7 @@ export class SuggestionsComponent implements OnInit {
     this.itemService.getMatchSuggestions().subscribe({
       next: (data) => {
         this.suggestions = Array.isArray(data) ? data : [];
+        this.groupedSuggestions = this.groupByMyPost(this.suggestions);
         this.isLoading = false;
       },
       error: (err) => {
@@ -40,6 +48,23 @@ export class SuggestionsComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  private groupByMyPost(suggestions: MatchSuggestion[]): GroupedSuggestion[] {
+    const map = new Map<string, GroupedSuggestion>();
+    for (const s of suggestions) {
+      if (!s.my_post) continue;
+      const key = s.my_post._id;
+      if (!map.has(key)) {
+        map.set(key, { myPost: s.my_post, matches: [] });
+      }
+      map.get(key)!.matches.push(s);
+    }
+    return Array.from(map.values());
+  }
+
+  get totalMatches(): number {
+    return this.suggestions.length;
   }
 
   goToPost(postId: string | undefined): void {
@@ -61,8 +86,13 @@ export class SuggestionsComponent implements OnInit {
   }
 
   getScoreClass(score: number): string {
-    if (score >= 0.9) return 'text-green-600';
-    if (score >= 0.75) return 'text-blue-600';
-    return 'text-yellow-600';
+    if (score >= 0.9) return 'score-high';
+    if (score >= 0.75) return 'score-high';
+    return 'score-med';
+  }
+
+  getScoreColorStyle(score: number): string {
+    if (score >= 0.75) return 'color: #4f46e5';
+    return 'color: #f59e0b';
   }
 }
