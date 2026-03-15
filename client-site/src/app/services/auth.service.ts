@@ -43,11 +43,19 @@ export class AuthService {
     const info = this.userInfoSubject.value;
     if (info?.id) return String(info.id);
     if (info?.userId) return String(info.userId);
-    return localStorage.getItem('user_id') || null;
+    try {
+      return localStorage.getItem('user_id') || null;
+    } catch {
+      return null;
+    }
   }
 
   private hasToken(): boolean {
-    return !!(localStorage.getItem(this.tokenKey) || localStorage.getItem('user_id'));
+    try {
+      return !!(localStorage.getItem(this.tokenKey) || localStorage.getItem('user_id'));
+    } catch {
+      return false;
+    }
   }
 
   private getStoredUserInfo(): UserInfo | null {

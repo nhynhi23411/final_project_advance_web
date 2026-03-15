@@ -1,6 +1,6 @@
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { NgModule } from "@angular/core";
+import { NgModule, ErrorHandler } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { MatDialogModule } from "@angular/material/dialog";
@@ -23,6 +23,11 @@ import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 import { PostsComponent } from "./views/posts/posts.component";
 import { SuggestionsComponent } from "./views/suggestions/suggestions.component";
+import { AboutComponent } from "./views/about/about.component";
+import { ArchiveComponent } from "./views/archive/archive.component";
+import { GuidePostingComponent } from "./views/guide-posting/guide-posting.component";
+import { ReturnProcessComponent } from "./views/return-process/return-process.component";
+import { TermsComponent } from "./views/terms/terms.component";
 
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
@@ -40,6 +45,7 @@ import { MapExampleComponent } from "./components/maps/map-example/map-example.c
 import { TableDropdownComponent } from "./components/dropdowns/table-dropdown/table-dropdown.component";
 import { NotificationDropdownComponent } from "./components/dropdowns/notification-dropdown/notification-dropdown.component";
 import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user-dropdown.component";
+import { GlobalErrorHandler } from "./global-error.handler";
 
 @NgModule({
   declarations: [
@@ -65,6 +71,11 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
     ToastComponent,
     PostsComponent,
     SuggestionsComponent,
+    AboutComponent,
+    ArchiveComponent,
+    GuidePostingComponent,
+    ReturnProcessComponent,
+    TermsComponent,
   ],
   imports: [
     BrowserModule,
@@ -77,6 +88,7 @@ import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
   ],
   bootstrap: [AppComponent],
 })

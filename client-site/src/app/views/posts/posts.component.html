@@ -1,142 +1,288 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen bg-blueGray-50">
-  <section class="relative pt-16 pb-32">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-wrap items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-blueGray-800">Tất cả bài đăng</h1>
-          <p class="mt-1 text-blueGray-600">
-            Danh sách đồ thất lạc đã được duyệt
-          </p>
+<main class="posts-page min-h-screen">
+  <div class="posts-container">
+    <!-- Header -->
+    <header class="posts-header">
+      <h1 class="posts-title">Tất cả bài đăng</h1>
+      <p class="posts-desc">Tìm đồ thất lạc trong khu vực Thủ Đức. Lọc theo loại, danh mục và địa điểm để tìm nhanh hơn.</p>
+      <!-- Quick stats -->
+      <div class="posts-stats" *ngIf="!isLoading && (allItems || []).length > 0">
+        <div class="posts-stat-card">
+          <span class="posts-stat-value">{{ getStats().total }}</span>
+          <span class="posts-stat-label">Tổng bài đăng</span>
+        </div>
+        <div class="posts-stat-card">
+          <span class="posts-stat-value">{{ getStats().lost }}</span>
+          <span class="posts-stat-label">Mất đồ</span>
+        </div>
+        <div class="posts-stat-card">
+          <span class="posts-stat-value">{{ getStats().found }}</span>
+          <span class="posts-stat-label">Nhặt được</span>
+        </div>
+        <div class="posts-stat-card">
+          <span class="posts-stat-value">{{ getStats().newThisWeek }}</span>
+          <span class="posts-stat-label">Mới trong tuần</span>
         </div>
       </div>
+    </header>
 
-      <form (ngSubmit)="onSearch()" class="mb-6">
-        <div
-          class="relative flex w-full max-w-xl bg-white rounded-lg shadow border border-blueGray-200 overflow-hidden"
-        >
-          <input
-            type="text"
-            [(ngModel)]="searchQuery"
-            name="searchQuery"
-            placeholder="Tìm ví, điện thoại, balo... theo tên, loại, địa điểm"
-            class="w-full px-4 py-2.5 text-blueGray-700 placeholder-blueGray-400 focus:outline-none focus:ring-2 focus:ring-lightBlue-300"
-            aria-label="Tìm kiếm bài đăng"
-          />
+    <!-- Filter bar -->
+    <section class="posts-filter-card">
+      <form (ngSubmit)="onSearch()" class="posts-filter-form">
+        <div class="posts-filter-row posts-filter-row-1">
+          <div class="posts-filter-group posts-search-wrap">
+            <label class="posts-filter-label" for="posts-search">Tìm kiếm</label>
+            <div class="posts-search-inner">
+              <input
+                id="posts-search"
+                type="text"
+                [(ngModel)]="searchQuery"
+                name="searchQuery"
+                placeholder="Tiêu đề, mô tả, địa điểm..."
+                class="posts-search-input"
+                aria-label="Tìm kiếm bài đăng"
+              />
+              <button type="submit" class="posts-search-btn" aria-label="Tìm">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+          <div class="posts-filter-group">
+            <label class="posts-filter-label" for="filter-type">Loại bài đăng</label>
+            <select
+              id="filter-type"
+              class="posts-select"
+              [(ngModel)]="filterPostType"
+              name="filterPostType"
+              (ngModelChange)="applyFilters()"
+            >
+              <option value="">Tất cả</option>
+              <option value="LOST">Đồ bị mất</option>
+              <option value="FOUND">Đồ nhặt được</option>
+            </select>
+          </div>
+          <div class="posts-filter-group">
+            <label class="posts-filter-label" for="filter-category">Danh mục</label>
+            <select
+              id="filter-category"
+              class="posts-select"
+              [(ngModel)]="filterCategory"
+              name="filterCategory"
+              (ngModelChange)="applyFilters()"
+            >
+              <option value="">Tất cả danh mục</option>
+              <option *ngFor="let c of (categories || [])" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="posts-filter-row posts-filter-row-2">
+          <div class="posts-filter-group">
+            <label class="posts-filter-label" for="filter-ward">Khu vực / Phường</label>
+            <select
+              id="filter-ward"
+              class="posts-select"
+              [(ngModel)]="filterWard"
+              name="filterWard"
+              (ngModelChange)="applyFilters()"
+            >
+              <option value="">Tất cả phường</option>
+              <option *ngFor="let w of (wards || [])" [value]="w">{{ w }}</option>
+            </select>
+          </div>
+          <div class="posts-filter-group">
+            <label class="posts-filter-label" for="filter-time">Thời gian</label>
+            <select
+              id="filter-time"
+              class="posts-select"
+              [(ngModel)]="filterTimeRange"
+              name="filterTimeRange"
+              (ngModelChange)="applyFilters()"
+            >
+              <option value="">Tất cả thời gian</option>
+              <option value="today">Hôm nay</option>
+              <option value="3days">3 ngày gần đây</option>
+              <option value="7days">7 ngày gần đây</option>
+              <option value="30days">30 ngày gần đây</option>
+            </select>
+          </div>
+          <div class="posts-filter-group">
+            <label class="posts-filter-label" for="filter-sort">Sắp xếp</label>
+            <select
+              id="filter-sort"
+              class="posts-select"
+              [(ngModel)]="sortBy"
+              name="sortBy"
+              (ngModelChange)="applyFilters()"
+            >
+              <option value="newest">Mới nhất</option>
+              <option value="oldest">Cũ nhất</option>
+              <option value="title">A-Z theo tiêu đề</option>
+              <option value="hasImage">Ưu tiên có ảnh</option>
+            </select>
+          </div>
+          <div class="posts-filter-actions">
+            <label class="posts-filter-label">&nbsp;</label>
+            <button
+              type="button"
+              class="posts-btn-reset"
+              (click)="resetFilters()"
+              [disabled]="!hasActiveFilters"
+            >
+              <i class="fas fa-times"></i> Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+        <!-- Quick chips -->
+        <div class="posts-chips">
           <button
-            class="bg-lightBlue-500 hover:bg-lightBlue-600 text-white px-4 flex items-center justify-center"
-            type="submit"
+            type="button"
+            class="posts-chip"
+            [class.is-active]="chipHasImage"
+            (click)="chipHasImage = !chipHasImage; applyFilters()"
           >
-            <i class="fas fa-search"></i>
+            <i class="fas fa-image"></i> Có hình ảnh
+          </button>
+          <button
+            type="button"
+            class="posts-chip"
+            [class.is-active]="chipRecent"
+            (click)="chipRecent = !chipRecent; applyFilters()"
+          >
+            <i class="fas fa-clock"></i> Gần đây (7 ngày)
           </button>
         </div>
       </form>
+    </section>
 
-      <div
-        *ngIf="error"
-        class="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800"
-      >
-        {{ error }}
-      </div>
+    <!-- Result count -->
+    <p class="posts-result-count" *ngIf="!isLoading && (allItems || []).length > 0">
+      Đang hiển thị <strong>{{ (filteredItems || []).length }}</strong> / {{ (allItems || []).length }} bài đăng
+      <span *ngIf="hasActiveFilters" class="posts-result-tag">(đã lọc)</span>
+    </p>
 
-      <div class="flex flex-wrap items-stretch -mx-4">
-        <ng-container *ngIf="!isLoading; else loadingTpl">
-          <ng-container *ngIf="items.length > 0; else emptyTpl">
-            <div
-              *ngFor="let item of items"
-              class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex"
-            >
-              <article
-                class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-              >
-                <div
-                  class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-                >
-                  <div class="flex justify-between items-center w-full">
-                    <span
-                      class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase"
-                      [ngClass]="getItemTypeClass(item.type || item.post_type)"
-                    >
-                      {{ getItemTypeLabel(item.type || item.post_type) }}
-                    </span>
-                    <span class="text-[10px] text-blueGray-400 font-medium">
-                      {{
-                        item.lost_found_date || item.metadata?.lost_found_date
-                          | date: "short"
-                      }}
-                    </span>
-                  </div>
-                  <span
-                    class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                    >{{ item.title }}</span
-                  >
-                </div>
-                <div class="w-full overflow-hidden flex-shrink-0">
-                  <div class="relative w-full" style="padding-top: 56.25%">
-                    <ng-container
-                      *ngIf="getItemImage(item) as imageUrl; else noImageBlock"
-                    >
-                      <img
-                        [src]="imageUrl"
-                        [alt]="item.title"
-                        (error)="onImageError($event)"
-                        class="absolute top-0 left-0 w-full h-full object-cover"
-                      />
-                    </ng-container>
-                    <ng-template #noImageBlock>
-                      <div
-                        class="absolute top-0 left-0 w-full h-full bg-blueGray-100 flex items-center justify-center text-blueGray-500 text-xs font-semibold uppercase"
-                      >
-                        Chua co anh tu bai dang
-                      </div>
-                    </ng-template>
-                  </div>
-                </div>
-                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                    <p class="flex items-start">
-                      <i
-                        class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                      ></i>
-                      <span class="line-clamp-2">{{
-                        item.location_text || item.location?.address || "—"
-                      }}</span>
-                    </p>
-                    <p class="flex items-center">
-                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
-                      {{ item.category }} -
-                      {{ item.color || item.metadata?.color || "—" }}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    (click)="viewItemDetail(item._id)"
-                    class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-                  >
-                    Xem chi tiết
-                  </button>
-                </div>
-              </article>
-            </div>
-          </ng-container>
-        </ng-container>
-
-        <ng-template #loadingTpl>
-          <div class="w-full text-center py-16">
-            <i class="fas fa-spinner fa-spin text-3xl text-blueGray-400"></i>
-            <p class="mt-2 text-blueGray-600">Đang tải bài đăng...</p>
-          </div>
-        </ng-template>
-
-        <ng-template #emptyTpl>
-          <div class="w-full text-center py-16 text-blueGray-500">
-            <p>Chưa có bài đăng nào.</p>
-          </div>
-        </ng-template>
-      </div>
+    <!-- Error -->
+    <div *ngIf="error" class="posts-error">
+      {{ error }}
     </div>
-  </section>
+
+    <!-- Content -->
+    <div class="posts-content">
+      <ng-container *ngIf="!isLoading; else loadingTpl">
+        <ng-container *ngIf="(filteredItems || []).length > 0; else emptyTpl">
+          <div class="posts-grid">
+            <article
+              *ngFor="let item of (filteredItems || [])"
+              class="posts-card"
+            >
+              <div class="posts-card-image-wrap">
+                <ng-container *ngIf="getItemImage(item) as imageUrl; else noImageBlock">
+                  <img
+                    [src]="imageUrl"
+                    [alt]="item.title"
+                    (error)="onImageError($event)"
+                    class="posts-card-img"
+                  />
+                </ng-container>
+                <ng-template #noImageBlock>
+                  <div class="posts-card-noimg">
+                    <i class="fas fa-image"></i>
+                    <span>Chưa có ảnh</span>
+                  </div>
+                </ng-template>
+                <span
+                  class="posts-card-badge"
+                  [ngClass]="getItemTypeClass(item.type || item.post_type)"
+                >
+                  {{ getItemTypeLabel(item.type || item.post_type) }}
+                </span>
+                <span
+                  *ngIf="item.status"
+                  class="posts-card-badge posts-card-badge-status"
+                  [ngClass]="getStatusUelClass(item.status)"
+                >
+                  {{ getStatusLabel(item.status) }}
+                </span>
+              </div>
+              <div class="posts-card-body">
+                <h2 class="posts-card-title">{{ item.title }}</h2>
+                <p class="posts-card-desc" *ngIf="item.description">
+                  {{ item.description | slice:0:80 }}{{ (item.description?.length || 0) > 80 ? '…' : '' }}
+                </p>
+                <div class="posts-card-meta">
+                  <span class="posts-card-cat" *ngIf="item.category">
+                    <i class="fas fa-tag"></i> {{ item.category }}
+                  </span>
+                  <span class="posts-card-loc" *ngIf="item.location_text">
+                    <i class="fas fa-map-marker-alt"></i> {{ item.location_text | slice:0:50 }}{{ (item.location_text?.length || 0) > 50 ? '…' : '' }}
+                  </span>
+                  <span class="posts-card-user">
+                    <i class="fas fa-user"></i> {{ item.created_by || '—' }}
+                  </span>
+                  <span class="posts-card-date">
+                    <i class="fas fa-calendar-alt"></i>
+                    {{ item.lost_found_date || item.created_at | date:'short' }}
+                  </span>
+                  <span class="posts-card-views"><i class="fas fa-eye"></i> {{ item.view_count != null ? item.view_count : 0 }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="posts-card-btn"
+                  (click)="viewItemDetail(item._id)"
+                >
+                  Xem chi tiết
+                </button>
+              </div>
+            </article>
+          </div>
+        </ng-container>
+      </ng-container>
+
+      <ng-template #loadingTpl>
+        <div class="posts-skeleton-grid posts-grid">
+          <div *ngFor="let i of [1,2,3,4,5,6]" class="posts-card skeleton-card">
+            <div class="skeleton skeleton-image"></div>
+            <div class="posts-card-body">
+              <div class="skeleton skeleton-line w-100"></div>
+              <div class="skeleton skeleton-line w-80"></div>
+              <div class="skeleton skeleton-line w-60 mt-2"></div>
+              <div class="skeleton skeleton-line w-40 mt-2"></div>
+              <div class="skeleton skeleton-btn mt-3"></div>
+            </div>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-template #emptyTpl>
+        <div class="posts-empty">
+          <div class="posts-empty-icon">
+            <i class="fas fa-inbox"></i>
+          </div>
+          <h2 class="posts-empty-title">{{ hasActiveFilters || searchQuery?.trim() ? 'Chưa có bài đăng phù hợp' : 'Chưa có bài đăng nào' }}</h2>
+          <p class="posts-empty-desc">
+            {{ hasActiveFilters || searchQuery?.trim()
+              ? 'Hãy thử thay đổi từ khóa hoặc bộ lọc để tìm kết quả phù hợp hơn.'
+              : 'Chưa có bài đăng nào. Hãy đăng tin đầu tiên!' }}
+          </p>
+          <button
+            type="button"
+            class="posts-empty-btn"
+            *ngIf="hasActiveFilters || searchQuery?.trim()"
+            (click)="searchQuery = ''; resetFilters(); onSearch()"
+          >
+            <i class="fas fa-redo"></i> Xóa bộ lọc và tìm lại
+          </button>
+          <a
+            *ngIf="!hasActiveFilters && !searchQuery?.trim()"
+            routerLink="/post-item"
+            class="posts-empty-btn"
+          >
+            <i class="fas fa-plus"></i> Đăng tin mới
+          </a>
+        </div>
+      </ng-template>
+    </div>
+  </div>
 </main>
 
 <app-footer></app-footer>

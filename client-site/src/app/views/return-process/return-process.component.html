@@ -1,0 +1,65 @@
+<app-auth-navbar></app-auth-navbar>
+<main>
+  <section class="static-hero">
+    <div class="static-hero-inner">
+      <h1 class="static-hero-title">Quy trình nhận lại đồ</h1>
+      <p class="static-hero-subtitle">
+        Các bước từ tìm bài đăng phù hợp đến hoàn tất trả đồ một cách an toàn, minh bạch.
+      </p>
+    </div>
+  </section>
+
+  <div class="static-body">
+    <div class="static-body-inner">
+      <h2 class="static-section-title">Quy trình từng bước</h2>
+
+      <div class="static-card">
+        <div class="static-step">
+          <span class="static-step-num">1</span>
+          <div class="static-step-body">
+            <h4>Tìm bài đăng phù hợp</h4>
+            <p>Tìm kiếm theo từ khóa, danh mục hoặc địa điểm trên trang <a [routerLink]="['/posts']" class="static-link">Tất cả bài đăng</a>. So sánh mô tả và hình ảnh với đồ bạn mất hoặc đồ bạn nhặt được.</p>
+          </div>
+        </div>
+        <div class="static-step">
+          <span class="static-step-num">2</span>
+          <div class="static-step-body">
+            <h4>Gửi yêu cầu xác minh</h4>
+            <p>Trên trang chi tiết bài đăng, nhấn nút liên hệ / gửi yêu cầu. Bạn sẽ cung cấp thông tin liên hệ và lời nhắn ngắn để người đăng phản hồi.</p>
+          </div>
+        </div>
+        <div class="static-step">
+          <span class="static-step-num">3</span>
+          <div class="static-step-body">
+            <h4>Cung cấp thông tin / bằng chứng nhận dạng</h4>
+            <p>Khi được liên hệ, hãy mô tả chi tiết đặc điểm đồ vật (màu, nhãn hiệu, nội dung bên trong nếu có thể). Người mất có thể cung cấp bằng chứng (hóa đơn, ảnh) để xác minh quyền sở hữu.</p>
+          </div>
+        </div>
+        <div class="static-step">
+          <span class="static-step-num">4</span>
+          <div class="static-step-body">
+            <h4>Người đăng xác minh</h4>
+            <p>Bên nhặt được sẽ đối chiếu thông tin với đồ thực tế. Khi hai bên thống nhất đúng đối tượng, có thể chuyển sang bước hẹn trả.</p>
+          </div>
+        </div>
+        <div class="static-step">
+          <span class="static-step-num">5</span>
+          <div class="static-step-body">
+            <h4>Hẹn trả và hoàn tất</h4>
+            <p>Hẹn địa điểm và thời gian giao nhận an toàn (nơi đông người, trong khuôn viên trường nếu phù hợp). Sau khi trao trả, hai bên có thể xác nhận trên hệ thống để đóng bài đăng.</p>
+          </div>
+        </div>
+
+        <div class="static-note">
+          <strong>Lưu ý quan trọng:</strong>
+          <ul style="margin: 0.5rem 0 0 1rem; padding-left: 1rem;">
+            <li>Không chia sẻ thông tin bí mật (mật khẩu, số CMND đầy đủ) công khai qua tin nhắn hoặc bài đăng.</li>
+            <li>Luôn xác minh kỹ trước khi trao trả để tránh nhầm lẫn.</li>
+            <li>Nếu có tranh chấp hoặc hành vi đáng ngờ, hãy báo cho ban quản trị qua email hoặc form hỗ trợ.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<app-footer></app-footer>

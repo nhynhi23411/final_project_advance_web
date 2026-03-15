@@ -1,61 +1,70 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen bg-blueGray-50">
-  <section class="relative pt-16 pb-32">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-wrap items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-blueGray-800">Gợi ý phù hợp</h1>
-          <p class="mt-1 text-blueGray-600">Các bài đăng có thể khớp với tin của bạn</p>
-        </div>
-      </div>
+<main class="sug-page min-h-screen bg-blueGray-50">
+  <section class="sug-section">
+    <div class="sug-container">
+      <!-- Header -->
+      <header class="sug-header">
+        <h1 class="sug-title">Gợi ý phù hợp</h1>
+        <p class="sug-subtitle">Các bài đăng có thể khớp với tin của bạn</p>
+        <p *ngIf="authService.isLoggedIn" class="sug-subtitle-note">Chỉ hiển thị bài đăng từ người dùng khác</p>
+      </header>
 
-      <div *ngIf="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+      <!-- Error -->
+      <div *ngIf="error" class="sug-message sug-message-error">
         {{ error }}
       </div>
 
-      <div *ngIf="!authService.isLoggedIn" class="text-center py-16 text-blueGray-600">
-        <i class="fas fa-lock text-4xl mb-4"></i>
-        <p>Vui lòng đăng nhập để xem gợi ý phù hợp với bài đăng của bạn.</p>
+      <!-- Not logged in -->
+      <div *ngIf="!authService.isLoggedIn" class="sug-empty-state">
+        <i class="fas fa-lock sug-empty-icon" aria-hidden="true"></i>
+        <p class="sug-empty-text">Vui lòng đăng nhập để xem gợi ý phù hợp với bài đăng của bạn.</p>
       </div>
 
-      <div *ngIf="authService.isLoggedIn" class="flex flex-wrap items-stretch -mx-4">
+      <!-- Logged in: content -->
+      <div *ngIf="authService.isLoggedIn">
         <ng-container *ngIf="!isLoading; else loadingTpl">
           <ng-container *ngIf="items.length > 0; else emptyTpl">
-            <div *ngFor="let item of items" class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-              <article class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]">
-                <div class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]">
-                  <div class="flex justify-between items-center w-full">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase"
-                          [ngClass]="getItemTypeClass(item.type || item.post_type)">
+            <div class="sug-grid">
+              <article *ngFor="let item of items" class="sug-card">
+                <div class="sug-card-head">
+                  <div class="sug-card-top">
+                    <span class="sug-badge-type" [ngClass]="getItemTypeClass(item.type || item.post_type)">
                       {{ getItemTypeLabel(item.type || item.post_type) }}
                     </span>
-                    <span class="text-[10px] text-blueGray-400 font-medium">
-                      {{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'short' }}
-                    </span>
+                    <span class="sug-badge-match">Phù hợp</span>
                   </div>
-                  <span class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1">{{ item.title }}</span>
+                  <span class="sug-card-time">{{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'short' }}</span>
+                  <h2 class="sug-card-title">{{ item.title }}</h2>
                 </div>
-                <div class="w-full overflow-hidden flex-shrink-0">
-                  <div class="relative w-full" style="padding-top:56.25%;">
-                    <img [src]="(item.images && item.images.length) ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'"
-                         [alt]="item.title" class="absolute top-0 left-0 w-full h-full object-cover" />
+
+                <div class="sug-card-image">
+                  <img
+                    *ngIf="item.images && item.images.length && item.images[0]"
+                    [src]="item.images[0]"
+                    [alt]="item.title"
+                    class="sug-card-img"
+                  />
+                  <div *ngIf="!item.images || !item.images.length || !item.images[0]" class="sug-card-placeholder">
+                    <i class="fas fa-image" aria-hidden="true"></i>
+                    <span>Chưa có ảnh</span>
                   </div>
                 </div>
-                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                    <p class="flex items-start">
-                      <i class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"></i>
-                      <span class="line-clamp-2">{{ item.location_text || item.location?.address || '—' }}</span>
-                    </p>
-                    <p class="flex items-center">
-                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
-                      {{ item.category }} - {{ item.color || item.metadata?.color || '—' }}
-                    </p>
+
+                <div class="sug-card-body">
+                  <div class="sug-meta">
+                    <div class="sug-meta-line">
+                      <i class="fas fa-map-marker-alt sug-meta-icon" aria-hidden="true"></i>
+                      <span class="sug-meta-text line-clamp-2">{{ item.location_text || item.location?.address || 'Chưa có địa điểm' }}</span>
+                    </div>
+                    <div class="sug-meta-line">
+                      <i class="fas fa-tag sug-meta-icon" aria-hidden="true"></i>
+                      <span class="sug-meta-text">{{ item.category || '—' }} · {{ item.color || item.metadata?.color || '—' }}</span>
+                    </div>
                   </div>
-                  <button type="button" (click)="viewItemDetail(item._id)"
-                          class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors">
+                  <button type="button" (click)="viewItemDetail(item._id)" class="sug-btn-detail">
                     Xem chi tiết
+                    <i class="fas fa-arrow-right sug-btn-icon" aria-hidden="true"></i>
                   </button>
                 </div>
               </article>
@@ -64,15 +73,16 @@
         </ng-container>
 
         <ng-template #loadingTpl>
-          <div class="w-full text-center py-16">
-            <i class="fas fa-spinner fa-spin text-3xl text-blueGray-400"></i>
-            <p class="mt-2 text-blueGray-600">Đang tải gợi ý...</p>
+          <div class="sug-loading">
+            <i class="fas fa-spinner sug-spinner" aria-hidden="true"></i>
+            <p class="sug-loading-text">Đang tải gợi ý...</p>
           </div>
         </ng-template>
 
         <ng-template #emptyTpl>
-          <div class="w-full text-center py-16 text-blueGray-500">
-            <p>Chưa có gợi ý phù hợp. Hãy đăng bài LOST hoặc FOUND để nhận gợi ý.</p>
+          <div class="sug-empty-state">
+            <p class="sug-empty-text sug-empty-title">Hiện chưa có bài đăng phù hợp từ người dùng khác.</p>
+            <p class="sug-empty-text">Hãy quay lại sau hoặc thử cập nhật thông tin bài đăng của bạn để nhận gợi ý.</p>
           </div>
         </ng-template>
       </div>

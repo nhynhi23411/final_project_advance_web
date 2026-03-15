@@ -1,344 +1,291 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen bg-blueGray-50 pt-16">
-  <!-- Header -->
-  <div class="bg-white border-b border-blueGray-200 sticky top-16 z-40">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between">
-      <h1 class="text-2xl font-bold text-blueGray-800">Chi tiết đồ thất lạc</h1>
-      <button
-        (click)="goBack()"
-        class="flex items-center text-blueGray-600 hover:text-blueGray-800 transition-colors"
-      >
-        <i class="fas fa-arrow-left mr-2"></i>
+<main class="item-detail-page min-h-screen bg-blueGray-50 pt-16">
+  <!-- Page header -->
+  <header class="item-detail-header">
+    <div class="item-detail-container item-detail-header-inner">
+      <button type="button" (click)="goBack()" class="item-detail-back">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
         <span>Quay lại</span>
       </button>
+      <h1 class="item-detail-page-title">Chi tiết đồ thất lạc</h1>
+      <div class="item-detail-header-spacer"></div>
     </div>
+  </header>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="item-detail-container item-detail-message item-detail-message-success">
+    <i class="fas fa-check-circle" aria-hidden="true"></i>
+    <span>{{ successMessage }}</span>
   </div>
 
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="container mx-auto px-4 mt-4">
-    <div
-      class="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg flex items-center"
-    >
-      <i class="fas fa-check-circle mr-3 text-lg"></i>
-      <span>{{ successMessage }}</span>
-    </div>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="error" class="container mx-auto px-4 mt-4">
-    <div
-      class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg flex items-center"
-    >
-      <i class="fas fa-exclamation-circle mr-3 text-lg"></i>
-      <span>{{ error }}</span>
-    </div>
+  <!-- Error -->
+  <div *ngIf="error" class="item-detail-container item-detail-message item-detail-message-error">
+    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ error }}</span>
   </div>
 
   <!-- Loading -->
-  <div
-    *ngIf="isLoading"
-    class="container mx-auto px-4 py-16 flex justify-center"
-  >
-    <div class="text-center">
-      <div class="inline-block animate-spin mb-4">
-        <i class="fas fa-spinner text-4xl text-blueGray-400"></i>
-      </div>
-      <p class="text-blueGray-600">Đang tải thông tin...</p>
-    </div>
+  <div *ngIf="isLoading" class="item-detail-container item-detail-loading">
+    <i class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
+    <p class="item-detail-loading-text">Đang tải thông tin...</p>
   </div>
 
-  <!-- Content -->
-  <div *ngIf="!isLoading && item" class="container mx-auto px-4 py-8">
-    <div class="flex flex-col lg:flex-row gap-8">
-      <!-- main area -->
-      <section class="flex-1 lg:pr-6">
-        <!-- image + gallery -->
-        <div class="bg-white rounded-lg shadow overflow-hidden">
-          <div
-            class="relative bg-blueGray-100 h-80 flex items-center justify-center"
-          >
+  <!-- Main content: 2 columns -->
+  <div *ngIf="!isLoading && item" class="item-detail-container item-detail-main">
+    <div class="item-detail-layout">
+      <!-- Left column: image + detail card -->
+      <section class="item-detail-primary">
+        <!-- Image / gallery -->
+        <div class="item-detail-gallery-card">
+          <div class="item-detail-gallery-main">
             <img
-              *ngIf="item.images && item.images.length"
-              [src]="item.images[0]"
+              *ngIf="getMainImageUrl()"
+              [src]="getMainImageUrl()"
               [alt]="item.title"
-              class="w-full h-full object-cover main-photo"
+              class="item-detail-gallery-img"
             />
-            <div
-              *ngIf="!item.images || item.images.length === 0"
-              class="text-blueGray-400 text-center"
-            >
-              <i class="fas fa-image text-6xl mb-4"></i>
+            <div *ngIf="!getMainImageUrl()" class="item-detail-gallery-placeholder">
+              <i class="fas fa-image" aria-hidden="true"></i>
               <p>Không có hình ảnh</p>
             </div>
           </div>
-          <div
-            *ngIf="item.images && item.images.length > 1"
-            class="flex gap-2 overflow-x-auto p-2 bg-blueGray-50"
-          >
-            <img
+          <div *ngIf="item.images && item.images.length > 1" class="item-detail-gallery-thumbs">
+            <button
               *ngFor="let img of item.images; let i = index"
-              [src]="img"
-              [alt]="'Hình ' + (i + 1)"
-              class="w-20 h-20 object-cover rounded cursor-pointer border border-blueGray-200 hover:border-blueGray-400"
-            />
+              type="button"
+              (click)="setSelectedImage(i)"
+              [class.item-detail-thumb-active]="selectedImageIndex === i"
+              class="item-detail-thumb"
+            >
+              <img [src]="img" [alt]="'Hình ' + (i + 1)" class="item-detail-thumb-img" />
+            </button>
           </div>
         </div>
 
-        <!-- title / metadata card -->
-        <div class="mt-6 bg-white rounded-lg shadow p-6">
-          <h2 class="text-2xl font-bold text-blueGray-800 mb-4 detail-title">
-            {{ item.title }}
-          </h2>
-          <dl class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-            <div>
-              <dt class="font-semibold text-blueGray-600">Loại</dt>
-              <dd class="mt-1">
-                <span
-                  [class]="
-                    getItemTypeClass() +
-                    ' inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold'
-                  "
-                >
-                  <i [class]="getItemTypeIcon() + ' mr-1'"></i>
-                  {{ getItemTypeLabel() }}
-                </span>
-              </dd>
+        <!-- Detail card: title, metadata, description -->
+        <div class="item-detail-card item-detail-info-card">
+          <div class="item-detail-info-head">
+            <h2 class="item-detail-title">{{ item.title }}</h2>
+            <div class="item-detail-badges">
+              <span
+                [class]="getItemTypeClass() + ' item-detail-badge item-detail-badge-type'"
+              >
+                <i [class]="getItemTypeIcon()" aria-hidden="true"></i>
+                {{ getItemTypeLabel() }}
+              </span>
+              <span class="item-detail-badge item-detail-badge-status" [ngClass]="getStatusUelClass()">
+                {{ getStatusLabel() }}
+              </span>
             </div>
-            <div>
-              <dt class="font-semibold text-blueGray-600">Danh mục</dt>
-              <dd class="mt-1">{{ item.category }}</dd>
+          </div>
+
+          <dl class="item-detail-meta-grid">
+            <div class="item-detail-meta-item">
+              <dt>Danh mục</dt>
+              <dd>{{ item.category }}</dd>
             </div>
-            <div>
-              <dt class="font-semibold text-blueGray-600">Màu sắc</dt>
-              <dd class="mt-1">{{ item.color || "Không xác định" }}</dd>
+            <div class="item-detail-meta-item">
+              <dt>Màu sắc</dt>
+              <dd>{{ item.color || "Không xác định" }}</dd>
             </div>
-            <div>
-              <dt class="font-semibold text-blueGray-600">Địa điểm</dt>
-              <dd class="mt-1">{{ item.location_text }}</dd>
+            <div class="item-detail-meta-item">
+              <dt>Địa điểm</dt>
+              <dd>{{ item.location_text }}</dd>
             </div>
-            <div>
-              <dt class="font-semibold text-blueGray-600">Ngày</dt>
-              <dd class="mt-1">{{ formatDate(item.lost_found_date) }}</dd>
-            </div>
-            <div>
-              <dt class="font-semibold text-blueGray-600">Trạng thái</dt>
-              <dd class="mt-1 font-semibold">{{ getStatusLabel() }}</dd>
+            <div class="item-detail-meta-item">
+              <dt>Ngày</dt>
+              <dd>{{ formatDate(item.lost_found_date) }}</dd>
             </div>
           </dl>
 
-          <div class="mt-6">
-            <h3 class="text-lg font-semibold text-blueGray-800 mb-2">Mô tả</h3>
-            <p
-              class="prose text-blueGray-700 leading-relaxed whitespace-pre-wrap"
-            >
-              {{ item.description || "Không có mô tả" }}
-            </p>
+          <div class="item-detail-description-block">
+            <h3 class="item-detail-subtitle">Mô tả</h3>
+            <p class="item-detail-description">{{ item.description || "Không có mô tả" }}</p>
           </div>
 
-          <div *ngIf="item.distinctive_marks" class="mt-6 border-t pt-4">
-            <dt class="font-semibold text-blueGray-600">Đặc điểm nhận dạng</dt>
-            <dd class="mt-1 whitespace-pre-wrap">
-              {{ item.distinctive_marks }}
-            </dd>
+          <div *ngIf="item.distinctive_marks" class="item-detail-description-block item-detail-distinctive">
+            <h3 class="item-detail-subtitle">Đặc điểm nhận dạng</h3>
+            <p class="item-detail-description">{{ item.distinctive_marks }}</p>
           </div>
         </div>
 
-        <!-- Claims List for Owner -->
+        <!-- Claims list (owner only) -->
         <div
           *ngIf="isOwner() && postClaims?.length"
-          class="mt-6 bg-white rounded-lg shadow p-6 border-l-4 border-lightBlue-500"
+          class="item-detail-card item-detail-claims-card"
         >
-          <h3 class="text-xl font-bold text-blueGray-800 mb-4">
-            <i class="fas fa-users mr-2 text-lightBlue-500"></i> Danh sách yêu
-            cầu Claim
+          <h3 class="item-detail-card-heading item-detail-card-heading-accent">
+            <i class="fas fa-users" aria-hidden="true"></i>
+            Danh sách yêu cầu Claim
           </h3>
-          <div class="space-y-4">
-            <div
-              *ngFor="let claim of postClaims"
-              class="p-4 border border-blueGray-200 rounded-lg bg-blueGray-50"
-            >
-              <div
-                class="flex flex-col sm:flex-row justify-between items-start mb-2"
-              >
+          <div class="item-detail-claims-list">
+            <div *ngFor="let claim of postClaims" class="item-detail-claim-item">
+              <div class="item-detail-claim-header">
                 <div>
-                  <h4 class="font-bold text-blueGray-700 text-lg">
-                    {{
-                      claim.claimant_user_id?.name ||
-                        claim.claimant_user_id?.username ||
-                        "Người dùng ẩn danh"
-                    }}
+                  <h4 class="item-detail-claim-name">
+                    {{ claim.claimant_user_id?.name || claim.claimant_user_id?.username || "Người dùng ẩn danh" }}
                   </h4>
-                  <p class="text-xs text-blueGray-500">
-                    <i class="fas fa-clock mr-1"></i>
+                  <p class="item-detail-claim-date">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
                     {{ formatDate(claim.created_at) }}
                   </p>
                 </div>
                 <span
-                  class="mt-2 sm:mt-0 px-2 py-1 text-xs font-bold rounded uppercase whitespace-nowrap"
+                  class="item-detail-claim-status"
                   [ngClass]="{
-                    'bg-yellow-200 text-yellow-800': claim.status === 'PENDING',
-                    'bg-lightBlue-200 text-lightBlue-800':
-                      claim.status === 'UNDER_VERIFICATION',
-                    'bg-emerald-200 text-emerald-800':
-                      claim.status === 'SUCCESSFUL',
-                    'bg-red-200 text-red-800':
-                      claim.status === 'REJECTED' ||
-                      claim.status === 'CANCELLED'
+                    'item-detail-claim-pending': claim.status === 'PENDING',
+                    'item-detail-claim-verifying': claim.status === 'UNDER_VERIFICATION',
+                    'item-detail-claim-success': claim.status === 'SUCCESSFUL',
+                    'item-detail-claim-rejected': claim.status === 'REJECTED' || claim.status === 'CANCELLED'
                   }"
                 >
                   {{ getClaimStatusLabel(claim.status) }}
                 </span>
               </div>
-
-              <div
-                class="text-sm text-blueGray-600 mb-3 bg-white p-3 rounded border border-blueGray-100"
-              >
-                <div *ngIf="claim.message" class="mb-2">
+              <div class="item-detail-claim-body">
+                <div *ngIf="claim.message" class="item-detail-claim-row">
                   <strong>Tin nhắn:</strong>
-                  <span class="text-blueGray-700">{{ claim.message }}</span>
+                  <span>{{ claim.message }}</span>
                 </div>
-                <div *ngIf="claim.secret_info" class="mb-2">
+                <div *ngIf="claim.secret_info" class="item-detail-claim-row">
                   <strong>Thông tin bí mật / Bằng chứng:</strong>
-                  <span class="text-blueGray-700 italic">{{
-                    claim.secret_info
-                  }}</span>
+                  <span class="item-detail-claim-italic">{{ claim.secret_info }}</span>
                 </div>
-                <div *ngIf="claim.image_proof_url" class="mb-3">
+                <div *ngIf="claim.image_proof_url" class="item-detail-claim-row">
                   <strong>Ảnh chứng thực:</strong>
-                  <a
-                    [href]="claim.image_proof_url"
-                    target="_blank"
-                    class="block mt-1"
-                  >
-                    <img
-                      [src]="claim.image_proof_url"
-                      class="h-20 object-cover rounded border hover:opacity-75 transition-opacity"
-                    />
+                  <a [href]="claim.image_proof_url" target="_blank" rel="noopener" class="item-detail-claim-img-link">
+                    <img [src]="claim.image_proof_url" alt="Ảnh chứng thực" class="item-detail-claim-img" />
                   </a>
                 </div>
-                <hr class="my-2 border-blueGray-100" />
+                <hr class="item-detail-claim-hr" />
                 <p *ngIf="claim.claimant_user_id?.email">
                   <strong>Email liên hệ:</strong>
-                  <a
-                    href="mailto:{{ claim.claimant_user_id.email }}"
-                    class="text-lightBlue-600 hover:underline ml-1"
-                    >{{ claim.claimant_user_id.email }}</a
-                  >
+                  <a href="mailto:{{ claim.claimant_user_id.email }}" class="item-detail-link">{{ claim.claimant_user_id.email }}</a>
                 </p>
                 <p *ngIf="claim.claimant_user_id?.phone">
                   <strong>Điện thoại:</strong>
-                  <a
-                    href="tel:{{ claim.claimant_user_id.phone }}"
-                    class="text-lightBlue-600 hover:underline ml-1"
-                    >{{ claim.claimant_user_id.phone }}</a
-                  >
+                  <a href="tel:{{ claim.claimant_user_id.phone }}" class="item-detail-link">{{ claim.claimant_user_id.phone }}</a>
                 </p>
-                <p
-                  *ngIf="
-                    !claim.claimant_user_id?.email &&
-                    !claim.claimant_user_id?.phone
-                  "
-                  class="text-blueGray-400 italic"
-                >
+                <p *ngIf="!claim.claimant_user_id?.email && !claim.claimant_user_id?.phone" class="item-detail-claim-muted">
                   Người dùng chưa cập nhật thông tin liên hệ.
                 </p>
               </div>
-
-              <!-- Owner Actions -->
               <div
-                *ngIf="
-                  claim.status === 'PENDING' ||
-                  claim.status === 'UNDER_VERIFICATION'
-                "
-                class="flex flex-wrap gap-2 mt-4 pt-3 border-t border-blueGray-200"
+                *ngIf="claim.status === 'PENDING' || claim.status === 'UNDER_VERIFICATION'"
+                class="item-detail-claim-actions"
               >
-                <span
-                  class="text-sm text-blueGray-500 w-full mb-1 font-semibold"
-                  >Xử lý yêu cầu:</span
-                >
-                <button
-                  *ngIf="claim.status === 'PENDING'"
-                  (click)="reviewClaim(claim._id, 'UNDER_VERIFICATION')"
-                  class="px-3 py-1.5 bg-lightBlue-500 text-white text-xs font-bold rounded shadow hover:bg-lightBlue-600 hover:shadow-md focus:outline-none transition-all mr-2"
-                >
-                  <i class="fas fa-comment-dots mr-1"></i> Đang liên hệ
-                </button>
-                <button
-                  (click)="reviewClaim(claim._id, 'SUCCESSFUL')"
-                  class="px-3 py-1.5 bg-emerald-500 text-white text-xs font-bold rounded shadow hover:bg-emerald-600 hover:shadow-md focus:outline-none transition-all mr-2"
-                >
-                  <i class="fas fa-check mr-1"></i> Duyệt / Giao đồ
-                </button>
-                <button
-                  (click)="reviewClaim(claim._id, 'REJECTED')"
-                  class="px-3 py-1.5 bg-red-500 text-white text-xs font-bold rounded shadow hover:bg-red-600 hover:shadow-md focus:outline-none transition-all"
-                >
-                  <i class="fas fa-times mr-1"></i> Từ chối
-                </button>
+                <span class="item-detail-claim-actions-label">Xử lý yêu cầu:</span>
+                <div class="item-detail-claim-buttons">
+                  <button
+                    *ngIf="claim.status === 'PENDING'"
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'UNDER_VERIFICATION')"
+                    class="item-detail-btn item-detail-btn-primary"
+                  >
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i> Đang liên hệ
+                  </button>
+                  <button
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'SUCCESSFUL')"
+                    class="item-detail-btn item-detail-btn-success"
+                  >
+                    <i class="fas fa-check" aria-hidden="true"></i> Duyệt / Giao đồ
+                  </button>
+                  <button
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'REJECTED')"
+                    class="item-detail-btn item-detail-btn-danger"
+                  >
+                    <i class="fas fa-times" aria-hidden="true"></i> Từ chối
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- sidebar -->
-      <aside class="lg:w-80 lg:ml-8 flex-shrink-0">
-        <div
-          *ngIf="isClaimButtonVisible()"
-          class="bg-white rounded-lg shadow p-6 mb-6"
-        >
-          <h3 class="text-lg font-bold mb-4">Gửi yêu cầu xác minh</h3>
-          <p class="text-sm text-blueGray-600 mb-4">
-            Nếu bạn nghĩ đây là đồ của mình, hãy gửi yêu cầu claim về món đồ
-            này.
+      <!-- Right column: sidebar -->
+      <aside class="item-detail-sidebar">
+        <!-- Card: Gửi yêu cầu xác minh -->
+        <div *ngIf="isClaimButtonVisible() || isOwner()" class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Gửi yêu cầu xác minh</h3>
+          <p class="item-detail-sidebar-desc">
+            Nếu bạn nghĩ đây là đồ của mình, hãy gửi yêu cầu xác minh về món đồ này.
           </p>
           <button
             type="button"
             (click)="handleClaimClick()"
-            [disabled]="
-              authService.isLoggedIn &&
-              (isClaimButtonDisabled() || isSubmitting)
-            "
-            [ngClass]="
-              hasClaimed
-                ? 'bg-emerald-600 hover:bg-emerald-700'
-                : 'bg-blueGray-700 hover:bg-blueGray-800'
-            "
-            class="w-full disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold uppercase px-4 py-2 rounded text-sm flex justify-center items-center transition-colors shadow hover:shadow-lg focus:outline-none"
+            [disabled]="isOwner() || isClaimButtonDisabled() || isSubmitting"
+            [ngClass]="{
+              'item-detail-btn-claim': true,
+              'item-detail-btn-claim-submitted': hasClaimed,
+              'item-detail-btn-claim-disabled': isOwner() || isClaimButtonDisabled() || isSubmitting
+            }"
           >
-            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
-            <i
-              *ngIf="hasClaimed && !isSubmitting"
-              class="fas fa-check-circle mr-2"
-            ></i>
+            <i *ngIf="isSubmitting" class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
+            <i *ngIf="hasClaimed && !isSubmitting" class="fas fa-check-circle" aria-hidden="true"></i>
             {{
               isSubmitting
                 ? "Đang gửi yêu cầu..."
                 : hasClaimed
-                  ? "Đã gửi yêu cầu/Claim"
-                  : "Yêu cầu xác minh/Claim món đồ"
+                  ? "Đã gửi yêu cầu"
+                  : isOwner()
+                    ? "Bạn là chủ bài đăng"
+                    : "Gửi yêu cầu xác minh"
             }}
           </button>
-          <p
-            *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT"
-            class="mt-2 text-xs text-yellow-700"
-          >
+          <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="item-detail-claim-limit">
             Bạn đã đạt giới hạn yêu cầu
           </p>
         </div>
 
-        <div class="bg-white rounded-lg shadow p-6">
-          <h3 class="text-lg font-bold mb-4">Thông tin đăng</h3>
-          <ul class="text-sm space-y-3">
-            <li><strong>Người đăng:</strong> {{ item.created_by }}</li>
-            <li>
-              <strong>Ngày đăng:</strong> {{ formatDate(item.created_at) }}
-            </li>
-            <li>
-              <strong>Cập nhật:</strong> {{ formatDate(item.updated_at) }}
-            </li>
+        <!-- Card: Thông tin đăng -->
+        <div class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Thông tin đăng</h3>
+          <ul class="item-detail-sidebar-list">
+            <li><span class="item-detail-sidebar-label">Người đăng</span><span class="item-detail-sidebar-value">{{ item.created_by || '—' }}</span></li>
+            <li><span class="item-detail-sidebar-label">Lượt xem</span><span class="item-detail-sidebar-value">{{ item.view_count != null ? item.view_count : 0 }}</span></li>
+            <li><span class="item-detail-sidebar-label">Ngày đăng</span><span class="item-detail-sidebar-value">{{ formatDate(item.created_at) }}</span></li>
+            <li><span class="item-detail-sidebar-label">Cập nhật</span><span class="item-detail-sidebar-value">{{ formatDate(item.updated_at) }}</span></li>
           </ul>
+          <div *ngIf="isOwner()" class="item-detail-sidebar-close">
+            <button type="button" (click)="closePost()" class="item-detail-btn item-detail-btn-secondary item-detail-btn-block">
+              <i class="fas fa-lock" aria-hidden="true"></i> Đóng bài đăng
+            </button>
+          </div>
+        </div>
+
+        <!-- Card: Bài đăng liên quan -->
+        <div *ngIf="relatedItems.length > 0" class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Các bài đăng liên quan</h3>
+          <p class="item-detail-sidebar-desc">Cùng danh mục hoặc khu vực</p>
+          <div class="item-detail-related-list">
+            <a
+              *ngFor="let rel of relatedItems"
+              [routerLink]="['/items', rel._id]"
+              class="item-detail-related-item"
+            >
+              <div class="item-detail-related-thumb">
+                <img *ngIf="rel.images && rel.images[0]" [src]="rel.images[0]" [alt]="rel.title" class="item-detail-related-thumb-img" />
+                <div *ngIf="!rel.images || !rel.images.length" class="item-detail-related-thumb-placeholder">
+                  <i class="fas fa-image" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="item-detail-related-content">
+                <span class="item-detail-related-badge" [ngClass]="getRelatedStatusClass(rel.status)">{{ getRelatedStatusLabel(rel.status) }}</span>
+                <p class="item-detail-related-title">{{ rel.title }}</p>
+                <p class="item-detail-related-meta">{{ rel.category }} · {{ rel.location_text | slice:0:30 }}{{ (rel.location_text?.length || 0) > 30 ? '…' : '' }}</p>
+              </div>
+              <i class="fas fa-chevron-right item-detail-related-arrow" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Empty state: không có bài liên quan -->
+        <div *ngIf="relatedItems.length === 0 && !isLoading && item" class="item-detail-sidebar-card item-detail-sidebar-empty">
+          <p class="item-detail-empty-text">Chưa có bài đăng liên quan.</p>
         </div>
       </aside>
     </div>

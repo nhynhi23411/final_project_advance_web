@@ -1,8 +1,9 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { environment } from "../../../environments/environment";
 import { ItemService, Item } from "../../services/item.service";
+import { ToastService } from "../../services/toast.service";
 
 export interface MeUser {
   userId?: string;
@@ -17,6 +18,7 @@ export interface MeUser {
 @Component({
   selector: "app-profile",
   templateUrl: "./profile.component.html",
+  styleUrls: ["./profile.component.scss"],
 })
 export class ProfileComponent implements OnInit {
   user: MeUser | null = null;
@@ -24,11 +26,22 @@ export class ProfileComponent implements OnInit {
   loading = true;
   loadingPosts = false;
   error: string | null = null;
+  activeTab: "posts" | "claims" | "archive" = "posts";
+
+  /** Filter My Posts by type: all / LOST / FOUND */
+  postTypeFilter: "all" | "LOST" | "FOUND" = "all";
+
+  /** Edit profile */
+  isEditing = false;
+  saving = false;
+  editForm = { name: "", email: "", phone: "" };
+  editErrors: { name?: string; email?: string; phone?: string } = {};
 
   constructor(
     private http: HttpClient,
     private itemService: ItemService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -100,6 +113,18 @@ export class ProfileComponent implements OnInit {
     return "text-orange-600 bg-orange-200";
   }
 
+  /** UI only: map status to UEL badge class for consistent styling */
+  getStatusUelClass(s: string | undefined): string {
+    if (!s) return "badge-uel-archived";
+    if (s === "APPROVED") return "badge-uel-approved";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN") return "badge-uel-pending";
+    if (s === "NEEDS_UPDATE") return "badge-uel-need-update";
+    if (s === "REJECTED") return "badge-uel-rejected";
+    if (s === "ARCHIVED") return "badge-uel-archived";
+    if (s === "RETURNED") return "badge-uel-returned";
+    return "badge-uel-archived";
+  }
+
   getTypeLabel(t: string): string {
     return t === "LOST" ? "Bị mất" : "Nhặt được";
   }
@@ -126,5 +151,105 @@ export class ProfileComponent implements OnInit {
       const s = (p as any).status;
       return s === "PENDING_SYSTEM" || s === "PENDING_ADMIN";
     }).length;
+  }
+
+  get archivedPosts(): Item[] {
+    return this.myPosts.filter((p) => {
+      const s = (p as any).status;
+      return s === "ARCHIVED" || s === "RETURNED";
+    });
+  }
+
+  /** Bài đăng của user hiện tại, lọc theo postTypeFilter (type/post_type). */
+  get filteredMyPosts(): Item[] {
+    if (!this.myPosts.length) return [];
+    if (this.postTypeFilter === "all") return this.myPosts;
+    return this.myPosts.filter((p) => {
+      const t = p.type ?? (p as any).post_type;
+      return t === this.postTypeFilter;
+    });
+  }
+
+  setTab(tab: "posts" | "claims" | "archive"): void {
+    this.activeTab = tab;
+  }
+
+  setPostTypeFilter(value: "all" | "LOST" | "FOUND"): void {
+    this.postTypeFilter = value;
+  }
+
+  /** Bật chế độ chỉnh sửa hồ sơ */
+  startEdit(): void {
+    if (!this.user) return;
+    this.editForm = {
+      name: this.user.name ?? "",
+      email: this.user.email ?? "",
+      phone: this.user.phone ?? "",
+    };
+    this.editErrors = {};
+    this.isEditing = true;
+  }
+
+  /** Thoát chỉnh sửa, khôi phục dữ liệu cũ */
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.editForm = { name: "", email: "", phone: "" };
+    this.editErrors = {};
+  }
+
+  /** Validation form: name không rỗng, email format, phone format cơ bản */
+  private validateEditForm(): boolean {
+    const e: { name?: string; email?: string; phone?: string } = {};
+    const name = (this.editForm.name ?? "").trim();
+    if (!name) e.name = "Họ tên không được để trống";
+    const email = (this.editForm.email ?? "").trim();
+    if (email) {
+      const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRe.test(email)) e.email = "Email không đúng định dạng";
+    }
+    const phone = (this.editForm.phone ?? "").trim();
+    if (phone) {
+      const phoneRe = /^[\d\s+\-()]{8,20}$/;
+      if (!phoneRe.test(phone)) e.phone = "Số điện thoại không đúng định dạng";
+    }
+    this.editErrors = e;
+    return Object.keys(e).length === 0;
+  }
+
+  /** Gửi PATCH /me, cập nhật user từ response, toast kết quả */
+  saveProfile(): void {
+    if (!this.validateEditForm() || this.saving) return;
+    const token = localStorage.getItem("access_token");
+    if (!token) {
+      this.toastService.error("Bạn cần đăng nhập để cập nhật hồ sơ.");
+      return;
+    }
+    this.saving = true;
+    const body = {
+      name: this.editForm.name.trim() || undefined,
+      email: this.editForm.email.trim() || undefined,
+      phone: this.editForm.phone.trim() || undefined,
+    };
+    this.http
+      .patch<{ message: string; user: MeUser }>(`${environment.apiUrl}/me`, body, {
+        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
+      })
+      .subscribe({
+        next: (res) => {
+          this.saving = false;
+          if (res.user) this.user = res.user;
+          this.isEditing = false;
+          this.editErrors = {};
+          this.toastService.success("Cập nhật hồ sơ thành công.");
+        },
+        error: (err) => {
+          this.saving = false;
+          const msg =
+            err?.error?.message ||
+            err?.error?.error ||
+            "Không thể cập nhật hồ sơ. Vui lòng thử lại.";
+          this.toastService.error(msg);
+        },
+      });
   }
 }

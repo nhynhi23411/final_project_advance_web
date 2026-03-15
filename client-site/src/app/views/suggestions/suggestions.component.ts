@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 @Component({
   selector: 'app-suggestions',
   templateUrl: './suggestions.component.html',
+  styleUrls: ['./suggestions.component.scss'],
 })
 export class SuggestionsComponent implements OnInit {
   items: Item[] = [];
@@ -20,6 +21,25 @@ export class SuggestionsComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadSuggestions();
+  }
+
+  /** Trả về true nếu bài đăng thuộc về user hiện tại (cần loại khỏi gợi ý). */
+  private isOwnPost(item: Item): boolean {
+    const currentId = this.authService.currentUserId;
+    if (!currentId) return false;
+    const ownerId =
+      (item as any).created_by_user_id ??
+      item.created_by ??
+      (item as any).owner_id ??
+      (item as any).user_id ??
+      (item as any).createdBy;
+    if (ownerId == null) return false;
+    return String(ownerId) === String(currentId);
+  }
+
+  /** Loại bỏ bài của chính user hiện tại khỏi danh sách gợi ý. */
+  private excludeOwnPosts(list: Item[]): Item[] {
+    return list.filter((it) => !this.isOwnPost(it));
   }
 
   loadSuggestions(): void {
@@ -37,7 +57,8 @@ export class SuggestionsComponent implements OnInit {
         if (categories.length === 0) {
           this.itemService.getItems({ status: 'APPROVED', type: oppositeType }).subscribe({
             next: (data) => {
-              this.items = (Array.isArray(data) ? data : []).slice(0, 12);
+              const raw = (Array.isArray(data) ? data : []).slice(0, 12);
+              this.items = this.excludeOwnPosts(raw);
               this.isLoading = false;
             },
             error: () => {
@@ -54,7 +75,8 @@ export class SuggestionsComponent implements OnInit {
               const cat = (it.category || '').toLowerCase();
               return categories.some((c) => cat.includes(c) || c.includes(cat));
             });
-            this.items = byCat.length ? byCat.slice(0, 12) : all.slice(0, 12);
+            const raw = byCat.length ? byCat.slice(0, 12) : all.slice(0, 12);
+            this.items = this.excludeOwnPosts(raw);
             this.isLoading = false;
           },
           error: () => {

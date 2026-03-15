@@ -1,65 +1,49 @@
 <div class="container mx-auto px-4 h-full">
   <div class="flex content-center items-center justify-center h-full">
     <div class="w-full lg:w-4/12 px-4">
-      <div class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0">
-        <!--
-        <div class="rounded-t mb-0 px-6 py-6">
-          <div class="text-center mb-3"><h6 class="text-blueGray-500 text-sm font-bold">Đăng nhập với</h6></div>
-          <div class="btn-wrapper text-center">
-            <button type="button" class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs">
-              <img alt="" class="w-5 mr-1" src="assets/img/github.svg" aria-hidden="true" /> Github
-            </button>
-            <button type="button" class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs">
-              <img alt="" class="w-5 mr-1" src="assets/img/google.svg" aria-hidden="true" /> Google
-            </button>
-          </div>
-          <hr class="mt-6 border-b-1 border-blueGray-300" />
-        </div>
-        -->
+      <div class="card-uel relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg border-0">
         <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <div class="text-blueGray-400 text-center mb-3 font-bold"><small>Đăng nhập</small></div>
+          <div class="uel-section-title text-center mb-6 text-blueGray-700">Đăng nhập</div>
           <form (ngSubmit)="handleLogin()">
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="login-email">Email</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="login-email">Email</label>
               <input id="login-email" type="email" name="email" [(ngModel)]="email" autocomplete="email"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="email@example.com" />
             </div>
 
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="login-password">Mật khẩu</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="login-password">Mật khẩu</label>
               <input id="login-password" type="password" name="password" [(ngModel)]="password" autocomplete="current-password"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="••••••••" />
             </div>
             <div>
-              <label class="inline-flex items-center cursor-pointer">
-                <input id="customCheckLogin" type="checkbox"
-                  class="form-checkbox border-0 text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150 rounded" />
-                <span class="ml-2 text-sm font-semibold text-blueGray-600">Ghi nhớ đăng nhập</span>
+              <label class="uel-checkbox-wrap inline-flex items-center cursor-pointer">
+                <input id="customCheckLogin" type="checkbox" class="uel-checkbox" />
+                <span class="uel-checkbox-label">Ghi nhớ đăng nhập</span>
               </label>
             </div>
 
             <div *ngIf="errorMessage"
-              class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-3 text-sm">
+              class="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-lg mb-3 text-sm">
               {{ errorMessage }}
             </div>
 
             <div class="text-center mt-6">
-              <button type="submit"
-                class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-1 mb-1 w-full ease-linear transition-all duration-150">
+              <button type="submit" class="btn-uel-primary w-full">
                 Đăng nhập
               </button>
             </div>
           </form>
         </div>
       </div>
-      <div class="flex flex-wrap mt-6 relative">
+      <div class="login-links flex flex-wrap mt-6 relative">
         <div class="w-1/2">
-          <a href="#" class="text-blueGray-200" (click)="$event.preventDefault()"><small>Quên mật khẩu?</small></a>
+          <a href="#" class="login-link login-link-muted" (click)="$event.preventDefault()"><small>Quên mật khẩu?</small></a>
         </div>
         <div class="w-1/2 text-right">
-          <a [routerLink]="['/auth/register']" class="text-blueGray-200"><small>Tạo tài khoản mới</small></a>
+          <a [routerLink]="['/auth/register']" class="login-link login-link-register"><small>Tạo tài khoản mới</small></a>
         </div>
       </div>
     </div>

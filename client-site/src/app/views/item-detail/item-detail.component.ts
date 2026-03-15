@@ -20,12 +20,14 @@ import { ClaimModalComponent } from "../../components/claim-modal/claim-modal.co
 })
 export class ItemDetailComponent implements OnInit {
   item: Item | null = null;
+  relatedItems: Item[] = [];
   activeClaimsCount = 0;
   isLoading = true;
   error: string | null = null;
   successMessage: string | null = null;
   MAX_CLAIMS_LIMIT = MAX_CLAIMS_LIMIT;
   selectedImage: string | null = null;
+  selectedImageIndex = 0;
   hasClaimed = false;
   postClaims: any[] = [];
 
@@ -56,7 +58,9 @@ export class ItemDetailComponent implements OnInit {
     this.itemService.getItemById(itemId).subscribe({
       next: (item) => {
         this.item = item;
+        this.selectedImageIndex = 0;
         this.isLoading = false;
+        this.loadRelatedItems(item);
         if (this.authService.isLoggedIn) {
           this.checkIfClaimed(itemId);
           if (this.isOwner()) {
@@ -256,15 +260,42 @@ export class ItemDetailComponent implements OnInit {
   onClaimSuccess(): void {
     this.hasClaimed = true;
     this.loadActiveClaimsCount();
-    this.successMessage = "Yêu cầu xác minh đã gửi thành công";
-    this.toastService.success(`Yêu cầu của bạn đã được gửi tới người đăng.`);
+    this.successMessage = "Yêu cầu xác minh đã được gửi.";
+    this.toastService.success("Yêu cầu xác minh đã được gửi.");
     setTimeout(() => {
       this.successMessage = null;
     }, 5000);
   }
 
+  loadRelatedItems(current: Item): void {
+    this.itemService.getItems({ status: "APPROVED" }).subscribe({
+      next: (list) => {
+        const arr = Array.isArray(list) ? list : [];
+        this.relatedItems = arr
+          .filter((i) => i._id !== current._id)
+          .filter(
+            (i) =>
+              (i.category && current.category && i.category === current.category) ||
+              (i.location_text && current.location_text && String(i.location_text).toLowerCase().includes(String(current.location_text).toLowerCase().slice(0, 20)))
+          )
+          .slice(0, 6);
+      },
+      error: () => {
+        this.relatedItems = [];
+      },
+    });
+  }
+
+  viewItem(id: string): void {
+    this.router.navigate(["/items", id]);
+  }
+
+  closePost(): void {
+    if (!this.item) return;
+    this.toastService.info("Chức năng đóng bài đăng đang được cập nhật. Vui lòng liên hệ quản trị viên.");
+  }
+
   goBack(): void {
-    // new homepage is root
     this.router.navigate(["/"]);
   }
 
@@ -287,13 +318,58 @@ export class ItemDetailComponent implements OnInit {
   getStatusLabel(): string {
     if (!this.item) return "";
     const statusMap: Record<string, string> = {
+      PENDING_SYSTEM: "Chờ duyệt",
+      PENDING_ADMIN: "Chờ admin",
       PENDING: "Chờ duyệt",
-      APPROVED: "Được duyệt",
+      APPROVED: "Đã duyệt",
+      NEEDS_UPDATE: "Cần cập nhật",
+      RETURNED: "Đã trả",
+      REJECTED: "Từ chối",
+      ARCHIVED: "Lưu trữ",
       MATCHED: "Đã match",
       COMPLETED: "Đã hoàn tất",
-      REJECTED: "Bị từ chối",
     };
     return statusMap[this.item.status] || this.item.status;
+  }
+
+  getStatusUelClass(): string {
+    if (!this.item?.status) return "badge-uel-archived";
+    const s = this.item.status;
+    if (s === "APPROVED") return "badge-uel-approved";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN" || s === "PENDING") return "badge-uel-pending";
+    if (s === "NEEDS_UPDATE") return "badge-uel-need-update";
+    if (s === "REJECTED") return "badge-uel-rejected";
+    if (s === "ARCHIVED") return "badge-uel-archived";
+    if (s === "RETURNED") return "badge-uel-returned";
+    return "badge-uel-archived";
+  }
+
+  getRelatedStatusLabel(s: string | undefined): string {
+    if (!s) return "—";
+    const m: Record<string, string> = {
+      PENDING_SYSTEM: "Chờ duyệt", PENDING_ADMIN: "Chờ admin", APPROVED: "Đã duyệt",
+      NEEDS_UPDATE: "Cần cập nhật", RETURNED: "Đã trả", REJECTED: "Từ chối", ARCHIVED: "Lưu trữ",
+    };
+    return m[s] || s;
+  }
+
+  getRelatedStatusClass(s: string | undefined): string {
+    if (!s) return "badge-uel-archived";
+    if (s === "APPROVED") return "badge-uel-approved";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN") return "badge-uel-pending";
+    if (s === "REJECTED") return "badge-uel-rejected";
+    if (s === "ARCHIVED") return "badge-uel-archived";
+    if (s === "RETURNED") return "badge-uel-returned";
+    return "badge-uel-archived";
+  }
+
+  setSelectedImage(index: number): void {
+    this.selectedImageIndex = index;
+  }
+
+  getMainImageUrl(): string | null {
+    if (!this.item?.images?.length) return null;
+    return this.item.images[this.selectedImageIndex] ?? this.item.images[0];
   }
 
   formatDate(date: Date | string): string {

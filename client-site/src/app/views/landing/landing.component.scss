@@ -1,8 +1,634 @@
-/* Viền rõ khi hover - chỉ hiện lúc di chuột vào */
+/* ========== Màu accent cam (#FF7A45) ========== */
+$orange-accent: #FF7A45;
+$blue-main: #123E7C;
+$blue-medium: #1C5FA8;
+
+/* Viền rõ khi hover - UEL palette */
 .card-lost:hover {
-  border: 2px solid #dc2626 !important; /* red-600 */
+  border: 2px solid $orange-accent !important;
 }
 
 .card-found:hover {
-  border: 2px solid #0284c7 !important; /* sky-600 */
+  border: 2px solid $blue-medium !important;
+}
+
+/* ========== Typography – chữ thoáng, không dính ========== */
+.landing-section-typo .landing-heading-section {
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  margin-bottom: 0.5em;
+}
+
+.landing-heading-with-accent {
+  position: relative;
+  &::after {
+    content: "";
+    display: block;
+    width: 48px;
+    height: 3px;
+    background: $orange-accent;
+    margin-top: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 2px;
+  }
+}
+
+.landing-body {
+  letter-spacing: 0.02em;
+  line-height: 1.6;
+}
+
+.landing-faq-title {
+  letter-spacing: 0.02em;
+  line-height: 1.45;
+}
+
+/* ========== Stats bar – gọn, mỗi chỉ số một dòng ========== */
+.landing-stats-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem 3rem;
+}
+
+.landing-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  min-width: 7rem;
+}
+
+.landing-stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .landing-stat-value {
+    font-size: 2rem;
+  }
+}
+
+.landing-stat-value.landing-stat-accent {
+  color: $blue-main;
+}
+
+.landing-stat-value.landing-stat-accent-orange {
+  color: $orange-accent;
+}
+
+.landing-stat-label {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #4b5563;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* ========== Category pills – hover cam ========== */
+.landing-cat-pill {
+  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  .landing-cat-icon {
+    color: $blue-medium;
+    transition: color 0.2s;
+  }
+  &:hover {
+    border-color: $orange-accent;
+    color: $orange-accent;
+    .landing-cat-icon {
+      color: $orange-accent;
+    }
+    box-shadow: 0 4px 12px rgba(255, 122, 69, 0.15);
+  }
+}
+
+/* ========== Icon boxes – bo tròn 14–18px, shadow nhẹ ========== */
+.landing-icon-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.landing-intro-icon {
+  width: 5rem;
+  height: 5rem;
+  box-shadow: 0 4px 14px rgba(18, 62, 124, 0.2);
+
+  i,
+  .fas,
+  svg {
+    color: #ffffff !important;
+    opacity: 1;
+  }
+}
+
+.landing-intro-icon-accent {
+  background: linear-gradient(135deg, $blue-main, $blue-medium) !important;
+}
+
+.landing-feature-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0.75rem;
+}
+
+.landing-connect-icon {
+  width: 4rem;
+  height: 4rem;
+  padding: 0.875rem;
+}
+
+/* Landing sections */
+.landing-section {
+  border-top: none;
+  border-bottom: none;
+}
+
+.landing-intro-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .landing-intro-row {
+    grid-template-columns: auto 1fr;
+    gap: 2.5rem;
+  }
+}
+
+.landing-intro-icon-wrap {
+  flex-shrink: 0;
+}
+
+.landing-intro-text {
+  min-width: 0;
+  width: 100%;
+}
+
+.landing-intro-text h2,
+.landing-intro-text p {
+  max-width: 100%;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Kết nối section */
+.landing-connect-row {
+  gap: 2rem;
+}
+
+.landing-connect-text {
+  box-sizing: border-box;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .landing-connect-text {
+    max-width: 41.666667%;
+  }
+}
+
+.landing-connect-card {
+  box-sizing: border-box;
+}
+
+.landing-step-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
+  }
+}
+
+/* ========== Quy trình hoạt động – redesign (cards, steps, flow) ========== */
+.landing-process-section {
+  .landing-process-header {
+    .landing-process-title {
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+    }
+    .landing-process-desc {
+      letter-spacing: 0.02em;
+      line-height: 1.6;
+    }
+  }
+
+  .landing-process-grid {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    justify-content: center;
+    gap: 0;
+    margin: 0 -0.75rem;
+  }
+
+  .landing-process-col {
+    flex: 1 1 100%;
+    min-width: 0;
+    padding: 0 0.75rem 1.5rem;
+    @media (min-width: 768px) {
+      flex: 1 1 0;
+      max-width: 320px;
+      padding-bottom: 0;
+    }
+  }
+
+  .landing-process-connector {
+    display: none;
+    @media (min-width: 768px) {
+      display: flex;
+      align-items: center;
+      flex: 0 0 40px;
+      padding: 0 4px;
+      &::before {
+        content: "";
+        width: 100%;
+        height: 2px;
+        background: linear-gradient(90deg, rgba(28, 95, 168, 0.35), rgba(255, 122, 69, 0.25));
+        border-radius: 1px;
+      }
+    }
+  }
+
+  .landing-process-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(15, 47, 143, 0.08);
+    border: 1px solid rgba(28, 95, 168, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, $blue-main, $blue-medium);
+      opacity: 0.85;
+    }
+
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 32px rgba(15, 47, 143, 0.14);
+      border-color: rgba(255, 122, 69, 0.2);
+      &::before {
+        background: linear-gradient(90deg, $blue-main, $orange-accent);
+        opacity: 1;
+      }
+    }
+  }
+
+  .landing-process-step {
+    flex-shrink: 0;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.02em;
+    border-radius: 14px;
+    box-shadow: 0 4px 14px rgba(18, 62, 124, 0.35);
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      border-radius: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      pointer-events: none;
+    }
+  }
+
+  .landing-process-step-1 {
+    background: linear-gradient(145deg, #123E7C, #1a4d92);
+  }
+  .landing-process-step-2 {
+    background: linear-gradient(145deg, #1C5FA8, #2470b8);
+  }
+  .landing-process-step-3 {
+    background: linear-gradient(145deg, #0F2F8F, #1a3d9e);
+  }
+
+  .landing-process-card-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: #1F2D3D;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    margin: 0 0 0.75rem;
+  }
+
+  .landing-process-card-desc {
+    font-size: 0.9375rem;
+    color: #64748b;
+    letter-spacing: 0.02em;
+    line-height: 1.65;
+    margin: 0;
+    flex: 1;
+  }
+}
+
+.landing-stat-card {
+  transition: box-shadow 0.2s ease;
+  &:hover {
+    box-shadow: 0 12px 28px rgba(16, 24, 40, 0.1);
+  }
+}
+
+/* ========== CTA button – cam nổi bật ========== */
+.landing-cta-btn {
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  &:hover {
+    filter: brightness(1.05);
+    box-shadow: 0 8px 24px rgba(18, 62, 124, 0.3);
+  }
+}
+
+.landing-cta-btn-orange {
+  background: $orange-accent !important;
+  color: #fff !important;
+  &:hover {
+    box-shadow: 0 8px 24px rgba(255, 122, 69, 0.4);
+  }
+}
+
+/* CTA "Đăng tin tìm đồ ngay" – chữ rõ, icon cách text, padding thoáng */
+.landing-cta-btn-post {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0.875rem 1.75rem;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  white-space: nowrap;
+  border-radius: 14px;
+  text-align: center;
+
+  .landing-cta-btn-icon {
+    flex-shrink: 0;
+    font-size: 1.125rem;
+    opacity: 0.95;
+  }
+
+  .landing-cta-btn-text {
+    display: inline-block;
+    letter-spacing: 0.02em;
+    word-spacing: 0.05em;
+  }
+
+  @media (max-width: 380px) {
+    padding: 0.75rem 1.25rem;
+    font-size: 1rem;
+    white-space: normal;
+    min-height: 48px;
+  }
+}
+
+/* ========== Section "Những bài đăng gần đây" – grid gọn, tối đa 10 bài ========== */
+.landing-recent-header {
+  .landing-heading-with-accent::after {
+    margin-left: 0;
+  }
+}
+
+/* CTA "Xem tất cả bài đăng" – nền cam, chữ trắng, nổi bật */
+.landing-view-all-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff !important;
+  background: $orange-accent;
+  border: none;
+  border-radius: 12px;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+
+  .landing-view-all-icon {
+    font-size: 0.75rem;
+    opacity: 0.95;
+  }
+
+  &:hover {
+    background: darken($orange-accent, 6%);
+    color: #fff !important;
+    box-shadow: 0 4px 14px rgba(255, 122, 69, 0.4);
+    transform: translateY(-1px);
+  }
+}
+
+.landing-recent-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .landing-recent-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .landing-recent-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+.landing-recent-loading,
+.landing-recent-empty {
+  grid-column: 1 / -1;
+}
+
+.col-full {
+  grid-column: 1 / -1;
+}
+
+/* Card bài đăng – gọn, dễ đọc, icon/text tách rõ, ảnh lớn hơn ========== */
+.landing-recent-card {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-recent-card-head {
+  flex-shrink: 0;
+  padding: 1rem 1.25rem 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.landing-recent-card-head-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.landing-recent-card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1e293b;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
+.landing-recent-badge {
+  &.landing-badge-lost {
+    background: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+  }
+  &.landing-badge-found {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+  }
+}
+
+.landing-recent-meta {
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* Khung ảnh lớn hơn, tỷ lệ ~70% chiều cao */
+.landing-recent-card-image {
+  width: 100%;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.landing-recent-card-image-inner {
+  position: relative;
+  width: 100%;
+  padding-top: 70%;
+  border-radius: 0 0 4px 4px;
+  overflow: hidden;
+}
+
+.landing-recent-card-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.landing-recent-card-no-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Metadata – icon và text có gap rõ, không dính */
+.landing-recent-card-body {
+  padding: 1.25rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background: rgba(248, 250, 252, 0.8);
+}
+
+.landing-recent-card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.landing-meta-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  font-size: 0.8125rem;
+  color: #475569;
+
+  .landing-meta-icon {
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
+    color: $blue-medium;
+    font-size: 0.75rem;
+  }
+
+  .landing-meta-text {
+    min-width: 0;
+    word-break: break-word;
+  }
+}
+
+.landing-recent-card-btn {
+  margin-top: auto;
+  width: 100%;
+  padding: 0.625rem 1rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, $blue-main, $blue-medium);
+  border: none;
+  border-radius: 10px;
+  letter-spacing: 0.02em;
+  transition: filter 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(1.08);
+    box-shadow: 0 4px 12px rgba(28, 95, 168, 0.3);
+  }
+}
+
+/* FAQ spacing */
+.landing-faq-list .landing-faq-item + .landing-faq-item {
+  margin-top: 1.5rem;
 }
