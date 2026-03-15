@@ -17,12 +17,33 @@
     0 8px 10px -6px rgba(0, 0, 0, 0.01);
 
   display: block;
+  min-height: 100vh;
+
+  background-color: var(--bg-body);
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+:host ::ng-deep app-auth-navbar nav {
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+:host ::ng-deep app-auth-navbar a,
+:host ::ng-deep app-auth-navbar .text-white,
+:host ::ng-deep app-auth-navbar i.fas {
+  color: #1e293b !important;
+}
+:host ::ng-deep app-auth-navbar a:hover {
+  color: #4f46e5 !important;
 }
 
 /* --- MAIN PAGE LAYOUT --- */
 .suggestions-page {
   flex-grow: 1;
-  padding: 60px 24px 100px;
+  padding: 65px 24px 100px;
   max-width: 950px;
   margin: 0 auto;
   width: 100%;

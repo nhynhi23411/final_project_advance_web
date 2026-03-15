@@ -1,18 +1,8 @@
-<div class="min-h-screen bg-blueGray-100 py-8">
+<app-auth-navbar></app-auth-navbar>
+
+<main class="post-item-page">
     <div class="container mx-auto px-4">
         <div class="max-w-xl mx-auto">
-
-            <div class="flex items-center justify-between mb-6">
-                <h1 class="text-3xl font-extrabold text-blueGray-800">Đăng tin</h1>
-                <button
-                    type="button"
-                    (click)="goBack()"
-                    class="flex items-center text-blueGray-600 hover:text-blueGray-800 transition-colors"
-                >
-                    <i class="fas fa-arrow-left mr-2"></i>
-                    <span>Quay lại</span>
-                </button>
-            </div>
 
             <div *ngIf="submitSuccess"
                 class="mb-6 p-6 bg-emerald-50 border border-emerald-300 rounded-lg text-center shadow-md">
@@ -143,4 +133,4 @@
             </form>
         </div>
     </div>
-</div>
+</main>

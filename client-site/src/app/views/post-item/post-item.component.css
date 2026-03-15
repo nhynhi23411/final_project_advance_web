@@ -1,0 +1,48 @@
+:host {
+  --primary: #4f46e5;
+  --bg-body: #f1f5f9;
+  --border: #e2e8f0;
+  --radius-lg: 24px;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  display: block;
+  min-height: 100vh;
+
+  background-color: var(--bg-body);
+  background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Navbar: cố định khi cuộn, nền trắng, chữ đậm */
+:host ::ng-deep app-auth-navbar nav {
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
+  background-color: #ffffff !important;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+:host ::ng-deep app-auth-navbar a,
+:host ::ng-deep app-auth-navbar .text-white,
+:host ::ng-deep app-auth-navbar i.fas {
+  color: #1e293b !important;
+}
+:host ::ng-deep app-auth-navbar a:hover {
+  color: #4f46e5 !important;
+}
+
+/* Khối nội dung chính */
+.post-item-page {
+  flex-grow: 1;
+  padding: 50px 24px 100px;
+  max-width: 950px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .post-item-page {
+    padding: 35px 16px 60px;
+  }
+}
