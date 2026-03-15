@@ -33,7 +33,7 @@ const routes: Routes = [
   { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent },
   { path: "posts", component: PostsComponent },
-  { path: "suggestions", component: SuggestionsComponent },
+  { path: "suggestions", component: SuggestionsComponent, canActivate: [AuthGuard] },
   { path: "items/:id", component: ItemDetailComponent },
   // landing page becomes home
   { path: "", component: LandingComponent },

@@ -1,83 +1,126 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen bg-blueGray-50">
-  <section class="relative pt-16 pb-32">
-    <div class="container mx-auto px-4">
-      <div class="flex flex-wrap items-center justify-between mb-8">
-        <div>
-          <h1 class="text-3xl font-bold text-blueGray-800">Gợi ý phù hợp</h1>
-          <p class="mt-1 text-blueGray-600">Các bài đăng có thể khớp với tin của bạn</p>
-        </div>
-      </div>
+<main class="suggestions-page">
 
-      <div *ngIf="error" class="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
-        {{ error }}
-      </div>
+  <!-- Page Header -->
+  <div class="page-header">
+    <h1>Gợi ý trùng khớp của bạn</h1>
+    <p>Hệ thống đã phân tích và tìm thấy các bài đăng có khả năng là món đồ bạn đang tìm kiếm.</p>
+  </div>
 
-      <div *ngIf="!authService.isLoggedIn" class="text-center py-16 text-blueGray-600">
-        <i class="fas fa-lock text-4xl mb-4"></i>
-        <p>Vui lòng đăng nhập để xem gợi ý phù hợp với bài đăng của bạn.</p>
-      </div>
-
-      <div *ngIf="authService.isLoggedIn" class="flex flex-wrap items-stretch -mx-4">
-        <ng-container *ngIf="!isLoading; else loadingTpl">
-          <ng-container *ngIf="items.length > 0; else emptyTpl">
-            <div *ngFor="let item of items" class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex">
-              <article class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]">
-                <div class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]">
-                  <div class="flex justify-between items-center w-full">
-                    <span class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase"
-                          [ngClass]="getItemTypeClass(item.type || item.post_type)">
-                      {{ getItemTypeLabel(item.type || item.post_type) }}
-                    </span>
-                    <span class="text-[10px] text-blueGray-400 font-medium">
-                      {{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'short' }}
-                    </span>
-                  </div>
-                  <span class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1">{{ item.title }}</span>
-                </div>
-                <div class="w-full overflow-hidden flex-shrink-0">
-                  <div class="relative w-full" style="padding-top:56.25%;">
-                    <img [src]="(item.images && item.images.length) ? item.images[0] : 'https://via.placeholder.com/400x300?text=No+Image'"
-                         [alt]="item.title" class="absolute top-0 left-0 w-full h-full object-cover" />
-                  </div>
-                </div>
-                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                    <p class="flex items-start">
-                      <i class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"></i>
-                      <span class="line-clamp-2">{{ item.location_text || item.location?.address || '—' }}</span>
-                    </p>
-                    <p class="flex items-center">
-                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
-                      {{ item.category }} - {{ item.color || item.metadata?.color || '—' }}
-                    </p>
-                  </div>
-                  <button type="button" (click)="viewItemDetail(item._id)"
-                          class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors">
-                    Xem chi tiết
-                  </button>
-                </div>
-              </article>
-            </div>
-          </ng-container>
-        </ng-container>
-
-        <ng-template #loadingTpl>
-          <div class="w-full text-center py-16">
-            <i class="fas fa-spinner fa-spin text-3xl text-blueGray-400"></i>
-            <p class="mt-2 text-blueGray-600">Đang tải gợi ý...</p>
-          </div>
-        </ng-template>
-
-        <ng-template #emptyTpl>
-          <div class="w-full text-center py-16 text-blueGray-500">
-            <p>Chưa có gợi ý phù hợp. Hãy đăng bài LOST hoặc FOUND để nhận gợi ý.</p>
-          </div>
-        </ng-template>
-      </div>
+  <!-- Error -->
+  <div *ngIf="error" class="error-box">
+    <div class="error-icon">
+      <i class="fas fa-exclamation-triangle"></i>
     </div>
-  </section>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Not logged in -->
+  <div *ngIf="!authService.isLoggedIn" class="empty-state">
+    <div class="empty-state-icon">
+      <i class="fas fa-lock"></i>
+    </div>
+    <h2>Yêu cầu đăng nhập</h2>
+    <p>Vui lòng đăng nhập để xem gợi ý phù hợp cho bài đăng của bạn.</p>
+    <a routerLink="/auth/login" class="btn-login">
+      <i class="fas fa-sign-in-alt"></i>
+      Đăng nhập ngay
+    </a>
+  </div>
+
+  <div *ngIf="authService.isLoggedIn">
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="empty-state">
+      <div class="loading-spinner">
+        <i class="fas fa-circle-notch fa-spin"></i>
+      </div>
+      <h2>Đang tìm kiếm...</h2>
+      <p>Vui lòng chờ trong giây lát</p>
+    </div>
+
+    <!-- Empty -->
+    <div *ngIf="!isLoading && groupedSuggestions.length === 0 && !error" class="empty-state empty-state--dashed">
+      <div class="empty-state-icon">
+        <i class="fas fa-search"></i>
+      </div>
+      <h2>Chưa có gợi ý</h2>
+      <p>Hệ thống chưa tìm thấy bài đăng nào giống bài của bạn.</p>
+    </div>
+
+    <!-- Grouped Suggestions -->
+    <ng-container *ngIf="!isLoading && groupedSuggestions.length > 0">
+      <section class="lost-item-group" *ngFor="let group of groupedSuggestions">
+
+        <!-- Parent Item (món đồ bị mất) -->
+        <div class="parent-item">
+          <img [src]="group.myPost.images?.length ? group.myPost.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=e2e8f0&color=94a3b8&size=200'"
+               [alt]="group.myPost.title"
+               class="parent-img">
+          <div class="parent-info">
+            <span class="parent-label">Bạn đã báo mất</span>
+            <h2>{{ group.myPost.title }}</h2>
+            <p class="parent-desc" *ngIf="group.myPost.description">{{ group.myPost.description }}</p>
+            <div class="parent-meta">
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                Ngày đăng: {{ group.myPost.created_at | date:'dd/MM/yyyy' }}
+              </span>
+              <span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
+                {{ group.myPost.category }}
+              </span>
+            </div>
+          </div>
+          <div class="badge-results">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            Tìm thấy {{ group.matches.length }} gợi ý
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Match List -->
+        <div class="match-list">
+          <div class="match-card" *ngFor="let s of group.matches">
+
+            <img [src]="s.matched_post?.images?.length ? s.matched_post!.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=f1f5f9&color=94a3b8&size=150'"
+                 [alt]="s.matched_post?.title"
+                 class="match-img">
+
+            <div class="match-details">
+              <h3>{{ s.matched_post?.title }}</h3>
+              <div class="match-tags">
+                <span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
+                  {{ s.matched_post?.category }}
+                </span>
+                <span *ngIf="s.distance_km != null">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"></circle><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                  Cách {{ s.distance_km }} km
+                </span>
+              </div>
+            </div>
+
+            <div class="match-action">
+              <div class="score-label">Độ khớp</div>
+              <div class="score-value" [style]="getScoreColorStyle(s.score)">
+                {{ scorePercent(s.score) }}%
+              </div>
+              <button class="btn-view" (click)="goToPost(s.matched_post?._id)">
+                Xem bài
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </section>
+    </ng-container>
+
+  </div>
 </main>
 
 <app-footer></app-footer>
