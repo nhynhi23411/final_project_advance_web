@@ -47,6 +47,17 @@ export interface Item {
     created_by_user_id?: string;
     created_at: Date;
     updated_at: Date;
+    location?: { address?: string };
+    metadata?: Record<string, any>;
+}
+
+export interface MatchSuggestion {
+    _id: string;
+    score: number;
+    distance_km: number | null;
+    created_at: string;
+    my_post: Item | null;
+    matched_post: Item | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -118,6 +129,13 @@ export class ItemService {
     /** Fetch current user's posts (requires auth). */
     getMyItems(): Observable<Item[]> {
         return this.http.get<Item[]>(`${this.base}/items/my`, {
+            headers: this.authHeaders(),
+        });
+    }
+
+    /** Fetch match suggestions for the current user (score > 60%). */
+    getMatchSuggestions(): Observable<MatchSuggestion[]> {
+        return this.http.get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`, {
             headers: this.authHeaders(),
         });
     }

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ItemService, Item } from '../../services/item.service';
+import { ItemService, MatchSuggestion } from '../../services/item.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -8,14 +8,14 @@ import { AuthService } from '../../services/auth.service';
   templateUrl: './suggestions.component.html',
 })
 export class SuggestionsComponent implements OnInit {
-  items: Item[] = [];
+  suggestions: MatchSuggestion[] = [];
   isLoading = false;
   error: string | null = null;
 
   constructor(
     private router: Router,
     private itemService: ItemService,
-    public authService: AuthService
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -29,39 +29,11 @@ export class SuggestionsComponent implements OnInit {
     }
     this.isLoading = true;
     this.error = null;
-    this.itemService.getMyItems().subscribe({
-      next: (myPosts) => {
-        const myList = Array.isArray(myPosts) ? myPosts : [];
-        const categories = [...new Set(myList.map((p) => (p.category || '').toLowerCase()).filter(Boolean))];
-        const oppositeType = myList.some((p) => (p.type || p.post_type) === 'LOST') ? 'FOUND' : 'LOST';
-        if (categories.length === 0) {
-          this.itemService.getItems({ status: 'APPROVED', type: oppositeType }).subscribe({
-            next: (data) => {
-              this.items = (Array.isArray(data) ? data : []).slice(0, 12);
-              this.isLoading = false;
-            },
-            error: () => {
-              this.items = [];
-              this.isLoading = false;
-            },
-          });
-          return;
-        }
-        this.itemService.getItems({ status: 'APPROVED', type: oppositeType }).subscribe({
-          next: (data) => {
-            const all = Array.isArray(data) ? data : [];
-            const byCat = all.filter((it) => {
-              const cat = (it.category || '').toLowerCase();
-              return categories.some((c) => cat.includes(c) || c.includes(cat));
-            });
-            this.items = byCat.length ? byCat.slice(0, 12) : all.slice(0, 12);
-            this.isLoading = false;
-          },
-          error: () => {
-            this.items = [];
-            this.isLoading = false;
-          },
-        });
+
+    this.itemService.getMatchSuggestions().subscribe({
+      next: (data) => {
+        this.suggestions = Array.isArray(data) ? data : [];
+        this.isLoading = false;
       },
       error: (err) => {
         this.error = err?.error?.message || 'Không thể tải gợi ý.';
@@ -70,15 +42,27 @@ export class SuggestionsComponent implements OnInit {
     });
   }
 
-  viewItemDetail(itemId: string): void {
-    this.router.navigate(['/items', itemId]);
+  goToPost(postId: string | undefined): void {
+    if (postId) this.router.navigate(['/items', postId]);
   }
 
-  getItemTypeLabel(type: string): string {
+  scorePercent(score: number): number {
+    return Math.round(score * 100);
+  }
+
+  getTypeLabel(type: string | undefined): string {
     return type === 'LOST' ? 'Bị mất' : 'Nhặt được';
   }
 
-  getItemTypeClass(type: string): string {
-    return type === 'LOST' ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600';
+  getTypeClass(type: string | undefined): string {
+    return type === 'LOST'
+      ? 'bg-red-500 text-white'
+      : 'bg-green-500 text-white';
+  }
+
+  getScoreClass(score: number): string {
+    if (score >= 0.9) return 'text-green-600';
+    if (score >= 0.75) return 'text-blue-600';
+    return 'text-yellow-600';
   }
 }
