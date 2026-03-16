@@ -1,99 +1,114 @@
 <app-auth-navbar></app-auth-navbar>
 <main>
-  <div
-    class="relative pt-16 pb-32 flex content-center items-center justify-center min-h-screen-75"
-  >
+  <!-- Hero: bản đẹp, chữ thoáng, ấn tượng -->
+  <div class="relative pt-24 pb-32 flex content-center items-center justify-center overflow-hidden" style="min-height: 78vh;">
     <div
-      class="absolute top-0 w-full h-full bg-center bg-cover"
-      style="
-        /* Gợi ý: sau này đổi thành ảnh liên quan đồ thất lạc (chìa khóa, ví, điện thoại...) */
-        background-image: url(&quot;https://images.unsplash.com/photo-1557804506-669a67965ba0?ixlib=rb-1.2.1&auto=format&fit=crop&w=1267&q=80&quot;);
-      "
+      class="absolute top-0 left-0 w-full h-full bg-center bg-cover"
+      style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"
     >
-      <span
-        id="blackOverlay"
-        class="w-full h-full absolute opacity-75 bg-black"
-      ></span>
+      <span class="w-full h-full absolute left-0 top-0 bg-black" style="opacity: 0.52;"></span>
     </div>
-    <div class="container relative mx-auto">
-      <div class="items-center flex flex-wrap">
-        <div class="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
-          <div class="pr-12">
-            <h1 class="text-white font-semibold text-5xl">
-              Tìm lại đồ thất lạc dễ dàng.
-            </h1>
-            <p class="mt-4 text-lg text-blueGray-200">
-              Đăng tin đồ bị mất hoặc đồ nhặt được, hệ thống giúp bạn kết nối,
-              đối soát và hẹn trả một cách an toàn, minh bạch.
-            </p>
-
-            <!-- SEARCH BAR -->
-            <form (ngSubmit)="onSearch()" class="mt-8 w-full">
-              <div
-                class="relative flex w-full max-w-xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden"
-              >
-                <input
-                  type="text"
-                  [(ngModel)]="searchTerm"
-                  name="searchTerm"
-                  placeholder="Tìm ví, điện thoại, balo... theo tên, loại, địa điểm"
-                  class="w-full px-4 py-3 text-blueGray-700 placeholder-blueGray-300 focus:outline-none"
-                  aria-label="Tìm kiếm bài đăng"
-                />
-                <button
-                  class="bg-emerald-500 hover:bg-emerald-600 text-white px-5 flex items-center justify-center"
-                  type="submit"
-                >
-                  <i class="fas fa-search mr-2"></i>
-                  <span class="hidden sm:inline">Tìm kiếm</span>
-                </button>
-              </div>
-            </form>
-            <!-- END SEARCH BAR -->
-          </div>
+    <div class="container relative mx-auto px-4 z-10">
+      <div class="flex flex-wrap items-center justify-center">
+        <div class="w-full max-w-2xl px-4 text-center">
+          <h1 class="animate-fade-in-up text-white font-semibold text-4xl sm:text-5xl lg:text-6xl leading-tight mb-6 tracking-readability" style="text-shadow: 0 2px 20px rgba(0,0,0,0.25); letter-spacing: 0.03em; line-height: 1.25;">
+            Tìm lại đồ thất lạc nhanh chóng
+          </h1>
+          <p class="animate-fade-in-up animate-delay-1 text-lg sm:text-xl max-w-2xl mx-auto mb-10 leading-relaxed" style="color: rgba(255,255,255,0.95); letter-spacing: 0.03em; line-height: 1.7;">
+            Đăng tin đồ bị mất hoặc đồ nhặt được. Hệ thống giúp bạn kết nối, đối soát và hẹn trả một cách an toàn, minh bạch.
+          </p>
+          <form (ngSubmit)="onSearch()" class="w-full max-w-xl mx-auto animate-fade-in-up animate-delay-2">
+            <div class="hero-search-wrap relative flex w-full">
+              <input
+                type="text"
+                [(ngModel)]="searchTerm"
+                name="searchTerm"
+                placeholder="Tìm ví, điện thoại, balo... theo tên, loại, địa điểm"
+                class="flex-1 min-w-0"
+                style="letter-spacing: 0.02em;"
+                aria-label="Tìm kiếm bài đăng"
+              />
+              <button class="hero-search-btn btn-uel-primary flex items-center justify-center gap-2" type="submit">
+                <i class="fas fa-search"></i>
+                <span class="hidden sm:inline">Tìm kiếm</span>
+              </button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
-    <div
-      class="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-70-px"
-      style="transform: translateZ(0)"
-    >
-      <svg
-        class="absolute bottom-0 overflow-hidden"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        version="1.1"
-        viewBox="0 0 2560 100"
-        x="0"
-        y="0"
-      >
-        <polygon
-          class="text-blueGray-200 fill-current"
-          points="2560 0 2560 100 0 100"
-        ></polygon>
-      </svg>
-    </div>
   </div>
 
-  <section class="pb-20 bg-blueGray-200 -mt-24">
+  <!-- Stats -->
+  <section class="landing-stats-bar landing-section-typo py-10 bg-white border-b border-blueGray-100">
     <div class="container mx-auto px-4">
-      <div class="flex flex-wrap">
-        <div class="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
+      <div class="landing-stats-inner">
+        <div class="landing-stat-item">
+          <span class="landing-stat-value landing-stat-accent">{{ statsTotalPosts }}</span>
+          <span class="landing-stat-label">Tổng bài đăng</span>
+        </div>
+        <div class="landing-stat-item">
+          <span class="landing-stat-value landing-stat-accent-orange">{{ statsFound }}</span>
+          <span class="landing-stat-label">Đồ đã tìm thấy</span>
+        </div>
+        <div class="landing-stat-item">
+          <span class="landing-stat-value" style="color: #0F2F8F;">{{ statsUsers }}</span>
+          <span class="landing-stat-label">Người dùng</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Category quick filter -->
+  <section class="landing-categories landing-section-typo py-10" style="background-color: #F4F8FC">
+    <div class="container mx-auto px-4">
+      <h3 class="landing-heading-section text-center text-lg font-semibold text-blueGray-800 mb-2">Tìm nhanh theo danh mục</h3>
+      <p class="landing-body text-center text-blueGray-600 mb-6">Chọn danh mục để xem bài đăng liên quan.</p>
+      <div class="flex flex-wrap justify-center gap-3">
+        <a *ngFor="let cat of (categoryFilters || [])" [routerLink]="['/posts']" [queryParams]="{ category: cat.value }" class="landing-cat-pill">
+          <i [class]="cat.icon" class="landing-cat-icon mr-2"></i>{{ cat.label }}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 1. Giới thiệu hệ thống -->
+  <section class="landing-section landing-section-typo py-16 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="landing-intro-row max-w-4xl mx-auto">
+        <div class="landing-intro-icon-wrap">
+          <div class="landing-icon-box landing-intro-icon landing-intro-icon-accent">
+            <i class="fas fa-university text-3xl" aria-hidden="true"></i>
+          </div>
+        </div>
+        <div class="landing-intro-text">
+          <h2 class="landing-heading-section text-2xl md:text-3xl font-semibold mb-4" style="color: #1F2D3D;">
+            Hệ thống tìm đồ thất lạc cho sinh viên
+          </h2>
+          <p class="landing-body text-blueGray-600 m-0">
+            Nền tảng hỗ trợ đăng tin đồ thất lạc và đồ nhặt được trong khu vực trường học, giúp kết nối người mất đồ và người nhặt được nhanh chóng, minh bạch.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20" style="background-color: #F4F8FC">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex flex-wrap -mx-3">
+        <div class="lg:pt-12 pt-8 w-full md:w-4/12 px-4 text-center">
           <a
             [routerLink]="['/post-item']"
             [queryParams]="{ type: 'LOST' }"
-            class="card-lost block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer"
+            class="card-uel card-lost block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-2xl border-2 border-transparent transition-all duration-300 cursor-pointer"
           >
-            <div class="px-4 py-5 flex-auto">
-              <div
-                class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400"
-              >
-                <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+            <div class="px-6 py-8 flex-auto text-left">
+              <div class="landing-icon-box landing-feature-icon text-white mb-6" style="background-color: #FF7A45">
+                <i class="fas fa-map-marker-alt text-lg" aria-hidden="true"></i>
               </div>
-              <h6 class="text-xl font-semibold">Đăng tin đồ bị mất</h6>
-              <p class="mt-2 mb-4 text-blueGray-500">
-                Ghi rõ loại đồ, màu sắc, địa điểm, thời gian và mô tả chi tiết
-                để tăng khả năng được match với tin nhặt được.
+              <h6 class="text-xl font-semibold mb-3" style="letter-spacing: 0.02em; line-height: 1.4; color: #1F2D3D;">Đăng tin đồ bị mất</h6>
+              <p class="text-blueGray-500 leading-relaxed mb-0" style="letter-spacing: 0.02em; line-height: 1.7;">
+                Ghi rõ loại đồ, màu sắc, địa điểm, thời gian và mô tả chi tiết để tăng khả năng được match với tin nhặt được.
               </p>
             </div>
           </a>
@@ -103,74 +118,58 @@
           <a
             [routerLink]="['/post-item']"
             [queryParams]="{ type: 'FOUND' }"
-            class="card-found block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg border-2 border-transparent transition-colors duration-200 cursor-pointer"
+            class="card-uel card-found block relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-2xl border-2 border-transparent transition-all duration-300 cursor-pointer"
           >
-            <div class="px-4 py-5 flex-auto">
-              <div
-                class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400"
-              >
-                <i class="fas fa-hand-holding-heart" aria-hidden="true"></i>
+            <div class="px-6 py-8 flex-auto text-left">
+              <div class="landing-icon-box landing-feature-icon text-white mb-6" style="background-color: #1C5FA8">
+                <i class="fas fa-hand-holding-heart text-lg" aria-hidden="true"></i>
               </div>
-              <h6 class="text-xl font-semibold">Đăng tin đồ nhặt được</h6>
-              <p class="mt-2 mb-4 text-blueGray-500">
-                Chia sẻ thông tin món đồ bạn nhặt được để hệ thống tự động đối
-                chiếu và thông báo cho chủ nhân phù hợp.
+              <h6 class="text-xl font-semibold mb-3" style="letter-spacing: 0.02em; line-height: 1.4; color: #1F2D3D;">Đăng tin đồ nhặt được</h6>
+              <p class="text-blueGray-500 leading-relaxed mb-0" style="letter-spacing: 0.02em; line-height: 1.7;">
+                Chia sẻ thông tin món đồ bạn nhặt được để hệ thống tự động đối chiếu và thông báo cho chủ nhân phù hợp.
               </p>
             </div>
           </a>
         </div>
 
-        <div class="pt-6 w-full md:w-4/12 px-4 text-center">
-          <div
-            class="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg"
-          >
-            <div class="px-4 py-5 flex-auto">
-              <div
-                class="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-emerald-400"
-              >
-                <i class="fas fa-shield-alt"></i>
+        <div class="pt-8 w-full md:w-4/12 px-4 text-center">
+          <div class="card-uel relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-2xl">
+            <div class="px-6 py-8 flex-auto text-left">
+              <div class="landing-icon-box landing-feature-icon text-white mb-6" style="background-color: #0F2F8F">
+                <i class="fas fa-shield-alt text-lg"></i>
               </div>
-              <h6 class="text-xl font-semibold">Đối soát & chống gian lận</h6>
-              <p class="mt-2 mb-4 text-blueGray-500">
-                Admin hỗ trợ đối chiếu thông tin, xác minh người nhận và lưu lại
-                lịch sử để tránh giả mạo và đảm bảo an toàn.
+              <h6 class="text-xl font-semibold mb-3" style="letter-spacing: 0.02em; line-height: 1.4; color: #1F2D3D;">Đối soát & chống gian lận</h6>
+              <p class="text-blueGray-500 leading-relaxed mb-0" style="letter-spacing: 0.02em; line-height: 1.7;">
+                Admin hỗ trợ đối chiếu thông tin, xác minh người nhận và lưu lại lịch sử để tránh giả mạo và đảm bảo an toàn.
               </p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center mt-32">
-        <div class="w-full md:w-5/12 px-4 mr-auto ml-auto">
-          <div
-            class="text-blueGray-500 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-white"
-          >
+      <div class="landing-connect-row flex flex-wrap items-center gap-8 mt-32">
+        <div class="landing-connect-text w-full md:w-5/12 px-4">
+          <div class="landing-icon-box landing-connect-icon text-blueGray-500 mb-6 bg-white">
             <i class="fas fa-user-friends text-xl"></i>
           </div>
-          <h3 class="text-3xl mb-2 font-semibold leading-normal">
+          <h3 class="text-3xl mb-2 font-semibold leading-normal tracking-readability" style="letter-spacing: 0.03em; line-height: 1.35; color: #1F2D3D;">
             Kết nối người mất và người nhặt
           </h3>
-          <p
-            class="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600"
-          >
-            Hệ thống tự động match tin “mất” và “nhặt” theo thông tin mô tả như
-            loại đồ, màu sắc, địa điểm, thời gian và ghi chú chi tiết.
+          <p class="text-lg font-light leading-relaxed mt-4 mb-4 text-blueGray-600" style="letter-spacing: 0.025em;">
+            Hệ thống tự động match tin “mất” và “nhặt” theo thông tin mô tả như loại đồ, màu sắc, địa điểm, thời gian và ghi chú chi tiết.
           </p>
-          <p
-            class="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600"
-          >
-            Toàn bộ trạng thái được theo dõi xuyên suốt: đăng tin → duyệt →
-            match → hẹn trả → xác minh → hoàn tất/đóng, giúp bạn dễ dàng tra cứu
-            lại.
+          <p class="text-lg font-light leading-relaxed mt-0 mb-4 text-blueGray-600" style="letter-spacing: 0.025em;">
+            Toàn bộ trạng thái được theo dõi xuyên suốt: đăng tin → duyệt → match → hẹn trả → xác minh → hoàn tất/đóng, giúp bạn dễ dàng tra cứu lại.
           </p>
-          <a [routerLink]="['/']" class="font-bold text-blueGray-700 mt-8">
+          <a [routerLink]="['/']" class="font-bold text-uel-accent mt-8 hover:opacity-90" style="letter-spacing: 0.02em;">
             Bắt đầu đăng tin ngay
           </a>
         </div>
 
-        <div class="w-full md:w-4/12 px-4 mr-auto ml-auto">
+        <div class="landing-connect-card w-full md:w-4/12 px-4 flex-shrink-0">
           <div
-            class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-red-600"
+            class="relative flex flex-col break-words w-full mb-6 shadow-lg rounded-lg overflow-hidden"
+            style="background-color: #1C5FA8"
           >
             <img
               alt="..."
@@ -178,21 +177,9 @@
               class="w-full align-middle rounded-t-lg"
             />
             <blockquote class="relative p-8 mb-4">
-              <svg
-                preserveAspectRatio="none"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 583 95"
-                class="absolute left-0 w-full block h-95-px -top-94-px"
-              >
-                <polygon
-                  points="-30,95 583,95 583,65"
-                  class="text-red-600 fill-current"
-                ></polygon>
-              </svg>
-              <h4 class="text-xl font-bold text-white">Trả lại đúng người</h4>
-              <p class="text-md font-light mt-2 text-white">
-                Quy trình hẹn trả có xác minh và ghi nhận lịch sử giúp tăng niềm
-                tin giữa người nhặt, người mất và cộng đồng xung quanh.
+              <h4 class="text-xl font-bold text-white" style="letter-spacing: 0.02em;">Trả lại đúng người</h4>
+              <p class="text-md font-light mt-2 text-white leading-relaxed" style="letter-spacing: 0.025em; line-height: 1.65;">
+                Quy trình hẹn trả có xác minh và ghi nhận lịch sử giúp tăng niềm tin giữa người nhặt, người mất và cộng đồng xung quanh.
               </p>
             </blockquote>
           </div>
@@ -200,203 +187,194 @@
       </div>
     </div>
   </section>
-  <section class="pt-20 pb-24 bg-blueGray-100">
+
+  <!-- 2. Quy trình hoạt động 3 bước (redesign) -->
+  <section class="landing-process-section landing-section landing-section-typo py-20 md:py-24 bg-white">
     <div class="container mx-auto px-4">
-      <div class="flex flex-wrap justify-between items-center mb-10">
-        <div class="w-full md:w-auto mb-4 md:mb-0">
-          <h2 class="text-3xl font-semibold text-blueGray-800">
-            Bài đăng gần đây
-          </h2>
-          <p class="mt-2 text-blueGray-500 text-sm">
-            Một số tin đồ mất / đồ nhặt được vừa được cộng đồng cập nhật.
-          </p>
-          <p *ngIf="isUsingSample" class="mt-1 text-yellow-600 text-xs">
-            (Hiển thị mẫu vì chưa có bài đăng thật)
-          </p>
-        </div>
-        <div class="w-full md:w-auto text-left md:text-right">
-          <a
-            [routerLink]="['/posts']"
-            class="inline-flex items-center text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
-          >
-            Xem tất cả bài đăng
-            <i class="fas fa-arrow-right ml-2 text-xs"></i>
-          </a>
+      <div class="landing-process">
+        <header class="landing-process-header text-center mb-14 md:mb-16">
+          <h2 class="landing-process-title landing-heading-with-accent text-2xl md:text-3xl font-bold mb-3" style="color: #1F2D3D;">Quy trình hoạt động</h2>
+          <p class="landing-process-desc landing-body text-blueGray-600 max-w-2xl mx-auto m-0">Đăng tin, tìm kiếm và nhận lại đồ qua 3 bước đơn giản.</p>
+        </header>
+        <div class="landing-process-grid">
+          <div class="landing-process-col">
+            <article class="landing-process-card">
+              <div class="landing-process-step landing-process-step-1">1</div>
+              <h3 class="landing-process-card-title">Đăng tin đồ thất lạc</h3>
+              <p class="landing-process-card-desc">Đăng tin đồ bị mất hoặc đồ nhặt được với mô tả chi tiết. Hệ thống sẽ duyệt và hiển thị cho cộng đồng.</p>
+            </article>
+          </div>
+          <div class="landing-process-connector" aria-hidden="true"></div>
+          <div class="landing-process-col">
+            <article class="landing-process-card">
+              <div class="landing-process-step landing-process-step-2">2</div>
+              <h3 class="landing-process-card-title">Cộng đồng hỗ trợ tìm kiếm</h3>
+              <p class="landing-process-card-desc">Người dùng xem tin, tìm kiếm và đối chiếu. Khi có tin trùng khớp, hệ thống gợi ý match để hai bên liên hệ.</p>
+            </article>
+          </div>
+          <div class="landing-process-connector" aria-hidden="true"></div>
+          <div class="landing-process-col">
+            <article class="landing-process-card">
+              <div class="landing-process-step landing-process-step-3">3</div>
+              <h3 class="landing-process-card-title">Xác minh và nhận lại đồ</h3>
+              <p class="landing-process-card-desc">Hẹn trả đồ, admin xác minh và đóng tin. Lịch sử được lưu lại minh bạch.</p>
+            </article>
+          </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <div class="flex flex-wrap items-stretch -mx-4">
-        <!-- dynamic generation of cards -->
+  <!-- Những bài đăng gần đây (tối đa 10 bài, grid gọn) -->
+  <section class="landing-recent landing-section-typo pt-16 pb-20 bg-blueGray-100">
+    <div class="container mx-auto px-4">
+      <div class="landing-recent-header flex flex-wrap justify-between items-end gap-4 mb-8">
+        <div>
+          <h2 class="landing-heading-section landing-heading-with-accent text-2xl md:text-3xl font-semibold text-blueGray-800 mb-2">
+            Những bài đăng gần đây
+          </h2>
+          <p class="landing-body text-blueGray-600 m-0">
+            Một số tin đồ mất / đồ nhặt được vừa được cộng đồng cập nhật.
+          </p>
+          <p *ngIf="isUsingSample" class="mt-2 text-amber-600 text-xs landing-body">(Hiển thị mẫu vì chưa có bài đăng thật)</p>
+        </div>
+        <a [routerLink]="['/posts']" class="landing-view-all-link">
+          <span class="landing-view-all-text">Xem tất cả bài đăng</span>
+          <i class="landing-view-all-icon fas fa-arrow-right" aria-hidden="true"></i>
+        </a>
+      </div>
+
+      <div class="landing-recent-grid">
         <ng-container *ngIf="!isLoadingItems; else loadingItems">
-          <ng-container *ngIf="items.length > 0; else noItems">
-            <div
-              *ngFor="let item of items"
-              class="w-full md:w-6/12 lg:w-3/12 px-4 mb-8 flex"
+          <ng-container *ngIf="(items || []).length > 0; else noItems">
+            <article
+              *ngFor="let item of (items || [])"
+              class="landing-recent-card card-uel bg-white rounded-xl overflow-hidden flex flex-col shadow-md hover:shadow-lg transition-all duration-300"
             >
-              <article
-                class="bg-white shadow-lg rounded-xl overflow-hidden flex flex-col w-full h-full hover:-translate-y-1 transition-transform duration-300 text-[13px]"
-              >
-                <div
-                  class="px-4 py-3 flex flex-col gap-1 border-b border-blueGray-100 min-h-[80px]"
-                >
-                  <div class="flex justify-between items-center w-full">
-                    <span
-                      class="inline-flex items-center px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider"
-                      [ngClass]="{
-                        'bg-red-100 text-red-600': item.type === 'LOST',
-                        'bg-emerald-100 text-emerald-600':
-                          item.type === 'FOUND'
-                      }"
-                    >
-                      <i
-                        [ngClass]="{
-                          'fas fa-exclamation-circle': item.type === 'LOST',
-                          'fas fa-hand-holding-heart': item.type === 'FOUND'
-                        }"
-                        class="mr-1"
-                      ></i>
-                      {{ item.type === "LOST" ? "Bị mất" : "Nhặt được" }}
-                    </span>
-                    <span class="text-[10px] text-blueGray-400 font-medium">
-                      {{ item.lost_found_date | date: "short" }}
-                    </span>
-                  </div>
+              <div class="landing-recent-card-head">
+                <div class="landing-recent-card-head-top">
                   <span
-                    class="text-blueGray-800 font-bold text-sm line-clamp-2 h-10 mt-1"
-                    [title]="item.title"
+                    class="landing-recent-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase"
+                    [ngClass]="{
+                      'landing-badge-lost': item.type === 'LOST',
+                      'landing-badge-found': item.type === 'FOUND'
+                    }"
                   >
-                    {{ item.title }}
+                    <i [ngClass]="item.type === 'LOST' ? 'fas fa-exclamation-circle' : 'fas fa-hand-holding-heart'"></i>
+                    {{ item.type === "LOST" ? "Mất đồ" : "Nhặt được" }}
                   </span>
+                  <span class="landing-recent-meta text-xs text-blueGray-500">{{ item.lost_found_date | date: "short" }}</span>
                 </div>
+                <h3 class="landing-recent-card-title" [title]="item.title">
+                  {{ item.title }}
+                </h3>
+              </div>
 
-                <div class="w-full overflow-hidden flex-shrink-0">
-                  <!-- maintain 4:3 ratio with fixed height for uniformity -->
-                  <div class="relative w-full" style="padding-top: 56.25%">
-                    <ng-container
-                      *ngIf="getItemImage(item) as imageUrl; else noImageBlock"
-                    >
-                      <img
-                        [src]="imageUrl"
-                        [alt]="item.title"
-                        (error)="onImageError($event)"
-                        class="absolute top-0 left-0 w-full h-full object-cover"
-                      />
-                    </ng-container>
-                    <ng-template #noImageBlock>
-                      <div
-                        class="absolute top-0 left-0 w-full h-full bg-blueGray-100 flex items-center justify-center text-blueGray-500 text-xs font-semibold uppercase"
-                      >
-                        Chua co anh tu bai dang
-                      </div>
-                    </ng-template>
+              <div class="landing-recent-card-image">
+                <div class="landing-recent-card-image-inner">
+                  <ng-container *ngIf="getItemImage(item) as imageUrl; else noImageBlock">
+                    <img [src]="imageUrl" [alt]="item.title" (error)="onImageError($event)" class="landing-recent-card-img" />
+                  </ng-container>
+                  <ng-template #noImageBlock>
+                    <div class="landing-recent-card-no-image">Chưa có ảnh</div>
+                  </ng-template>
+                </div>
+              </div>
+
+              <div class="landing-recent-card-body">
+                <div class="landing-recent-card-meta">
+                  <div class="landing-meta-line">
+                    <i class="fas fa-map-marker-alt landing-meta-icon" aria-hidden="true"></i>
+                    <span class="landing-meta-text line-clamp-2">{{ item.location_text || '—' }}</span>
+                  </div>
+                  <div class="landing-meta-line">
+                    <i class="fas fa-tag landing-meta-icon" aria-hidden="true"></i>
+                    <span class="landing-meta-text">Màu: {{ item.color || "—" }} · {{ item.category || "—" }}</span>
                   </div>
                 </div>
-
-                <div class="p-4 flex flex-col flex-1 bg-blueGray-50/50">
-                  <div class="text-[11px] text-blueGray-500 space-y-2 mb-4">
-                    <p class="flex items-start">
-                      <i
-                        class="fas fa-map-marker-alt text-lightBlue-500 w-4 mt-0.5"
-                      ></i>
-                      <span class="line-clamp-2 leading-snug">{{
-                        item.location_text
-                      }}</span>
-                    </p>
-                    <p class="flex items-center">
-                      <i class="far fa-clock text-blueGray-400 w-4"></i>
-                      {{ item.lost_found_date | date: "short" }}
-                    </p>
-                    <p class="flex items-center">
-                      <i class="fas fa-tag text-blueGray-400 w-4"></i>
-                      Màu: {{ item.color || "Không xác định" }} - Loại:
-                      {{ item.category }}
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    (click)="viewItemDetail(item._id)"
-                    class="mt-auto w-full bg-lightBlue-500 text-white text-[11px] font-bold uppercase px-3 py-2.5 rounded shadow hover:bg-lightBlue-600 transition-colors"
-                  >
-                    Xem chi tiết
-                  </button>
-                </div>
-              </article>
-            </div>
+                <button type="button" (click)="viewItemDetail(item._id)" class="landing-recent-card-btn">
+                  Xem chi tiết
+                </button>
+              </div>
+            </article>
           </ng-container>
         </ng-container>
 
-        <!-- loading and empty templates -->
         <ng-template #loadingItems>
-          <div class="w-full text-center py-8">
-            <i
-              class="fas fa-spinner animate-spin text-2xl text-blueGray-400"
-            ></i>
-            <p class="mt-2 text-blueGray-600">Đang tải bài đăng...</p>
+          <div class="landing-recent-loading w-full col-full text-center py-12">
+            <i class="fas fa-spinner animate-spin text-3xl text-blueGray-400"></i>
+            <p class="landing-body mt-3 text-blueGray-600">Đang tải bài đăng...</p>
           </div>
         </ng-template>
 
         <ng-template #noItems>
-          <div class="w-full text-center py-8 text-blueGray-500">
-            <p>Chưa có bài đăng gần đây.</p>
+          <div class="landing-recent-empty w-full col-full text-center py-12 text-blueGray-500">
+            <i class="fas fa-inbox text-4xl mb-3 opacity-60"></i>
+            <p class="landing-body m-0">Chưa có bài đăng gần đây.</p>
           </div>
         </ng-template>
       </div>
     </div>
   </section>
-  <section class="relative py-20">
-    <div
-      class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-      style="transform: translateZ(0)"
-    >
-      <svg
-        class="absolute bottom-0 overflow-hidden"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        version="1.1"
-        viewBox="0 0 2560 100"
-        x="0"
-        y="0"
-      >
-        <polygon
-          class="text-white fill-current"
-          points="2560 0 2560 100 0 100"
-        ></polygon>
-      </svg>
-    </div>
 
+  <!-- 4. Thống kê hệ thống -->
+  <section class="landing-section py-20" style="background-color: #F4F8FC">
     <div class="container mx-auto px-4">
-      <div class="items-center flex flex-wrap">
-        <div class="w-full md:w-4/12 ml-auto mr-auto px-4">
+      <div class="flex flex-wrap -mx-4 justify-center">
+        <div class="w-full sm:w-6/12 md:w-4/12 lg:w-3/12 px-4 mb-8 lg:mb-0">
+          <div class="landing-stat-card card-uel text-center p-8 h-full">
+            <div class="text-3xl md:text-4xl font-bold mb-2" style="color: #123E7C;">120+</div>
+            <p class="text-blueGray-600 m-0 font-medium" style="letter-spacing: 0.02em;">Đồ đã tìm lại</p>
+          </div>
+        </div>
+        <div class="w-full sm:w-6/12 md:w-4/12 lg:w-3/12 px-4 mb-8 lg:mb-0">
+          <div class="landing-stat-card card-uel text-center p-8 h-full">
+            <div class="text-3xl md:text-4xl font-bold mb-2" style="color: #1C5FA8;">350+</div>
+            <p class="text-blueGray-600 m-0 font-medium" style="letter-spacing: 0.02em;">Bài đăng</p>
+          </div>
+        </div>
+        <div class="w-full sm:w-6/12 md:w-4/12 lg:w-3/12 px-4">
+          <div class="landing-stat-card card-uel text-center p-8 h-full">
+            <div class="text-3xl md:text-4xl font-bold mb-2" style="color: #0F2F8F;">900+</div>
+            <p class="text-blueGray-600 m-0 font-medium" style="letter-spacing: 0.02em;">Người dùng</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-20 bg-white">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap items-center gap-8">
+        <div class="w-full md:w-4/12 px-4 flex-shrink-0">
           <img
             alt="..."
             class="max-w-full rounded-lg shadow-lg"
             src="https://images.unsplash.com/photo-1555212697-194d092e3b8f?ixlib=rb-1.2.1&auto=format&fit=crop&w=634&q=80"
           />
         </div>
-        <div class="w-full md:w-5/12 ml-auto mr-auto px-4">
+        <div class="w-full md:w-5/12 px-4">
           <div class="md:pr-12">
-            <div
-              class="text-red-600 p-3 text-center inline-flex items-center justify-center w-16 h-16 mb-6 shadow-lg rounded-full bg-red-300"
-            >
+            <div class="landing-icon-box landing-connect-icon mb-6" style="background-color: #ffedd5; color: #ea580c;">
               <i class="fas fa-rocket text-xl"></i>
             </div>
-            <h3 class="text-3xl font-semibold">Quy trình rõ ràng</h3>
-            <p class="mt-4 text-lg leading-relaxed text-blueGray-500">
-              Mỗi tin đăng đều đi qua các bước: tạo tin, duyệt, match, hẹn trả,
-              xác minh và hoàn tất, giúp mọi thao tác minh bạch và dễ theo dõi.
+            <h3 class="text-3xl font-semibold tracking-readability" style="letter-spacing: 0.03em; line-height: 1.35; color: #1F2D3D;">Quy trình rõ ràng</h3>
+            <p class="mt-4 text-lg leading-relaxed text-blueGray-500" style="letter-spacing: 0.025em;">
+              Mỗi tin đăng đều đi qua các bước: tạo tin, duyệt, match, hẹn trả, xác minh và hoàn tất, giúp mọi thao tác minh bạch và dễ theo dõi.
             </p>
             <ul class="list-none mt-6">
               <li class="py-2">
                 <div class="flex items-center">
                   <div>
                     <span
-                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-red-600 bg-red-200 mr-3"
+                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-uel-accent mr-3"
+                      style="background-color: #ffedd5"
                     >
                       <i class="fas fa-fingerprint"></i>
                     </span>
                   </div>
                   <div>
-                    <h4 class="text-blueGray-500">
+                    <h4 class="text-blueGray-500 leading-relaxed" style="letter-spacing: 0.02em;">
                       Thu thập thuộc tính chi tiết cho mỗi món đồ
                     </h4>
                   </div>
@@ -406,13 +384,14 @@
                 <div class="flex items-center">
                   <div>
                     <span
-                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-red-600 bg-red-200 mr-3"
+                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-uel-accent mr-3"
+                      style="background-color: #ffedd5"
                     >
                       <i class="fab fa-html5"></i>
                     </span>
                   </div>
                   <div>
-                    <h4 class="text-blueGray-500">
+                    <h4 class="text-blueGray-500 leading-relaxed" style="letter-spacing: 0.02em;">
                       Match tự động giữa tin “mất” và “nhặt”
                     </h4>
                   </div>
@@ -422,13 +401,14 @@
                 <div class="flex items-center">
                   <div>
                     <span
-                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-red-600 bg-red-200 mr-3"
+                      class="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-uel-accent mr-3"
+                      style="background-color: #ffedd5"
                     >
                       <i class="far fa-paper-plane"></i>
                     </span>
                   </div>
                   <div>
-                    <h4 class="text-blueGray-500">
+                    <h4 class="text-blueGray-500 leading-relaxed" style="letter-spacing: 0.02em;">
                       Hẹn trả và xác minh qua kênh quản trị viên
                     </h4>
                   </div>
@@ -441,194 +421,13 @@
     </div>
   </section>
 
-  <section class="pt-20 pb-48">
+  <section class="py-24" style="background-color: #0F2F8F">
     <div class="container mx-auto px-4">
-      <div class="flex flex-wrap justify-center text-center mb-24">
-        <div class="w-full lg:w-6/12 px-4">
-          <h2 class="text-4xl font-semibold">Những người kết nối cộng đồng</h2>
-          <p class="text-lg leading-relaxed m-4 text-blueGray-500">
-            Đội ngũ vận hành và cộng đồng người dùng cùng nhau xây dựng hệ sinh
-            thái trả lại đồ thất lạc một cách văn minh, đáng tin cậy.
-          </p>
-        </div>
-      </div>
-      <div class="flex flex-wrap">
-        <!-- giữ nguyên các card team, chỉ đổi mô tả nếu muốn -->
-        <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-          <div class="px-6">
-            <img
-              alt="..."
-              src="assets/img/team-1-800x800.jpg"
-              class="shadow-lg rounded-full mx-auto max-w-120-px"
-            />
-            <div class="pt-6 text-center">
-              <h5 class="text-xl font-bold">Ryan Tompson</h5>
-              <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Lost & Found Moderator
-              </p>
-              <div class="mt-6">
-                <button
-                  class="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-twitter"></i>
-                </button>
-                <button
-                  class="bg-lightBlue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-facebook-f"></i>
-                </button>
-                <button
-                  class="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-dribbble"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-          <div class="px-6">
-            <img
-              alt="..."
-              src="assets/img/team-2-800x800.jpg"
-              class="shadow-lg rounded-full mx-auto max-w-120-px"
-            />
-            <div class="pt-6 text-center">
-              <h5 class="text-xl font-bold">Romina Hadid</h5>
-              <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Community Manager
-              </p>
-              <div class="mt-6">
-                <button
-                  class="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-google"></i>
-                </button>
-                <button
-                  class="bg-lightBlue-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-facebook-f"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-          <div class="px-6">
-            <img
-              alt="..."
-              src="assets/img/team-3-800x800.jpg"
-              class="shadow-lg rounded-full mx-auto max-w-120-px"
-            />
-            <div class="pt-6 text-center">
-              <h5 class="text-xl font-bold">Alexa Smith</h5>
-              <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                UX Designer
-              </p>
-              <div class="mt-6">
-                <button
-                  class="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-google"></i>
-                </button>
-                <button
-                  class="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-twitter"></i>
-                </button>
-                <button
-                  class="bg-blueGray-700 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-instagram"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-          <div class="px-6">
-            <img
-              alt="..."
-              src="assets/img/team-4-470x470.png"
-              class="shadow-lg rounded-full mx-auto max-w-120-px"
-            />
-            <div class="pt-6 text-center">
-              <h5 class="text-xl font-bold">Jenna Kardi</h5>
-              <p class="mt-1 text-sm text-blueGray-400 uppercase font-semibold">
-                Founder & Admin Lead
-              </p>
-              <div class="mt-6">
-                <button
-                  class="bg-pink-500 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-dribbble"></i>
-                </button>
-                <button
-                  class="bg-red-600 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-google"></i>
-                </button>
-                <button
-                  class="bg-lightBlue-400 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-twitter"></i>
-                </button>
-                <button
-                  class="bg-blueGray-700 text-white w-8 h-8 rounded-full outline-none focus:outline-none mr-1 mb-1"
-                  type="button"
-                >
-                  <i class="fab fa-instagram"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="pb-20 relative block bg-blueGray-800">
-    <div
-      class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-      style="transform: translateZ(0)"
-    >
-      <svg
-        class="absolute bottom-0 overflow-hidden"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
-        version="1.1"
-        viewBox="0 0 2560 100"
-        x="0"
-        y="0"
-      >
-        <polygon
-          class="text-blueGray-800 fill-current"
-          points="2560 0 2560 100 0 100"
-        ></polygon>
-      </svg>
-    </div>
-
-    <div class="container mx-auto px-4 lg:pt-24 lg:pb-64">
       <div class="flex flex-wrap text-center justify-center">
         <div class="w-full lg:w-6/12 px-4">
-          <h2 class="text-4xl font-semibold text-white">Theo dõi trạng thái</h2>
-          <p class="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">
-            Mỗi món đồ đều gắn với một timeline trạng thái rõ ràng, giúp bạn
-            biết chính xác tin đang ở bước nào trong quy trình xử lý.
+          <h2 class="text-4xl font-semibold text-white tracking-readability" style="letter-spacing: 0.03em; line-height: 1.3;">Theo dõi trạng thái</h2>
+          <p class="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400" style="letter-spacing: 0.025em;">
+            Mỗi món đồ đều gắn với một timeline trạng thái rõ ràng, giúp bạn biết chính xác tin đang ở bước nào trong quy trình xử lý.
           </p>
         </div>
       </div>
@@ -639,12 +438,9 @@
           >
             <i class="fas fa-medal text-xl"></i>
           </div>
-          <h6 class="text-xl mt-5 font-semibold text-white">
-            Đăng & duyệt tin
-          </h6>
-          <p class="mt-2 mb-4 text-blueGray-400">
-            Tin đăng được admin duyệt nhanh chóng để đảm bảo nội dung rõ ràng,
-            đúng quy định và dễ match.
+          <h6 class="text-xl mt-5 font-semibold text-white" style="letter-spacing: 0.02em;">Đăng & duyệt tin</h6>
+          <p class="mt-2 mb-4 text-blueGray-400 leading-relaxed" style="letter-spacing: 0.025em;">
+            Tin đăng được admin duyệt nhanh chóng để đảm bảo nội dung rõ ràng, đúng quy định và dễ match.
           </p>
         </div>
         <div class="w-full lg:w-3/12 px-4 text-center">
@@ -653,10 +449,9 @@
           >
             <i class="fas fa-poll text-xl"></i>
           </div>
-          <h5 class="text-xl mt-5 font-semibold text-white">Match & hẹn trả</h5>
-          <p class="mt-2 mb-4 text-blueGray-400">
-            Khi có tin phù hợp, hệ thống gợi ý match và hỗ trợ thiết lập buổi
-            hẹn trả giữa hai bên.
+          <h5 class="text-xl mt-5 font-semibold text-white" style="letter-spacing: 0.02em;">Match & hẹn trả</h5>
+          <p class="mt-2 mb-4 text-blueGray-400 leading-relaxed" style="letter-spacing: 0.025em;">
+            Khi có tin phù hợp, hệ thống gợi ý match và hỗ trợ thiết lập buổi hẹn trả giữa hai bên.
           </p>
         </div>
         <div class="w-full lg:w-3/12 px-4 text-center">
@@ -665,79 +460,74 @@
           >
             <i class="fas fa-lightbulb text-xl"></i>
           </div>
-          <h5 class="text-xl mt-5 font-semibold text-white">Xác minh & đóng</h5>
-          <p class="mt-2 mb-4 text-blueGray-400">
-            Sau khi trả đồ, admin xác minh kết quả và đóng yêu cầu, lưu lại lịch
-            sử cho lần tra cứu sau này.
+          <h5 class="text-xl mt-5 font-semibold text-white" style="letter-spacing: 0.02em;">Xác minh & đóng</h5>
+          <p class="mt-2 mb-4 text-blueGray-400 leading-relaxed" style="letter-spacing: 0.025em;">
+            Sau khi trả đồ, admin xác minh kết quả và đóng yêu cầu, lưu lại lịch sử cho lần tra cứu sau này.
           </p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="relative block py-24 lg:pt-0 bg-blueGray-800">
+  <!-- 5. CTA – Kêu gọi hành động -->
+  <section class="landing-section landing-section-typo py-24 bg-white">
+    <div class="container mx-auto px-4 text-center">
+      <h2 class="landing-heading-section text-2xl md:text-3xl font-semibold mb-3" style="color: #1F2D3D;">Bạn vừa làm mất đồ?</h2>
+      <p class="landing-body text-blueGray-600 max-w-xl mx-auto mb-8">Đăng tin ngay để cộng đồng hỗ trợ tìm kiếm. Hoặc nếu bạn nhặt được đồ của ai đó, hãy đăng tin để trả lại đúng chủ.</p>
+      <a [routerLink]="['/post-item']" class="landing-cta-btn landing-cta-btn-orange landing-cta-btn-post">
+        <i class="landing-cta-btn-icon fas fa-plus-circle" aria-hidden="true"></i>
+        <span class="landing-cta-btn-text">Đăng tin tìm đồ ngay</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 6. FAQ -->
+  <section class="landing-section landing-section-typo py-20" style="background-color: #F4F8FC">
     <div class="container mx-auto px-4">
-      <div class="flex flex-wrap justify-center lg:-mt-64 -mt-48">
+      <h2 class="landing-heading-section landing-heading-with-accent text-2xl md:text-3xl font-semibold text-center mb-4" style="color: #1F2D3D;">Câu hỏi thường gặp</h2>
+      <p class="landing-body text-center text-blueGray-600 mb-12 max-w-2xl mx-auto">Một số câu hỏi thường gặp về cách sử dụng hệ thống.</p>
+      <div class="landing-faq-list max-w-3xl mx-auto">
+        <div class="landing-faq-item card-uel p-6">
+          <h4 class="landing-faq-title text-lg font-semibold mb-3" style="color: #1F2D3D;">Làm sao để đăng tin tìm đồ?</h4>
+          <p class="landing-body text-blueGray-600 m-0">Vào mục <strong>Tạo bài đăng</strong> trên menu, chọn loại “Tôi bị mất đồ” hoặc “Tôi nhặt được đồ”, điền thông tin chi tiết (loại đồ, màu sắc, địa điểm, thời gian) và gửi tin. Sau khi admin duyệt, tin sẽ hiển thị cho cộng đồng.</p>
+        </div>
+        <div class="landing-faq-item card-uel p-6">
+          <h4 class="landing-faq-title text-lg font-semibold mb-3" style="color: #1F2D3D;">Làm sao xác minh người nhận đồ?</h4>
+          <p class="landing-body text-blueGray-600 m-0">Khi hai bên thống nhất trả đồ, bạn hẹn gặp tại địa điểm an toàn. Admin hỗ trợ đối soát thông tin và xác minh sau khi hoàn tất trả đồ, rồi đóng tin trên hệ thống.</p>
+        </div>
+        <div class="landing-faq-item card-uel p-6">
+          <h4 class="landing-faq-title text-lg font-semibold mb-3" style="color: #1F2D3D;">Hệ thống hoạt động trong khu vực nào?</h4>
+          <p class="landing-body text-blueGray-600 m-0">Hiện tại hệ thống tập trung phục vụ khu vực <strong>Thành phố Thủ Đức, TP.HCM</strong>. Bạn chọn phường và nhập địa chỉ chi tiết khi đăng tin để dễ đối chiếu và hẹn trả.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="py-24" style="background-color: #0F2F8F">
+    <div class="container mx-auto px-4">
+      <div class="flex flex-wrap justify-center">
         <div class="w-full lg:w-6/12 px-4">
-          <div
-            class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200"
-          >
-            <div class="flex-auto p-5 lg:p-10">
-              <h4 class="text-2xl font-semibold">Cần hỗ trợ thêm?</h4>
-              <p class="leading-relaxed mt-1 mb-4 text-blueGray-500">
-                Điền thông tin bên dưới nếu bạn cần trợ giúp về việc đăng tin,
-                match nhầm, hoặc xử lý tranh chấp liên quan đến đồ thất lạc.
-              </p>
-              <div class="relative w-full mb-3 mt-8">
-                <label
-                  class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                  htmlFor="full-name"
-                >
-                  Họ và tên
-                </label>
-                <input
-                  type="text"
-                  class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Nhập họ và tên"
-                />
-              </div>
-
-              <div class="relative w-full mb-3">
-                <label
-                  class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                  htmlFor="email"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                  placeholder="Địa chỉ email liên hệ"
-                />
-              </div>
-
-              <div class="relative w-full mb-3">
-                <label
-                  class="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                  htmlFor="message"
-                >
-                  Nội dung
-                </label>
-                <textarea
-                  rows="4"
-                  cols="80"
-                  class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full"
-                  placeholder="Mô tả vấn đề bạn đang gặp phải..."
-                ></textarea>
-              </div>
-              <div class="text-center mt-6">
-                <button
-                  class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
-                  type="button"
-                >
-                  Gửi yêu cầu hỗ trợ
-                </button>
-              </div>
+          <div class="support-form-card relative flex flex-col min-w-0 break-words w-full mb-6">
+            <h4 class="support-form-title" style="letter-spacing: 0.03em;">Cần hỗ trợ thêm?</h4>
+            <p class="support-form-desc leading-relaxed" style="letter-spacing: 0.025em;">
+              Điền thông tin bên dưới nếu bạn cần trợ giúp về việc đăng tin, match nhầm, hoặc xử lý tranh chấp liên quan đến đồ thất lạc.
+            </p>
+            <div class="relative w-full mb-4">
+              <label for="full-name">Họ và tên</label>
+              <input id="full-name" type="text" placeholder="Nhập họ và tên" />
+            </div>
+            <div class="relative w-full mb-4">
+              <label for="support-email">Email</label>
+              <input id="support-email" type="email" placeholder="Địa chỉ email liên hệ" />
+            </div>
+            <div class="relative w-full mb-4">
+              <label for="support-message">Nội dung</label>
+              <textarea id="support-message" rows="4" placeholder="Mô tả vấn đề bạn đang gặp phải..."></textarea>
+            </div>
+            <div class="text-center">
+              <button type="button" class="btn-uel-primary support-form-submit">
+                Gửi yêu cầu hỗ trợ
+              </button>
             </div>
           </div>
         </div>

@@ -1,74 +1,56 @@
 <div class="container mx-auto px-4 h-full">
   <div class="flex content-center items-center justify-center h-full">
     <div class="w-full lg:w-6/12 px-4">
-      <div
-        class="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded-lg bg-blueGray-200 border-0"
-      >
-        <!--
-        <div class="rounded-t mb-0 px-6 py-6">
-          <div class="text-center mb-3"><h6 class="text-blueGray-500 text-sm font-bold">Đăng ký với</h6></div>
-          <div class="btn-wrapper text-center">
-            <button type="button" class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs">
-              <img alt="" class="w-5 mr-1" src="assets/img/github.svg" aria-hidden="true" /> Github
-            </button>
-            <button type="button" class="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs">
-              <img alt="" class="w-5 mr-1" src="assets/img/google.svg" aria-hidden="true" /> Google
-            </button>
-          </div>
-          <hr class="mt-6 border-b-1 border-blueGray-300" />
-        </div>
-        -->
+      <div class="card-uel relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg border-0">
         <div class="flex-auto px-4 lg:px-10 py-10 pt-0">
-          <div class="text-blueGray-400 text-center mb-3 font-bold"><small>Đăng ký tài khoản</small></div>
+          <div class="uel-section-title text-center mb-6 text-blueGray-700">Đăng ký tài khoản</div>
           <form (ngSubmit)="handleRegister()">
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="reg-name">Họ tên</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-name">Họ tên</label>
               <input id="reg-name" type="text" name="name" [(ngModel)]="name" autocomplete="name"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="Nguyễn Văn A" />
             </div>
 
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="reg-username">Username</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-username">Username</label>
               <input id="reg-username" type="text" name="username" [(ngModel)]="username" autocomplete="username" spellcheck="false"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="nguyenvana" />
             </div>
 
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="reg-email">Email</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-email">Email</label>
               <input id="reg-email" type="email" name="email" [(ngModel)]="email" autocomplete="email" spellcheck="false"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="email@example.com" />
             </div>
 
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="reg-phone">Số điện thoại</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-phone">Số điện thoại</label>
               <input id="reg-phone" type="tel" name="phone" [(ngModel)]="phone" autocomplete="tel"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="0901234567" />
             </div>
 
             <div class="relative w-full mb-3">
-              <label class="block uppercase text-blueGray-600 text-xs font-bold mb-2" for="reg-password">Mật khẩu</label>
+              <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-password">Mật khẩu</label>
               <input id="reg-password" type="password" name="password" [(ngModel)]="password" autocomplete="new-password"
-                class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring-2 focus:ring-blueGray-500 w-full ease-linear transition-all duration-150"
+                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
                 placeholder="••••••••" />
             </div>
 
             <div>
-              <label class="inline-flex items-center cursor-pointer">
-                <input id="customCheckRegister" type="checkbox" name="agree"
-                  class="form-checkbox border-0 text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150 rounded" />
-                <span class="ml-2 text-sm font-semibold text-blueGray-600">
-                  Tôi đồng ý với <a href="#" class="text-red-600" (click)="$event.preventDefault()">Chính sách bảo mật</a>
+              <label class="uel-checkbox-wrap inline-flex items-center cursor-pointer">
+                <input id="customCheckRegister" type="checkbox" name="agree" class="uel-checkbox" />
+                <span class="uel-checkbox-label">
+                  Tôi đồng ý với <a [routerLink]="['/terms']" class="uel-policy-link" (click)="$event.stopPropagation()">Điều khoản & Chính sách bảo mật</a>
                 </span>
               </label>
             </div>
 
             <div class="text-center mt-6">
-              <button type="submit"
-                class="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-blueGray-500 mr-1 mb-1 w-full ease-linear transition-all duration-150">
+              <button type="submit" class="btn-uel-primary w-full">
                 Đăng ký
               </button>
             </div>
@@ -76,7 +58,7 @@
         </div>
       </div>
       <div class="flex flex-wrap mt-6 relative justify-center">
-        <a [routerLink]="['/auth/login']" class="text-blueGray-200"><small>Đã có tài khoản? Đăng nhập</small></a>
+        <a [routerLink]="['/auth/login']" class="text-white opacity-90 hover:opacity-100"><small>Đã có tài khoản? Đăng nhập</small></a>
       </div>
     </div>
   </div>

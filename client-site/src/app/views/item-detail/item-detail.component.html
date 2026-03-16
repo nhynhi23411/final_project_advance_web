@@ -1,275 +1,203 @@
 <app-auth-navbar></app-auth-navbar>
 
-<main class="min-h-screen" style="background: #f5f7fa;">
-  <!-- Header -->
-  <div class="sticky top-16 z-40" style="background: white; border-bottom: 1px solid #e2e8f0;">
-    <div class="container mx-auto px-4 py-4 flex items-center justify-between" style="max-width: 1100px;">
-      <h1 class="text-xl font-bold" style="color: #1e293b; letter-spacing: -0.3px;">Chi tiết bài đăng</h1>
-      <button
-        (click)="goBack()"
-        class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all"
-        style="color: #64748b; background: #f8fafc;"
-        onmouseover="this.style.background='#f1f5f9'"
-        onmouseout="this.style.background='#f8fafc'"
-      >
-        <i class="fas fa-arrow-left"></i>
+<main class="item-detail-page min-h-screen bg-blueGray-50 pt-16">
+  <!-- Page header -->
+  <header class="item-detail-header">
+    <div class="item-detail-container item-detail-header-inner">
+      <button type="button" (click)="goBack()" class="item-detail-back">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
         <span>Quay lại</span>
       </button>
+      <h1 class="item-detail-page-title">Chi tiết đồ thất lạc</h1>
+      <div class="item-detail-header-spacer"></div>
     </div>
+  </header>
+
+  <!-- Success -->
+  <div *ngIf="successMessage" class="item-detail-container item-detail-message item-detail-message-success">
+    <i class="fas fa-check-circle" aria-hidden="true"></i>
+    <span>{{ successMessage }}</span>
   </div>
 
-  <!-- Success Message -->
-  <div *ngIf="successMessage" class="container mx-auto px-4 mt-6" style="max-width: 1100px;">
-    <div class="flex items-center gap-4 p-4 rounded-xl" style="background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border: 1px solid #a7f3d0;">
-      <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #10b981;">
-        <i class="fas fa-check text-white"></i>
-      </div>
-      <span class="font-medium" style="color: #047857;">{{ successMessage }}</span>
-    </div>
-  </div>
-
-  <!-- Error Message -->
-  <div *ngIf="error" class="container mx-auto px-4 mt-6" style="max-width: 1100px;">
-    <div class="flex items-center gap-4 p-4 rounded-xl" style="background: #fef2f2; border: 1px solid #fecaca;">
-      <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style="background: #fee2e2;">
-        <i class="fas fa-exclamation-triangle" style="color: #dc2626;"></i>
-      </div>
-      <span class="font-medium" style="color: #dc2626;">{{ error }}</span>
-    </div>
+  <!-- Error -->
+  <div *ngIf="error" class="item-detail-container item-detail-message item-detail-message-error">
+    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ error }}</span>
   </div>
 
   <!-- Loading -->
-  <div *ngIf="isLoading" class="container mx-auto px-4 py-20 flex justify-center" style="max-width: 1100px;">
-    <div class="text-center">
-      <i class="fas fa-circle-notch fa-spin text-4xl mb-4" style="color: #10b981;"></i>
-      <p class="font-semibold" style="color: #1e293b;">Đang tải thông tin...</p>
-      <p class="text-sm mt-1" style="color: #94a3b8;">Vui lòng chờ trong giây lát</p>
-    </div>
+  <div *ngIf="isLoading" class="item-detail-container item-detail-loading">
+    <i class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
+    <p class="item-detail-loading-text">Đang tải thông tin...</p>
   </div>
 
-  <!-- Content -->
-  <div *ngIf="!isLoading && item" class="container mx-auto px-4 py-8" style="max-width: 1100px;">
-    <div class="flex flex-col lg:flex-row gap-8">
-      
-      <!-- Main Area -->
-      <section class="flex-1">
-        
-        <!-- Image Gallery -->
-        <div class="rounded-2xl overflow-hidden" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <div class="relative flex items-center justify-center" style="height: 400px; background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);">
+  <!-- Main content: 2 columns -->
+  <div *ngIf="!isLoading && item" class="item-detail-container item-detail-main">
+    <div class="item-detail-layout">
+      <!-- Left column: image + detail card -->
+      <section class="item-detail-primary">
+        <!-- Image / gallery -->
+        <div class="item-detail-gallery-card">
+          <div class="item-detail-gallery-main">
             <img
-              *ngIf="item.images && item.images.length"
-              [src]="item.images[0]"
+              *ngIf="getMainImageUrl()"
+              [src]="getMainImageUrl()"
               [alt]="item.title"
-              class="w-full h-full object-cover main-photo"
+              class="item-detail-gallery-img"
             />
-            <div *ngIf="!item.images || item.images.length === 0" class="text-center">
-              <i class="fas fa-image text-6xl mb-3" style="color: #cbd5e1;"></i>
-              <p style="color: #94a3b8;">Không có hình ảnh</p>
+            <div *ngIf="!getMainImageUrl()" class="item-detail-gallery-placeholder">
+              <i class="fas fa-image" aria-hidden="true"></i>
+              <p>Không có hình ảnh</p>
             </div>
           </div>
-          <div *ngIf="item.images && item.images.length > 1" class="flex gap-3 overflow-x-auto p-4" style="background: #fafbfc;">
-            <img
+          <div *ngIf="item.images && item.images.length > 1" class="item-detail-gallery-thumbs">
+            <button
               *ngFor="let img of item.images; let i = index"
-              [src]="img"
-              [alt]="'Hình ' + (i + 1)"
-              class="object-cover rounded-lg cursor-pointer transition-all"
-              style="width: 80px; height: 80px; border: 2px solid #e2e8f0;"
-              onmouseover="this.style.borderColor='#1e293b'; this.style.transform='scale(1.05)';"
-              onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='scale(1)';"
-            />
+              type="button"
+              (click)="setSelectedImage(i)"
+              [class.item-detail-thumb-active]="selectedImageIndex === i"
+              class="item-detail-thumb"
+            >
+              <img [src]="img" [alt]="'Hình ' + (i + 1)" class="item-detail-thumb-img" />
+            </button>
           </div>
         </div>
 
-        <!-- Item Info Card -->
-        <div class="mt-6 rounded-2xl p-6" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <h2 class="text-2xl font-bold mb-6 detail-title" style="color: #1e293b; letter-spacing: -0.5px;">
-            {{ item.title }}
-          </h2>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <!-- Loai -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-tag" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Loại</p>
-                <span [class]="getItemTypeClass() + ' inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold'">
-                  <i [class]="getItemTypeIcon() + ' mr-1.5'"></i>
-                  {{ getItemTypeLabel() }}
-                </span>
-              </div>
-            </div>
-            
-            <!-- Danh muc -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-folder" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Danh mục</p>
-                <p class="font-medium" style="color: #334155;">{{ item.category }}</p>
-              </div>
-            </div>
-            
-            <!-- Mau sac -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-palette" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Màu sắc</p>
-                <p class="font-medium" style="color: #334155;">{{ item.color || "Không xác định" }}</p>
-              </div>
-            </div>
-            
-            <!-- Dia diem -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-map-marker-alt" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Địa điểm</p>
-                <p class="font-medium" style="color: #334155;">{{ item.location_text }}</p>
-              </div>
-            </div>
-            
-            <!-- Ngay -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-calendar-alt" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Ngày</p>
-                <p class="font-medium" style="color: #334155;">{{ formatDate(item.lost_found_date) }}</p>
-              </div>
-            </div>
-            
-            <!-- Trang thai -->
-            <div class="flex items-start gap-3">
-              <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #f1f5f9;">
-                <i class="fas fa-info-circle" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Trạng thái</p>
-                <p class="font-bold" style="color: #334155;">{{ getStatusLabel() }}</p>
-              </div>
+        <!-- Detail card: title, metadata, description -->
+        <div class="item-detail-card item-detail-info-card">
+          <div class="item-detail-info-head">
+            <h2 class="item-detail-title">{{ item.title }}</h2>
+            <div class="item-detail-badges">
+              <span
+                [class]="getItemTypeClass() + ' item-detail-badge item-detail-badge-type'"
+              >
+                <i [class]="getItemTypeIcon()" aria-hidden="true"></i>
+                {{ getItemTypeLabel() }}
+              </span>
+              <span class="item-detail-badge item-detail-badge-status" [ngClass]="getStatusUelClass()">
+                {{ getStatusLabel() }}
+              </span>
             </div>
           </div>
 
-          <!-- Mo ta -->
-          <div class="mt-8 pt-6" style="border-top: 1px solid #f1f5f9;">
-            <h3 class="text-lg font-bold mb-3" style="color: #1e293b;">Mô tả chi tiết</h3>
-            <p class="leading-relaxed whitespace-pre-wrap" style="color: #475569;">
-              {{ item.description || "Không có mô tả" }}
-            </p>
+          <dl class="item-detail-meta-grid">
+            <div class="item-detail-meta-item">
+              <dt>Danh mục</dt>
+              <dd>{{ item.category }}</dd>
+            </div>
+            <div class="item-detail-meta-item">
+              <dt>Màu sắc</dt>
+              <dd>{{ item.color || "Không xác định" }}</dd>
+            </div>
+            <div class="item-detail-meta-item">
+              <dt>Địa điểm</dt>
+              <dd>{{ item.location_text }}</dd>
+            </div>
+            <div class="item-detail-meta-item">
+              <dt>Ngày</dt>
+              <dd>{{ formatDate(item.lost_found_date) }}</dd>
+            </div>
           </div>
 
-          <!-- Dac diem nhan dang -->
-          <div *ngIf="item.distinctive_marks" class="mt-6 p-4 rounded-xl" style="background: #fffbeb; border: 1px solid #fef3c7;">
-            <div class="flex items-start gap-3">
-              <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #fef3c7;">
-                <i class="fas fa-fingerprint" style="color: #d97706;"></i>
-              </div>
-              <div>
-                <p class="text-sm font-bold mb-1" style="color: #92400e;">Đặc điểm nhận dạng</p>
-                <p class="text-sm whitespace-pre-wrap" style="color: #a16207;">{{ item.distinctive_marks }}</p>
-              </div>
-            </div>
+          <div class="item-detail-description-block">
+            <h3 class="item-detail-subtitle">Mô tả</h3>
+            <p class="item-detail-description">{{ item.description || "Không có mô tả" }}</p>
+          </div>
+
+          <div *ngIf="item.distinctive_marks" class="item-detail-description-block item-detail-distinctive">
+            <h3 class="item-detail-subtitle">Đặc điểm nhận dạng</h3>
+            <p class="item-detail-description">{{ item.distinctive_marks }}</p>
           </div>
         </div>
 
-        <!-- Claims List for Owner -->
-        <div *ngIf="isOwner() && postClaims?.length" class="mt-6 rounded-2xl p-6" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06); border-left: 4px solid #0ea5e9;">
-          <h3 class="text-xl font-bold mb-6 flex items-center gap-3" style="color: #1e293b;">
-            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: #e0f2fe;">
-              <i class="fas fa-users" style="color: #0ea5e9;"></i>
-            </div>
+        <!-- Claims list (owner only) -->
+        <div
+          *ngIf="isOwner() && postClaims?.length"
+          class="item-detail-card item-detail-claims-card"
+        >
+          <h3 class="item-detail-card-heading item-detail-card-heading-accent">
+            <i class="fas fa-users" aria-hidden="true"></i>
             Danh sách yêu cầu Claim
           </h3>
-          
-          <div class="space-y-4">
-            <div *ngFor="let claim of postClaims" class="p-5 rounded-xl" style="background: #f8fafc; border: 1px solid #e2e8f0;">
-              
-              <!-- Claim Header -->
-              <div class="flex flex-col sm:flex-row justify-between items-start mb-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-12 h-12 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%);">
-                    <i class="fas fa-user text-white"></i>
-                  </div>
-                  <div>
-                    <h4 class="font-bold" style="color: #1e293b;">
-                      {{ claim.claimant_user_id?.name || claim.claimant_user_id?.username || "Người dùng ẩn danh" }}
-                    </h4>
-                    <p class="text-xs flex items-center gap-1" style="color: #94a3b8;">
-                      <i class="fas fa-clock"></i>
-                      {{ formatDate(claim.created_at) }}
-                    </p>
-                  </div>
+          <div class="item-detail-claims-list">
+            <div *ngFor="let claim of postClaims" class="item-detail-claim-item">
+              <div class="item-detail-claim-header">
+                <div>
+                  <h4 class="item-detail-claim-name">
+                    {{ claim.claimant_user_id?.name || claim.claimant_user_id?.username || "Người dùng ẩn danh" }}
+                  </h4>
+                  <p class="item-detail-claim-date">
+                    <i class="fas fa-clock" aria-hidden="true"></i>
+                    {{ formatDate(claim.created_at) }}
+                  </p>
                 </div>
-                <span class="mt-3 sm:mt-0 px-3 py-1.5 text-xs font-bold rounded-lg uppercase"
-                      [ngClass]="{
-                        'bg-yellow-100 text-yellow-700': claim.status === 'PENDING',
-                        'bg-blue-100 text-blue-700': claim.status === 'UNDER_VERIFICATION',
-                        'bg-green-100 text-green-700': claim.status === 'SUCCESSFUL',
-                        'bg-red-100 text-red-700': claim.status === 'REJECTED' || claim.status === 'CANCELLED'
-                      }">
+                <span
+                  class="item-detail-claim-status"
+                  [ngClass]="{
+                    'item-detail-claim-pending': claim.status === 'PENDING',
+                    'item-detail-claim-verifying': claim.status === 'UNDER_VERIFICATION',
+                    'item-detail-claim-success': claim.status === 'SUCCESSFUL',
+                    'item-detail-claim-rejected': claim.status === 'REJECTED' || claim.status === 'CANCELLED'
+                  }"
+                >
                   {{ getClaimStatusLabel(claim.status) }}
                 </span>
               </div>
-
-              <!-- Claim Content -->
-              <div class="p-4 rounded-xl mb-4" style="background: white; border: 1px solid #e2e8f0;">
-                <div *ngIf="claim.message" class="mb-3">
-                  <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Tin nhắn</p>
-                  <p style="color: #334155;">{{ claim.message }}</p>
+              <div class="item-detail-claim-body">
+                <div *ngIf="claim.message" class="item-detail-claim-row">
+                  <strong>Tin nhắn:</strong>
+                  <span>{{ claim.message }}</span>
                 </div>
-                <div *ngIf="claim.secret_info" class="mb-3">
-                  <p class="text-xs font-semibold uppercase tracking-wide mb-1" style="color: #94a3b8;">Thông tin bí mật / Bằng chứng</p>
-                  <p class="italic" style="color: #334155;">{{ claim.secret_info }}</p>
+                <div *ngIf="claim.secret_info" class="item-detail-claim-row">
+                  <strong>Thông tin bí mật / Bằng chứng:</strong>
+                  <span class="item-detail-claim-italic">{{ claim.secret_info }}</span>
                 </div>
-                <div *ngIf="claim.image_proof_url" class="mb-3">
-                  <p class="text-xs font-semibold uppercase tracking-wide mb-2" style="color: #94a3b8;">Ảnh chứng thực</p>
-                  <a [href]="claim.image_proof_url" target="_blank" class="inline-block">
-                    <img [src]="claim.image_proof_url" class="h-24 object-cover rounded-lg transition-opacity hover:opacity-80" style="border: 2px solid #e2e8f0;" />
+                <div *ngIf="claim.image_proof_url" class="item-detail-claim-row">
+                  <strong>Ảnh chứng thực:</strong>
+                  <a [href]="claim.image_proof_url" target="_blank" rel="noopener" class="item-detail-claim-img-link">
+                    <img [src]="claim.image_proof_url" alt="Ảnh chứng thực" class="item-detail-claim-img" />
                   </a>
                 </div>
-                
-                <div class="pt-3 mt-3" style="border-top: 1px solid #f1f5f9;">
-                  <p *ngIf="claim.claimant_user_id?.email" class="text-sm mb-1">
-                    <span style="color: #64748b;">Email:</span>
-                    <a href="mailto:{{ claim.claimant_user_id.email }}" class="ml-2 font-medium hover:underline" style="color: #0ea5e9;">{{ claim.claimant_user_id.email }}</a>
-                  </p>
-                  <p *ngIf="claim.claimant_user_id?.phone" class="text-sm">
-                    <span style="color: #64748b;">Điện thoại:</span>
-                    <a href="tel:{{ claim.claimant_user_id.phone }}" class="ml-2 font-medium hover:underline" style="color: #0ea5e9;">{{ claim.claimant_user_id.phone }}</a>
-                  </p>
-                  <p *ngIf="!claim.claimant_user_id?.email && !claim.claimant_user_id?.phone" class="text-sm italic" style="color: #94a3b8;">
-                    Người dùng chưa cập nhật thông tin liên hệ.
-                  </p>
-                </div>
+                <hr class="item-detail-claim-hr" />
+                <p *ngIf="claim.claimant_user_id?.email">
+                  <strong>Email liên hệ:</strong>
+                  <a href="mailto:{{ claim.claimant_user_id.email }}" class="item-detail-link">{{ claim.claimant_user_id.email }}</a>
+                </p>
+                <p *ngIf="claim.claimant_user_id?.phone">
+                  <strong>Điện thoại:</strong>
+                  <a href="tel:{{ claim.claimant_user_id.phone }}" class="item-detail-link">{{ claim.claimant_user_id.phone }}</a>
+                </p>
+                <p *ngIf="!claim.claimant_user_id?.email && !claim.claimant_user_id?.phone" class="item-detail-claim-muted">
+                  Người dùng chưa cập nhật thông tin liên hệ.
+                </p>
               </div>
-
-              <!-- Owner Actions -->
-              <div *ngIf="claim.status === 'PENDING' || claim.status === 'UNDER_VERIFICATION'" class="pt-4" style="border-top: 1px solid #e2e8f0;">
-                <p class="text-xs font-semibold uppercase tracking-wide mb-3" style="color: #64748b;">Xử lý yêu cầu</p>
-                <div class="flex flex-wrap gap-2">
-                  <button *ngIf="claim.status === 'PENDING'"
-                          (click)="reviewClaim(claim._id, 'UNDER_VERIFICATION')"
-                          class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
-                          style="background: #0ea5e9; box-shadow: 0 2px 8px rgba(14,165,233,0.3);">
-                    <i class="fas fa-comment-dots"></i> Đang liên hệ
+              <div
+                *ngIf="claim.status === 'PENDING' || claim.status === 'UNDER_VERIFICATION'"
+                class="item-detail-claim-actions"
+              >
+                <span class="item-detail-claim-actions-label">Xử lý yêu cầu:</span>
+                <div class="item-detail-claim-buttons">
+                  <button
+                    *ngIf="claim.status === 'PENDING'"
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'UNDER_VERIFICATION')"
+                    class="item-detail-btn item-detail-btn-primary"
+                  >
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i> Đang liên hệ
                   </button>
-                  <button (click)="reviewClaim(claim._id, 'SUCCESSFUL')"
-                          class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
-                          style="background: #10b981; box-shadow: 0 2px 8px rgba(16,185,129,0.3);">
-                    <i class="fas fa-check"></i> Duyệt / Giao đồ
+                  <button
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'SUCCESSFUL')"
+                    class="item-detail-btn item-detail-btn-success"
+                  >
+                    <i class="fas fa-check" aria-hidden="true"></i> Duyệt / Giao đồ
                   </button>
-                  <button (click)="reviewClaim(claim._id, 'REJECTED')"
-                          class="px-4 py-2 text-white text-sm font-semibold rounded-lg transition-all flex items-center gap-2"
-                          style="background: #ef4444; box-shadow: 0 2px 8px rgba(239,68,68,0.3);">
-                    <i class="fas fa-times"></i> Từ chối
+                  <button
+                    type="button"
+                    (click)="reviewClaim(claim._id, 'REJECTED')"
+                    class="item-detail-btn item-detail-btn-danger"
+                  >
+                    <i class="fas fa-times" aria-hidden="true"></i> Từ chối
                   </button>
                 </div>
               </div>
@@ -278,71 +206,86 @@
         </div>
       </section>
 
-      <!-- Sidebar -->
-      <aside class="lg:w-80 flex-shrink-0">
-        
-        <!-- Claim Button Card -->
-        <div *ngIf="isClaimButtonVisible()" class="rounded-2xl p-6 mb-6" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-              <i class="fas fa-hand-holding-heart text-white text-lg"></i>
-            </div>
-            <h3 class="text-lg font-bold" style="color: #1e293b;">Yêu cầu xác minh</h3>
-          </div>
-          <p class="text-sm mb-5" style="color: #64748b;">
-            Nếu bạn nghĩ đây là đồ của mình, hãy gửi yêu cầu claim về món đồ này.
+      <!-- Right column: sidebar -->
+      <aside class="item-detail-sidebar">
+        <!-- Card: Gửi yêu cầu xác minh -->
+        <div *ngIf="isClaimButtonVisible() || isOwner()" class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Gửi yêu cầu xác minh</h3>
+          <p class="item-detail-sidebar-desc">
+            Nếu bạn nghĩ đây là đồ của mình, hãy gửi yêu cầu xác minh về món đồ này.
           </p>
           <button
             type="button"
             (click)="handleClaimClick()"
-            [disabled]="authService.isLoggedIn && (isClaimButtonDisabled() || isSubmitting)"
-            class="w-full disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold px-4 py-3 rounded-xl text-sm flex justify-center items-center transition-all"
-            [ngStyle]="{'background': hasClaimed ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #1e293b 0%, #334155 100%)', 'box-shadow': hasClaimed ? '0 4px 14px rgba(16,185,129,0.3)' : '0 4px 14px rgba(30,41,59,0.3)'}"
+            [disabled]="isOwner() || isClaimButtonDisabled() || isSubmitting"
+            [ngClass]="{
+              'item-detail-btn-claim': true,
+              'item-detail-btn-claim-submitted': hasClaimed,
+              'item-detail-btn-claim-disabled': isOwner() || isClaimButtonDisabled() || isSubmitting
+            }"
           >
-            <i *ngIf="isSubmitting" class="fas fa-spinner fa-spin mr-2"></i>
-            <i *ngIf="hasClaimed && !isSubmitting" class="fas fa-check-circle mr-2"></i>
-            {{ isSubmitting ? "Đang gửi yêu cầu..." : hasClaimed ? "Đã gửi yêu cầu" : "Gửi yêu cầu Claim" }}
+            <i *ngIf="isSubmitting" class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
+            <i *ngIf="hasClaimed && !isSubmitting" class="fas fa-check-circle" aria-hidden="true"></i>
+            {{
+              isSubmitting
+                ? "Đang gửi yêu cầu..."
+                : hasClaimed
+                  ? "Đã gửi yêu cầu"
+                  : isOwner()
+                    ? "Bạn là chủ bài đăng"
+                    : "Gửi yêu cầu xác minh"
+            }}
           </button>
-          <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="mt-3 text-xs text-center px-3 py-2 rounded-lg" style="background: #fffbeb; color: #d97706;">
-            <i class="fas fa-exclamation-triangle mr-1"></i> Bạn đã đạt giới hạn yêu cầu
+          <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="item-detail-claim-limit">
+            Bạn đã đạt giới hạn yêu cầu
           </p>
         </div>
 
-        <!-- Post Info Card -->
-        <div class="rounded-2xl p-6" style="background: white; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
-          <h3 class="text-lg font-bold mb-5 flex items-center gap-2" style="color: #1e293b;">
-            <i class="fas fa-info-circle" style="color: #64748b;"></i>
-            Thông tin đăng
-          </h3>
-          <div class="space-y-4">
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: #f1f5f9;">
-                <i class="fas fa-user text-sm" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs" style="color: #94a3b8;">Người đăng</p>
-                <p class="font-medium text-sm" style="color: #334155;">{{ item.created_by }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: #f1f5f9;">
-                <i class="fas fa-calendar-plus text-sm" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs" style="color: #94a3b8;">Ngày đăng</p>
-                <p class="font-medium text-sm" style="color: #334155;">{{ formatDate(item.created_at) }}</p>
-              </div>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background: #f1f5f9;">
-                <i class="fas fa-sync-alt text-sm" style="color: #64748b;"></i>
-              </div>
-              <div>
-                <p class="text-xs" style="color: #94a3b8;">Cập nhật</p>
-                <p class="font-medium text-sm" style="color: #334155;">{{ formatDate(item.updated_at) }}</p>
-              </div>
-            </div>
+        <!-- Card: Thông tin đăng -->
+        <div class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Thông tin đăng</h3>
+          <ul class="item-detail-sidebar-list">
+            <li><span class="item-detail-sidebar-label">Người đăng</span><span class="item-detail-sidebar-value">{{ item.created_by || '—' }}</span></li>
+            <li><span class="item-detail-sidebar-label">Lượt xem</span><span class="item-detail-sidebar-value">{{ item.view_count != null ? item.view_count : 0 }}</span></li>
+            <li><span class="item-detail-sidebar-label">Ngày đăng</span><span class="item-detail-sidebar-value">{{ formatDate(item.created_at) }}</span></li>
+            <li><span class="item-detail-sidebar-label">Cập nhật</span><span class="item-detail-sidebar-value">{{ formatDate(item.updated_at) }}</span></li>
+          </ul>
+          <div *ngIf="isOwner()" class="item-detail-sidebar-close">
+            <button type="button" (click)="closePost()" class="item-detail-btn item-detail-btn-secondary item-detail-btn-block">
+              <i class="fas fa-lock" aria-hidden="true"></i> Đóng bài đăng
+            </button>
           </div>
+        </div>
+
+        <!-- Card: Bài đăng liên quan -->
+        <div *ngIf="relatedItems.length > 0" class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">Các bài đăng liên quan</h3>
+          <p class="item-detail-sidebar-desc">Cùng danh mục hoặc khu vực</p>
+          <div class="item-detail-related-list">
+            <a
+              *ngFor="let rel of relatedItems"
+              [routerLink]="['/items', rel._id]"
+              class="item-detail-related-item"
+            >
+              <div class="item-detail-related-thumb">
+                <img *ngIf="rel.images && rel.images[0]" [src]="rel.images[0]" [alt]="rel.title" class="item-detail-related-thumb-img" />
+                <div *ngIf="!rel.images || !rel.images.length" class="item-detail-related-thumb-placeholder">
+                  <i class="fas fa-image" aria-hidden="true"></i>
+                </div>
+              </div>
+              <div class="item-detail-related-content">
+                <span class="item-detail-related-badge" [ngClass]="getRelatedStatusClass(rel.status)">{{ getRelatedStatusLabel(rel.status) }}</span>
+                <p class="item-detail-related-title">{{ rel.title }}</p>
+                <p class="item-detail-related-meta">{{ rel.category }} · {{ rel.location_text | slice:0:30 }}{{ (rel.location_text?.length || 0) > 30 ? '…' : '' }}</p>
+              </div>
+              <i class="fas fa-chevron-right item-detail-related-arrow" aria-hidden="true"></i>
+            </a>
+          </div>
+        </div>
+
+        <!-- Empty state: không có bài liên quan -->
+        <div *ngIf="relatedItems.length === 0 && !isLoading && item" class="item-detail-sidebar-card item-detail-sidebar-empty">
+          <p class="item-detail-empty-text">Chưa có bài đăng liên quan.</p>
         </div>
       </aside>
     </div>

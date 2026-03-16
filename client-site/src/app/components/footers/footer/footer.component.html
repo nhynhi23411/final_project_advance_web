@@ -1,109 +1,61 @@
-<footer class="relative bg-blueGray-200 pt-8 pb-6">
-  <div
-    class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-    style="transform: translateZ(0)"
-  >
-    <svg
-      class="absolute bottom-0 overflow-hidden"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="none"
-      version="1.1"
-      viewBox="0 0 2560 100"
-      x="0"
-      y="0"
-    >
-      <polygon
-        class="text-blueGray-200 fill-current"
-        points="2560 0 2560 100 0 100"
-      ></polygon>
-    </svg>
-  </div>
-  <div class="container mx-auto px-4">
-    <div class="flex flex-wrap text-center lg:text-left">
-      <div class="w-full lg:w-6/12 px-4">
-        <h4 class="text-3xl font-semibold">
-          Hệ thống tìm đồ thất lạc
-        </h4>
-        <h5 class="text-lg mt-0 mb-2 text-blueGray-600">
-          Đề tài: Xây dựng website hỗ trợ đăng tin tìm kiếm và trả lại đồ thất lạc
-          cho sinh viên và người dùng.
-        </h5>
-        <p class="mt-4 text-blueGray-500 text-sm">
-          Ứng dụng cho phép người dùng đăng tin nhặt được/mất đồ, tìm kiếm theo khu vực
-          và kết nối giữa người nhặt được với người bị mất một cách nhanh chóng, minh bạch.
-        </p>
-        <div class="mt-6 lg:mb-0 mb-6">
-          <button
-            class="bg-white text-blueGray-700 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
-            type="button"
-          >
-            <i class="fas fa-university"></i>
-          </button>
-          <button
-            class="bg-white text-blueGray-700 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
-            type="button"
-          >
-            <i class="fas fa-users"></i>
-          </button>
-          <button
-            class="bg-white text-blueGray-700 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
-            type="button"
-          >
-            <i class="fas fa-envelope"></i>
-          </button>
+<footer class="footer-uel">
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <!-- Cột 1: Logo + tên + mô tả -->
+      <div class="footer-col footer-brand-col">
+        <div class="footer-brand">
+          <span class="footer-brand-box">LF</span>
+          <span class="footer-brand-name">Hệ thống tìm đồ thất lạc</span>
         </div>
+        <p class="footer-desc">
+          Hỗ trợ đăng tin đồ thất lạc và đồ nhặt được. Kết nối người mất đồ và người nhặt được nhanh chóng, minh bạch.
+        </p>
       </div>
-      <div class="w-full lg:w-6/12 px-4">
-        <div class="flex flex-wrap items-top mb-6">
-          <div class="w-full lg:w-6/12 px-4 ml-auto">
-            <span
-              class="block uppercase text-blueGray-500 text-sm font-semibold mb-2"
-            >
-              Thông tin nhóm
-            </span>
-            <ul class="list-unstyled text-left lg:text-left">
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Nhóm: <span class="font-normal">Nhóm 5 - PTDL</span>
-              </li>
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Môn học: <span class="font-normal">Phát triển Ứng dụng Web nâng cao</span>
-              </li>
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Giảng viên hướng dẫn: <span class="font-normal">[Cập nhật tên GV]</span>
-              </li>
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Thành viên nhóm: <span class="font-normal">[Cập nhật danh sách]</span>
-              </li>
-            </ul>
-          </div>
-          <div class="w-full lg:w-6/12 px-4">
-            <span
-              class="block uppercase text-blueGray-500 text-sm font-semibold mb-2"
-            >
-              Thông tin liên hệ
-            </span>
-            <ul class="list-unstyled text-left lg:text-left">
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Trường: <span class="font-normal">[Tên trường/khoa]</span>
-              </li>
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Email nhóm: <span class="font-normal">[email nhóm]</span>
-              </li>
-              <li class="text-blueGray-600 font-semibold pb-2 text-sm">
-                Học kỳ/Năm học: <span class="font-normal">[HK - Năm học]</span>
-              </li>
-            </ul>
-          </div>
+      <!-- Cột 2: Liên kết nhanh -->
+      <div class="footer-col">
+        <h5 class="footer-heading">Liên kết nhanh</h5>
+        <ul class="footer-list">
+          <li><a [routerLink]="['/']" class="footer-link">Trang chủ</a></li>
+          <li><a [routerLink]="['/posts']" class="footer-link">Tất cả bài đăng</a></li>
+          <li><a [routerLink]="['/post-item']" class="footer-link">Đăng tin mới</a></li>
+          <li><a [routerLink]="['/about']" class="footer-link">Về chúng tôi</a></li>
+        </ul>
+      </div>
+      <!-- Cột 3: Hỗ trợ -->
+      <div class="footer-col">
+        <h5 class="footer-heading">Hỗ trợ</h5>
+        <ul class="footer-list">
+          <li><a [routerLink]="['/guide-posting']" class="footer-link">Hướng dẫn đăng tin</a></li>
+          <li><a [routerLink]="['/return-process']" class="footer-link">Quy trình nhận lại đồ</a></li>
+          <li><a href="mailto:support@timdothatlac.edu.vn" class="footer-link">Liên hệ hỗ trợ</a></li>
+        </ul>
+        <p class="footer-hours">T2 – T6, 8h00 – 17h00</p>
+      </div>
+      <!-- Cột 4: Liên hệ + mạng xã hội -->
+      <div class="footer-col">
+        <h5 class="footer-heading">Liên hệ</h5>
+        <ul class="footer-list footer-contact-list">
+          <li>
+            <i class="fas fa-envelope footer-icon" aria-hidden="true"></i>
+            <a href="mailto:support@timdothatlac.edu.vn" class="footer-link">support@timdothatlac.edu.vn</a>
+          </li>
+          <li>
+            <i class="fas fa-phone footer-icon" aria-hidden="true"></i>
+            <span>028 1234 5678</span>
+          </li>
+          <li>
+            <i class="fas fa-map-marker-alt footer-icon" aria-hidden="true"></i>
+            <span>Phòng 101, Tòa nhà A, Khu vực trường Đại học</span>
+          </li>
+        </ul>
+        <div class="footer-social">
+          <a href="#" class="footer-social-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="mailto:support@timdothatlac.edu.vn" class="footer-social-btn" aria-label="Email"><i class="fas fa-envelope"></i></a>
         </div>
       </div>
     </div>
-    <hr class="my-6 border-blueGray-300" />
-    <div class="flex flex-wrap items-center md:justify-between justify-center">
-      <div class="w-full md:w-4/12 px-4 mx-auto text-center">
-        <div class="text-sm text-blueGray-500 font-semibold py-1">
-          Copyright © {{ date }} - Đề tài "Web tìm đồ thất lạc" - Nhóm 5 PTDL.
-        </div>
-      </div>
+    <div class="footer-bottom">
+      <p class="footer-copyright">Copyright © {{ date }} — Hệ thống tìm đồ thất lạc. Đề tài Phát triển Ứng dụng Web nâng cao — Nhóm 5 PTDL.</p>
     </div>
   </div>
 </footer>

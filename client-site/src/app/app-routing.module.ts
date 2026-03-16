@@ -15,6 +15,11 @@ import { PostItemComponent } from "./views/post-item/post-item.component";
 import { ItemDetailComponent } from "./views/item-detail/item-detail.component";
 import { PostsComponent } from "./views/posts/posts.component";
 import { SuggestionsComponent } from "./views/suggestions/suggestions.component";
+import { AboutComponent } from "./views/about/about.component";
+import { ArchiveComponent } from "./views/archive/archive.component";
+import { GuidePostingComponent } from "./views/guide-posting/guide-posting.component";
+import { ReturnProcessComponent } from "./views/return-process/return-process.component";
+import { TermsComponent } from "./views/terms/terms.component";
 
 import { AuthGuard } from "./guards/auth.guard";
 
@@ -31,9 +36,14 @@ const routes: Routes = [
   },
   // application views
   { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
+  { path: "archive", component: ArchiveComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent },
   { path: "posts", component: PostsComponent },
-  { path: "suggestions", component: SuggestionsComponent, canActivate: [AuthGuard] },
+  { path: "suggestions", component: SuggestionsComponent },
+  { path: "about", component: AboutComponent },
+  { path: "guide-posting", component: GuidePostingComponent },
+  { path: "return-process", component: ReturnProcessComponent },
+  { path: "terms", component: TermsComponent },
   { path: "items/:id", component: ItemDetailComponent },
   // landing page becomes home
   { path: "", component: LandingComponent },

@@ -1,136 +1,210 @@
-<app-auth-navbar></app-auth-navbar>
+<div class="post-item-page">
+  <div class="post-item-wrap">
+    <!-- Back link -->
+    <button type="button" class="post-item-back" (click)="goBack()">
+      <i class="fas fa-arrow-left"></i>
+      <span>Quay lại</span>
+    </button>
 
-<main class="post-item-page">
-    <div class="container mx-auto px-4">
-        <div class="max-w-xl mx-auto">
-
-            <div *ngIf="submitSuccess"
-                class="mb-6 p-6 bg-emerald-50 border border-emerald-300 rounded-lg text-center shadow-md">
-                <div class="flex items-center justify-center mb-3">
-                    <div class="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center">
-                        <i class="fas fa-check text-white text-2xl"></i>
-                    </div>
-                </div>
-                <h3 class="text-lg font-bold text-emerald-700 mb-1">Đăng tin thành công!</h3>
-                <p class="text-sm text-emerald-600 mb-2">Bài đăng của bạn đang chờ kiểm duyệt.</p>
-                <p class="text-xs text-blueGray-400">Bạn sẽ được chuyển về trang chủ sau vài giây...
-                    <a routerLink="/" class="text-lightBlue-500 underline font-semibold ml-1">Về trang chủ ngay</a>
-                </p>
-            </div>
-
-            <div *ngIf="submitError"
-                class="mb-6 p-4 bg-red-50 border border-red-300 rounded-lg text-red-600 font-semibold text-sm">
-                {{ submitError }}
-            </div>
-
-            <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
-                        Loại bài đăng<span class="text-red-500">*</span>
-                    </label>
-                    <div class="flex gap-6">
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="radio" formControlName="type" value="LOST"
-                                class="form-radio text-lightBlue-600 w-4 h-4" />
-                            <span class="ml-2 text-sm text-blueGray-600">Tôi bị mất đồ</span>
-                        </label>
-                        <label class="inline-flex items-center cursor-pointer">
-                            <input type="radio" formControlName="type" value="FOUND"
-                                class="form-radio text-lightBlue-600 w-4 h-4" />
-                            <span class="ml-2 text-sm text-blueGray-600">Tôi nhặt được đồ</span>
-                        </label>
-                    </div>
-                    <p *ngIf="isInvalid('type')" class="text-red-500 text-xs mt-1">{{ getError('type') }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
-                        Tiêu đề<span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" formControlName="title" placeholder="Nhập tiêu đề..."
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 focus:border-lightBlue-300 transition"
-                        [class.border-red-400]="isInvalid('title')" />
-                    <div class="flex justify-between mt-1">
-                        <p *ngIf="isInvalid('title')" class="text-red-500 text-xs">{{ getError('title') }}</p>
-                        <p class="text-xs text-blueGray-400 ml-auto">
-                            {{ form.get('title')?.value?.length || 0 }}/200
-                        </p>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
-                        Danh mục sản phẩm<span class="text-red-500">*</span>
-                    </label>
-                    <select formControlName="category"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 bg-white placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 focus:border-lightBlue-300 transition appearance-none"
-                        [class.border-red-400]="isInvalid('category')">
-                        <option value="" disabled>Danh mục</option>
-                        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-                    </select>
-                    <p *ngIf="isInvalid('category')" class="text-red-500 text-xs mt-1">{{ getError('category') }}</p>
-                </div>
-
-                <div *ngFor="let field of dynamicFields" class="transition-all duration-300">
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">{{ field.label }}</label>
-                    <input *ngIf="field.type === 'text'" type="text" [formControlName]="field.key"
-                        [placeholder]="field.placeholder || ''"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition" />
-                    <textarea *ngIf="field.type === 'textarea'" [formControlName]="field.key"
-                        [placeholder]="field.placeholder || ''" rows="2"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition resize-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
-                        Địa điểm<span class="text-red-500">*</span>
-                    </label>
-                    <input type="text" formControlName="location_text" placeholder="Địa điểm"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition"
-                        [class.border-red-400]="isInvalid('location_text')" />
-                    <p *ngIf="isInvalid('location_text')" class="text-red-500 text-xs mt-1">{{ getError('location_text')
-                        }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">
-                        Thời điểm<span class="text-red-500">*</span>
-                    </label>
-                    <input type="date" formControlName="lost_found_date"
-                        [max]="maxDate"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition"
-                        [class.border-red-400]="isInvalid('lost_found_date')" />
-                    <p *ngIf="isInvalid('lost_found_date')" class="text-red-500 text-xs mt-1">{{
-                        getError('lost_found_date') }}</p>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">Nhập mô tả chi tiết</label>
-                    <textarea formControlName="description" placeholder="Mô tả chi tiết vật phẩm...." rows="4"
-                        class="w-full px-4 py-3 border border-blueGray-300 rounded-lg text-sm text-blueGray-700 placeholder-blueGray-300 focus:outline-none focus:ring-2 focus:ring-lightBlue-300 transition resize-none"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-bold text-blueGray-700 mb-2">Hình ảnh</label>
-                    <app-image-uploader #imageUploader (filesSelected)="onFilesSelected($event)"></app-image-uploader>
-                </div>
-
-                <div class="flex gap-6 pt-4 pb-2">
-                    <button type="button" (click)="resetForm()"
-                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white bg-red-500 active:bg-red-600 uppercase shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150">
-                        Xóa thông tin
-                    </button>
-                    <button type="submit" [disabled]="submitting"
-                        class="flex-1 py-2.5 rounded-full text-sm font-bold text-white bg-blueGray-700 active:bg-blueGray-600 uppercase shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150 disabled:opacity-50">
-                        <span *ngIf="!submitting">Đăng tin</span>
-                        <span *ngIf="submitting" class="inline-flex items-center">
-                            <i class="fas fa-spinner fa-spin mr-2"></i> Đang gửi...
-                        </span>
-                    </button>
-                </div>
-
-            </form>
-        </div>
+    <!-- Success message -->
+    <div *ngIf="submitSuccess" class="post-item-card post-item-success-card">
+      <div class="post-item-success-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <h2 class="post-item-success-title">Đăng tin thành công!</h2>
+      <p class="post-item-success-desc">Bài đăng của bạn đang chờ kiểm duyệt.</p>
+      <p class="post-item-success-note">
+        Bạn sẽ được chuyển về trang chủ sau vài giây…
+        <a routerLink="/" class="post-item-success-link">Về trang chủ ngay</a>
+      </p>
     </div>
-</main>
+
+    <!-- Submit error -->
+    <div *ngIf="submitError && !submitSuccess" class="post-item-error-banner">
+      <i class="fas fa-exclamation-circle"></i>
+      {{ submitError }}
+    </div>
+
+    <!-- Form -->
+    <div *ngIf="!submitSuccess" class="post-item-card post-item-form-card">
+      <header class="post-item-form-header">
+        <h1 class="post-item-form-title">Đăng tin</h1>
+        <p class="post-item-form-desc">
+          Điền thông tin món đồ bị mất hoặc nhặt được. Các trường có dấu <span class="post-item-required">*</span> là bắt buộc.
+        </p>
+      </header>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()" class="post-item-form">
+        <!-- Section A: Thông tin cơ bản -->
+        <section class="post-item-section">
+          <h2 class="post-item-section-title">
+            <i class="fas fa-info-circle"></i>
+            Thông tin cơ bản
+          </h2>
+
+          <div class="post-item-field">
+            <span class="post-item-label">Loại bài đăng <span class="post-item-required">*</span></span>
+            <div class="post-item-type-toggle" role="group" aria-label="Loại bài đăng">
+              <label class="post-item-type-option" [class.is-selected]="form.get('type')?.value === 'LOST'">
+                <input type="radio" formControlName="type" value="LOST" class="post-item-type-input" />
+                <i class="fas fa-search-location"></i>
+                <span>Tôi bị mất đồ</span>
+              </label>
+              <label class="post-item-type-option" [class.is-selected]="form.get('type')?.value === 'FOUND'">
+                <input type="radio" formControlName="type" value="FOUND" class="post-item-type-input" />
+                <i class="fas fa-hand-holding-heart"></i>
+                <span>Tôi nhặt được đồ</span>
+              </label>
+            </div>
+            <p *ngIf="isInvalid('type')" class="post-item-error-text">{{ getError('type') }}</p>
+          </div>
+
+          <div class="post-item-field">
+            <label class="post-item-label" for="post-item-title">Tiêu đề <span class="post-item-required">*</span></label>
+            <input
+              id="post-item-title"
+              type="text"
+              formControlName="title"
+              placeholder="Ví dụ: Ví da màu nâu tại thư viện"
+              class="post-item-input"
+              [class.is-invalid]="isInvalid('title')"
+            />
+            <div class="post-item-field-footer">
+              <p *ngIf="isInvalid('title')" class="post-item-error-text">{{ getError('title') }}</p>
+              <span class="post-item-char-count">{{ form.get('title')?.value?.length || 0 }}/200</span>
+            </div>
+          </div>
+
+          <div class="post-item-field">
+            <label class="post-item-label" for="post-item-category">Danh mục sản phẩm <span class="post-item-required">*</span></label>
+            <select
+              id="post-item-category"
+              formControlName="category"
+              class="post-item-select"
+              [class.is-invalid]="isInvalid('category')"
+            >
+              <option value="" disabled>Chọn danh mục</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+            <p *ngIf="isInvalid('category')" class="post-item-error-text">{{ getError('category') }}</p>
+          </div>
+
+          <div *ngFor="let field of dynamicFields" class="post-item-field">
+            <label class="post-item-label" [attr.for]="'post-item-' + field.key">{{ field.label }}</label>
+            <input
+              *ngIf="field.type === 'text'"
+              [id]="'post-item-' + field.key"
+              type="text"
+              [formControlName]="field.key"
+              [placeholder]="field.placeholder || ''"
+              class="post-item-input"
+            />
+            <textarea
+              *ngIf="field.type === 'textarea'"
+              [id]="'post-item-' + field.key"
+              [formControlName]="field.key"
+              [placeholder]="field.placeholder || ''"
+              rows="3"
+              class="post-item-textarea"
+            ></textarea>
+          </div>
+        </section>
+
+        <!-- Section B: Địa điểm và thời gian -->
+        <section class="post-item-section">
+          <h2 class="post-item-section-title">
+            <i class="fas fa-map-marker-alt"></i>
+            Địa điểm và thời gian
+          </h2>
+
+          <div class="post-item-location-block">
+            <p class="post-item-label">Địa điểm (khu vực Thủ Đức) <span class="post-item-required">*</span></p>
+            <div class="post-item-location-fields">
+              <div class="post-item-field">
+                <label class="post-item-sublabel" for="post-item-ward">Phường</label>
+                <select
+                  id="post-item-ward"
+                  formControlName="ward"
+                  class="post-item-select"
+                  [class.is-invalid]="isInvalid('ward')"
+                >
+                  <option value="" disabled>Chọn phường</option>
+                  <option *ngFor="let w of thuDucWards" [value]="w">{{ w }}</option>
+                </select>
+                <p *ngIf="isInvalid('ward')" class="post-item-error-text">{{ getError('ward') }}</p>
+              </div>
+              <div class="post-item-field">
+                <label class="post-item-sublabel" for="post-item-address">Chi tiết địa chỉ</label>
+                <input
+                  id="post-item-address"
+                  type="text"
+                  formControlName="address_detail"
+                  placeholder="Số nhà, tên đường, gần điểm dễ nhận biết..."
+                  class="post-item-input"
+                  [class.is-invalid]="isInvalid('address_detail')"
+                />
+                <p class="post-item-helper">Ví dụ: 12 Nguyễn Văn Bá, gần chợ Linh Xuân</p>
+                <p *ngIf="isInvalid('address_detail')" class="post-item-error-text">{{ getError('address_detail') }}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="post-item-field">
+            <label class="post-item-label" for="post-item-date">Thời điểm <span class="post-item-required">*</span></label>
+            <div class="post-item-date-wrap">
+              <input
+                id="post-item-date"
+                type="date"
+                formControlName="lost_found_date"
+                [max]="maxDate"
+                class="post-item-input post-item-date-input"
+                [class.is-invalid]="isInvalid('lost_found_date')"
+              />
+            </div>
+            <p *ngIf="isInvalid('lost_found_date')" class="post-item-error-text">{{ getError('lost_found_date') }}</p>
+          </div>
+        </section>
+
+        <!-- Section C: Mô tả và hình ảnh -->
+        <section class="post-item-section">
+          <h2 class="post-item-section-title">
+            <i class="fas fa-align-left"></i>
+            Mô tả và hình ảnh
+          </h2>
+
+          <div class="post-item-field">
+            <label class="post-item-label" for="post-item-desc">Mô tả chi tiết</label>
+            <textarea
+              id="post-item-desc"
+              formControlName="description"
+              placeholder="Mô tả chi tiết vật phẩm: màu sắc, đặc điểm nhận dạng, tình trạng..."
+              rows="4"
+              class="post-item-textarea post-item-textarea-lg"
+            ></textarea>
+          </div>
+
+          <div class="post-item-field">
+            <span class="post-item-label">Hình ảnh</span>
+            <p class="post-item-helper post-item-helper-upload">Tối đa 5 ảnh, mỗi ảnh ≤ 5MB. Ảnh giúp người khác nhận diện đồ vật dễ hơn.</p>
+            <div class="post-item-upload-box">
+              <i class="fas fa-cloud-upload-alt post-item-upload-icon" aria-hidden="true"></i>
+              <app-image-uploader #imageUploader (filesSelected)="onFilesSelected($event)"></app-image-uploader>
+            </div>
+          </div>
+        </section>
+
+        <!-- Actions -->
+        <div class="post-item-actions">
+          <button type="button" class="post-item-btn post-item-btn-reset" (click)="resetForm()">
+            <i class="fas fa-eraser"></i>
+            Xóa thông tin
+          </button>
+          <button type="submit" class="post-item-btn post-item-btn-submit" [disabled]="submitting">
+            <span *ngIf="!submitting"><i class="fas fa-paper-plane"></i> Đăng tin</span>
+            <span *ngIf="submitting"><i class="fas fa-spinner fa-spin"></i> Đang gửi...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

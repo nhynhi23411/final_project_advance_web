@@ -5,6 +5,42 @@ import { CATEGORIES, CATEGORY_METADATA, MetadataField } from '../../config/categ
 import { ItemService, ItemPayload } from '../../services/item.service';
 import { ImageUploaderComponent } from '../../components/image-uploader/image-uploader.component';
 
+/** Wards (phường) in Thành phố Thủ Đức, TP.HCM — predefined list. */
+export const THU_DUC_WARDS: string[] = [
+  'Phường Linh Xuân',
+  'Phường Linh Trung',
+  'Phường Linh Chiểu',
+  'Phường Linh Tây',
+  'Phường Linh Đông',
+  'Phường Bình Thọ',
+  'Phường Trường Thọ',
+  'Phường Hiệp Bình Chánh',
+  'Phường Hiệp Bình Phước',
+  'Phường Tam Bình',
+  'Phường Tam Phú',
+  'Phường Bình Chiểu',
+  'Phường Cát Lái',
+  'Phường Thạnh Mỹ Lợi',
+  'Phường An Khánh',
+  'Phường An Lợi Đông',
+  'Phường Thảo Điền',
+  'Phường An Phú',
+  'Phường Phước Long A',
+  'Phường Phước Long B',
+  'Phường Long Bình',
+  'Phường Long Thạnh Mỹ',
+  'Phường Tăng Nhơn Phú A',
+  'Phường Tăng Nhơn Phú B',
+  'Phường Phước Bình',
+  'Phường Phú Hữu',
+  'Phường Long Phước',
+  'Phường Long Trường',
+  'Phường Trường Thạnh',
+  'Phường Thủ Thiêm',
+];
+
+const LOCATION_SUFFIX = ', Thành phố Thủ Đức, TP.HCM';
+
 @Component({
     selector: 'app-post-item',
     templateUrl: './post-item.component.html',
@@ -15,6 +51,7 @@ export class PostItemComponent implements OnInit {
 
     form!: FormGroup;
     categories = CATEGORIES;
+    thuDucWards = THU_DUC_WARDS;
     dynamicFields: MetadataField[] = [];
     submitting = false;
     submitError = '';
@@ -37,7 +74,8 @@ export class PostItemComponent implements OnInit {
             type: [initialType, Validators.required],
             title: ['', [Validators.required, Validators.maxLength(200)]],
             category: ['', Validators.required],
-            location_text: ['', Validators.required],
+            ward: ['', Validators.required],
+            address_detail: ['', Validators.required],
             lost_found_date: ['', [Validators.required, this.maxDateValidator]],
             description: [''],
         });
@@ -101,11 +139,12 @@ export class PostItemComponent implements OnInit {
         this.submitSuccess = false;
 
         const raw = this.form.value;
+        const location_text = this.buildLocationText(raw.ward, raw.address_detail);
         const payload: ItemPayload = {
             type: raw.type,
             title: raw.title.trim(),
             category: raw.category,
-            location_text: raw.location_text.trim(),
+            location_text,
             lost_found_date: raw.lost_found_date ? new Date(raw.lost_found_date).toISOString() : undefined,
             description: raw.description?.trim() || undefined,
             color: raw.color?.trim() || undefined,
@@ -136,7 +175,7 @@ export class PostItemComponent implements OnInit {
     }
 
     resetForm(): void {
-        this.form.reset({ type: '', category: '' });
+        this.form.reset({ type: '', category: '', ward: '', address_detail: '' });
         this.dynamicFields = [];
         this.uploadedUrls = [];
         this.uploadedPublicIds = [];
@@ -153,10 +192,24 @@ export class PostItemComponent implements OnInit {
     getError(name: string): string {
         const ctrl = this.form.get(name);
         if (!ctrl || !ctrl.errors) return '';
-        if (ctrl.errors.required) return 'Trường này không được để trống';
+        if (ctrl.errors.required) {
+            if (name === 'ward') return 'Vui lòng chọn phường';
+            if (name === 'address_detail') return 'Vui lòng nhập chi tiết địa chỉ';
+            return 'Trường này không được để trống';
+        }
         if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
         if (ctrl.errors.maxDate) return 'Chỉ được chọn ngày hôm nay hoặc trước đó';
         return '';
+    }
+
+    /** Build single location string for backend: "[detail], [ward], Thành phố Thủ Đức, TP.HCM" */
+    private buildLocationText(ward: string, addressDetail: string): string {
+        const detail = (addressDetail || '').trim();
+        const w = (ward || '').trim();
+        if (!detail && !w) return LOCATION_SUFFIX;
+        if (!detail) return `${w}${LOCATION_SUFFIX}`;
+        if (!w) return `${detail}${LOCATION_SUFFIX}`;
+        return `${detail}, ${w}${LOCATION_SUFFIX}`;
     }
 
     get maxDate(): string {

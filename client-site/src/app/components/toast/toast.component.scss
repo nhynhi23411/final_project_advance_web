@@ -1,5 +1,7 @@
 .toast-box {
   animation: toast-fade-in 0.3s ease-out;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
 }
 
 @keyframes toast-fade-in {

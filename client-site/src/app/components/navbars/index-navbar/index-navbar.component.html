@@ -1,83 +1,35 @@
-<nav
-  class="top-0 fixed z-50 w-full flex flex-wrap items-center justify-between px-2 py-3 navbar-expand-lg bg-white shadow"
->
-  <div
-    class="container px-4 mx-auto flex flex-wrap items-center justify-between"
-  >
-    <div
-      class="w-full relative flex justify-between lg:w-auto lg:static lg:block lg:justify-start"
+<nav class="app-nav app-nav-fixed" role="navigation">
+  <div class="app-nav-inner">
+    <a [routerLink]="['/']" class="app-nav-logo">
+      <span class="app-nav-logo-icon">LF</span>
+      <span class="app-nav-logo-text">Tìm đồ thất lạc</span>
+    </a>
+    <button
+      type="button"
+      class="app-nav-toggle"
+      (click)="setNavbarOpen()"
+      aria-label="Menu"
+      [attr.aria-expanded]="navbarOpen"
     >
-      <a
-        [routerLink]="['/']"
-        class="text-blueGray-700 text-sm font-bold leading-relaxed inline-block mr-4 py-2 whitespace-nowrap uppercase"
-      >
-        Trang Chủ
-      </a>
-      <button
-        class="cursor-pointer text-xl leading-none px-3 py-1 border border-solid border-transparent rounded bg-transparent block lg:hidden outline-none focus:outline-none"
-        type="button"
-        (click)="setNavbarOpen()"
-      >
-        <i class="fas fa-bars"></i>
-      </button>
-    </div>
+      <i class="fas fa-bars"></i>
+    </button>
     <div
-      class="lg:flex flex-grow items-center"
-      [ngClass]="{ hidden: !navbarOpen, block: navbarOpen }"
-      id="example-navbar-warning"
+      class="app-nav-menu"
+      [class.is-open]="navbarOpen"
+      id="navbar-menu"
     >
-      <ul class="flex flex-col lg:flex-row list-none mr-auto">
-        <li class="flex items-center">
-          <a
-            [routerLink]="['/post-item']"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold"
-          >
-            Tạo Bài Đăng
-          </a>
-        </li>
-        <li class="flex items-center" *ngIf="authService.isLoggedIn">
-          <a
-            [routerLink]="['/suggestions']"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold"
-          >
-            Gợi ý
-          </a>
-        </li>
-        <li class="flex items-center" *ngIf="authService.isLoggedIn">
-          <a
-            [routerLink]="['/profile']"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold"
-          >
-            Hồ Sơ Cá Nhân
-          </a>
-        </li>
-      </ul>
-      <ul class="flex flex-col lg:flex-row list-none lg:ml-auto">
-        <li class="flex items-center" *ngIf="!authService.isLoggedIn">
-          <a
-            [routerLink]="['/auth/login']"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold"
-          >
-            Đăng nhập
-          </a>
-        </li>
-        <li class="flex items-center" *ngIf="!authService.isLoggedIn">
-          <a
-            [routerLink]="['/auth/register']"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold"
-          >
-            Đăng ký
-          </a>
-        </li>
-        <li class="flex items-center" *ngIf="authService.isLoggedIn">
-          <a
-            (click)="logout()"
-            class="hover:text-blueGray-500 text-blueGray-700 px-3 py-2 flex items-center text-xs uppercase font-bold cursor-pointer"
-          >
-            Đăng xuất
-          </a>
-        </li>
-      </ul>
+      <div class="app-nav-links">
+        <a [routerLink]="['/']" routerLinkActive="is-active" [routerLinkActiveOptions]="{exact: true}" class="app-nav-link">Trang chủ</a>
+        <a [routerLink]="['/posts']" routerLinkActive="is-active" class="app-nav-link">Bài đăng</a>
+        <a [routerLink]="['/post-item']" routerLinkActive="is-active" class="app-nav-link">Đăng tin</a>
+        <a [routerLink]="['/about']" routerLinkActive="is-active" class="app-nav-link">Về chúng tôi</a>
+        <a *ngIf="authService.isLoggedIn" [routerLink]="['/suggestions']" routerLinkActive="is-active" class="app-nav-link">Gợi ý</a>
+      </div>
+      <div class="app-nav-actions">
+        <a *ngIf="!authService.isLoggedIn" [routerLink]="['/auth/login']" class="app-nav-btn app-nav-btn-secondary">Đăng nhập</a>
+        <a *ngIf="!authService.isLoggedIn" [routerLink]="['/auth/register']" class="app-nav-btn app-nav-btn-primary">Đăng ký</a>
+        <a *ngIf="authService.isLoggedIn" (click)="logout()" class="app-nav-btn app-nav-btn-secondary" role="button">Đăng xuất</a>
+      </div>
     </div>
   </div>
 </nav>
