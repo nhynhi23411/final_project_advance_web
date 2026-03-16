@@ -14,6 +14,7 @@ export interface GroupedSuggestion {
   styleUrls: ['./suggestions.component.scss'],
 })
 export class SuggestionsComponent implements OnInit {
+  items: Item[] = [];
   suggestions: MatchSuggestion[] = [];
   groupedSuggestions: GroupedSuggestion[] = [];
   isLoading = false;
@@ -24,6 +25,20 @@ export class SuggestionsComponent implements OnInit {
     private itemService: ItemService,
     public authService: AuthService,
   ) {}
+
+  getItemTypeLabel(type: string | undefined): string {
+    return type === 'LOST' ? 'Bị mất' : 'Nhặt được';
+  }
+
+  getItemTypeClass(type: string | undefined): string {
+    return type === 'LOST'
+      ? 'bg-red-100 text-red-600'
+      : 'bg-emerald-100 text-emerald-600';
+  }
+
+  viewItemDetail(id: string): void {
+    this.router.navigate(['/items', id]);
+  }
 
   ngOnInit(): void {
     this.loadSuggestions();
@@ -55,11 +70,25 @@ export class SuggestionsComponent implements OnInit {
     }
     this.isLoading = true;
     this.error = null;
+
+    // 1. Tải Match Suggestions (Gợi ý chính xác từ server)
+    this.itemService.getMatchSuggestions().subscribe({
+      next: (res) => {
+        this.suggestions = res || [];
+        this.groupedSuggestions = this.groupByMyPost(this.suggestions);
+      },
+      error: (err) => {
+        console.error('Lỗi khi tải Match Suggestions:', err);
+      }
+    });
+
+    // 2. Tải Recommended Items (Gợi ý tương tự dựa trên category)
     this.itemService.getMyItems().subscribe({
       next: (myPosts) => {
         const myList = Array.isArray(myPosts) ? myPosts : [];
         const categories = [...new Set(myList.map((p) => (p.category || '').toLowerCase()).filter(Boolean))];
         const oppositeType = myList.some((p) => (p.type || p.post_type) === 'LOST') ? 'FOUND' : 'LOST';
+
         if (categories.length === 0) {
           this.itemService.getItems({ status: 'APPROVED', type: oppositeType }).subscribe({
             next: (data) => {
@@ -74,6 +103,7 @@ export class SuggestionsComponent implements OnInit {
           });
           return;
         }
+
         this.itemService.getItems({ status: 'APPROVED', type: oppositeType }).subscribe({
           next: (data) => {
             const all = Array.isArray(data) ? data : [];

@@ -123,8 +123,6 @@ export class ItemService {
 
     /** Fetch match suggestions for the current user (score > 60%). */
     getMatchSuggestions(): Observable<MatchSuggestion[]> {
-        return this.http.get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`, {
-            headers: this.authHeaders(),
-        });
+        return this.http.get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`);
     }
 }
