@@ -14,12 +14,18 @@
       <div *ngIf="error" class="sug-message sug-message-error">
         {{ error }}
       </div>
+      <h2>Đang tìm kiếm...</h2>
+      <p>Vui lòng chờ trong giây lát</p>
+    </div>
 
       <!-- Not logged in -->
       <div *ngIf="!authService.isLoggedIn" class="sug-empty-state">
         <i class="fas fa-lock sug-empty-icon" aria-hidden="true"></i>
         <p class="sug-empty-text">Vui lòng đăng nhập để xem gợi ý phù hợp với bài đăng của bạn.</p>
       </div>
+      <h2>Chưa có gợi ý</h2>
+      <p>Hệ thống chưa tìm thấy bài đăng nào giống bài của bạn.</p>
+    </div>
 
       <!-- Logged in: content -->
       <div *ngIf="authService.isLoggedIn">
@@ -77,17 +83,54 @@
             <i class="fas fa-spinner sug-spinner" aria-hidden="true"></i>
             <p class="sug-loading-text">Đang tải gợi ý...</p>
           </div>
-        </ng-template>
+        </div>
+
+        <hr class="divider">
+
+        <!-- Match List -->
+        <div class="match-list">
+          <div class="match-card" *ngFor="let s of group.matches">
+
+            <img [src]="s.matched_post?.images?.length ? s.matched_post!.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=f1f5f9&color=94a3b8&size=150'"
+                 [alt]="s.matched_post?.title"
+                 class="match-img">
+
+            <div class="match-details">
+              <h3>{{ s.matched_post?.title }}</h3>
+              <div class="match-tags">
+                <span>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
+                  {{ s.matched_post?.category }}
+                </span>
+                <span *ngIf="s.distance_km != null">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"></circle><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
+                  Cách {{ s.distance_km }} km
+                </span>
+              </div>
+            </div>
+
+            <div class="match-action">
+              <div class="score-label">Độ khớp</div>
+              <div class="score-value" [style]="getScoreColorStyle(s.score)">
+                {{ scorePercent(s.score) }}%
+              </div>
+              <button class="btn-view" (click)="goToPost(s.matched_post?._id)">
+                Xem bài
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+              </button>
+            </div>
 
         <ng-template #emptyTpl>
           <div class="sug-empty-state">
             <p class="sug-empty-text sug-empty-title">Hiện chưa có bài đăng phù hợp từ người dùng khác.</p>
             <p class="sug-empty-text">Hãy quay lại sau hoặc thử cập nhật thông tin bài đăng của bạn để nhận gợi ý.</p>
           </div>
-        </ng-template>
-      </div>
-    </div>
-  </section>
+        </div>
+
+      </section>
+    </ng-container>
+
+  </div>
 </main>
 
 <app-footer></app-footer>

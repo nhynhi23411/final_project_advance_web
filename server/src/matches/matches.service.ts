@@ -2,6 +2,9 @@ import { Injectable, Logger } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Match, MatchDocument } from "./schemas/match.schema";
+import { Post, PostDocument } from "../posts/schemas/post.schema";
+
+const MIN_SUGGESTION_SCORE = 0.6;
 
 @Injectable()
 export class MatchesService {
@@ -9,7 +12,65 @@ export class MatchesService {
 
   constructor(
     @InjectModel(Match.name) private readonly matchModel: Model<MatchDocument>,
+    @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
   ) {}
+
+  async findSuggestionsByUser(userId: string) {
+    const uid = new Types.ObjectId(userId);
+
+    const userPostIds = await this.postModel
+      .find({ created_by_user_id: uid, status: "APPROVED" })
+      .distinct("_id")
+      .exec();
+
+    if (userPostIds.length === 0) return [];
+
+    const matches = await this.matchModel
+      .find({
+        status: "ACTIVE",
+        score: { $gte: MIN_SUGGESTION_SCORE },
+        $or: [
+          { lost_post_id: { $in: userPostIds } },
+          { found_post_id: { $in: userPostIds } },
+        ],
+      })
+      .sort({ score: -1 })
+      .lean()
+      .exec();
+
+    const allPostIds = [
+      ...new Set(
+        matches.flatMap((m: any) => [
+          m.lost_post_id.toString(),
+          m.found_post_id.toString(),
+        ]),
+      ),
+    ];
+
+    const posts = await this.postModel
+      .find({ _id: { $in: allPostIds } })
+      .select("_id title post_type category images location status metadata")
+      .lean()
+      .exec();
+
+    const postMap = new Map(posts.map((p: any) => [p._id.toString(), p]));
+    const userPostIdSet = new Set(userPostIds.map((id: any) => id.toString()));
+
+    return matches.map((m: any) => {
+      const lostId = m.lost_post_id.toString();
+      const foundId = m.found_post_id.toString();
+      const isOwnerLost = userPostIdSet.has(lostId);
+
+      return {
+        _id: m._id,
+        score: m.score,
+        distance_km: m.distance_km,
+        created_at: m.created_at,
+        my_post: postMap.get(isOwnerLost ? lostId : foundId) || null,
+        matched_post: postMap.get(isOwnerLost ? foundId : lostId) || null,
+      };
+    });
+  }
 
   async upsertMatch(input: {
     lostPostId: string;

@@ -44,6 +44,7 @@ const LOCATION_SUFFIX = ', Thành phố Thủ Đức, TP.HCM';
 @Component({
     selector: 'app-post-item',
     templateUrl: './post-item.component.html',
+    styleUrls: ['./post-item.component.css'],
 })
 export class PostItemComponent implements OnInit {
     @ViewChild('imageUploader') imageUploader!: ImageUploaderComponent;

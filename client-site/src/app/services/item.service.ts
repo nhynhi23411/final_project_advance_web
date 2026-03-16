@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
@@ -47,6 +47,17 @@ export interface Item {
     created_by_user_id?: string;
     created_at: Date;
     updated_at: Date;
+    location?: { address?: string };
+    metadata?: Record<string, any>;
+}
+
+export interface MatchSuggestion {
+    _id: string;
+    score: number;
+    distance_km: number | null;
+    created_at: string;
+    my_post: Item | null;
+    matched_post: Item | null;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -55,25 +66,17 @@ export class ItemService {
 
     constructor(private http: HttpClient) { }
 
-    private authHeaders(): HttpHeaders {
-        const token = localStorage.getItem('access_token') || '';
-        return new HttpHeaders({ Authorization: `Bearer ${token}` });
-    }
-
-    /** Upload one image through backend → Cloudinary. Returns {url, publicId}. */
+    /** Upload one image through backend → Cloudinary. Returns {url, publicId}.
+     *  Authorization header is injected automatically by AuthInterceptor. */
     uploadImage(file: File): Observable<UploadResult> {
         const fd = new FormData();
         fd.append('file', file, file.name);
-        return this.http.post<UploadResult>(`${this.base}/items/upload-image`, fd, {
-            headers: this.authHeaders(),
-        });
+        return this.http.post<UploadResult>(`${this.base}/items/upload-image`, fd);
     }
 
     /** Create a new Lost / Found item post. */
     createItem(data: ItemPayload): Observable<any> {
-        return this.http.post(`${this.base}/items`, data, {
-            headers: this.authHeaders(),
-        }).pipe(
+        return this.http.post(`${this.base}/items`, data).pipe(
             catchError((err: HttpErrorResponse) => {
                 const msg = this.getApiErrorMessage(err);
                 return throwError({ message: msg } as ApiError);
@@ -110,14 +113,17 @@ export class ItemService {
 
     /** Fetch a single item by ID. */
     getItemById(id: string): Observable<Item> {
-        return this.http.get<Item>(`${this.base}/items/${id}`, {
-            headers: this.authHeaders(),
-        });
+        return this.http.get<Item>(`${this.base}/items/${id}`);
     }
 
     /** Fetch current user's posts (requires auth). */
     getMyItems(): Observable<Item[]> {
-        return this.http.get<Item[]>(`${this.base}/items/my`, {
+        return this.http.get<Item[]>(`${this.base}/items/my`);
+    }
+
+    /** Fetch match suggestions for the current user (score > 60%). */
+    getMatchSuggestions(): Observable<MatchSuggestion[]> {
+        return this.http.get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`, {
             headers: this.authHeaders(),
         });
     }
