@@ -14,123 +14,138 @@
       <div *ngIf="error" class="sug-message sug-message-error">
         {{ error }}
       </div>
-      <h2>Đang tìm kiếm...</h2>
-      <p>Vui lòng chờ trong giây lát</p>
-    </div>
 
       <!-- Not logged in -->
       <div *ngIf="!authService.isLoggedIn" class="sug-empty-state">
         <i class="fas fa-lock sug-empty-icon" aria-hidden="true"></i>
         <p class="sug-empty-text">Vui lòng đăng nhập để xem gợi ý phù hợp với bài đăng của bạn.</p>
       </div>
-      <h2>Chưa có gợi ý</h2>
-      <p>Hệ thống chưa tìm thấy bài đăng nào giống bài của bạn.</p>
-    </div>
 
       <!-- Logged in: content -->
       <div *ngIf="authService.isLoggedIn">
         <ng-container *ngIf="!isLoading; else loadingTpl">
-          <ng-container *ngIf="items.length > 0; else emptyTpl">
-            <div class="sug-grid">
-              <article *ngFor="let item of items" class="sug-card">
-                <div class="sug-card-head">
-                  <div class="sug-card-top">
-                    <span class="sug-badge-type" [ngClass]="getItemTypeClass(item.type || item.post_type)">
+          
+          <!-- Section 1: Exact Matches (Match Suggestions) -->
+          <div *ngIf="groupedSuggestions.length > 0" class="exact-matches-section mb-12">
+            <h2 class="text-2xl font-bold mb-4 text-blueGray-700">Khớp chính xác</h2>
+            <div *ngFor="let group of groupedSuggestions" class="my-post-group bg-white p-6 rounded-lg shadow-md mb-6">
+              <h3 class="font-semibold text-lg mb-4 text-blueGray-600 border-b pb-2">
+                Dựa trên tin: <span class="text-blue-600">{{ group.myPost.title }}</span>
+              </h3>
+              
+              <div class="match-list gap-4">
+                <div class="match-card border rounded p-4 flex gap-4 mb-4" *ngFor="let s of group.matches">
+                  <img [src]="s.matched_post?.images?.length ? s.matched_post!.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=f1f5f9&color=94a3b8&size=150'"
+                       [alt]="s.matched_post?.title"
+                       class="match-img w-24 h-24 object-cover rounded">
+
+                  <div class="match-details flex-1">
+                    <h4 class="font-bold text-lg mb-1">{{ s.matched_post?.title }}</h4>
+                    <div class="match-meta text-sm text-blueGray-500 mb-2">
+                      <span class="mr-3">
+                        <i class="fas fa-tag mr-1"></i> {{ s.matched_post?.category }}
+                      </span>
+                      <span *ngIf="s.distance_km != null">
+                        <i class="fas fa-map-marker-alt mr-1"></i> Cách {{ s.distance_km | number:'1.1-1' }} km
+                      </span>
+                    </div>
+                    
+                    <div class="score-display flex items-center gap-2">
+                      <span class="text-sm font-medium">Độ khớp:</span>
+                      <div class="score-bar-bg bg-gray-200 h-2 w-32 rounded overflow-hidden">
+                        <div class="score-bar-fill h-full" 
+                             [style.width.%]="scorePercent(s.score)"
+                             [ngClass]="getScoreClass(s.score)"></div>
+                      </div>
+                      <span class="score-text font-bold" [style]="getScoreColorStyle(s.score)">
+                        {{ scorePercent(s.score) }}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="match-action flex flex-col justify-center">
+                    <button class="btn-view bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition" 
+                            (click)="goToPost(s.matched_post?._id)">
+                      Xem bài
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr *ngIf="groupedSuggestions.length > 0 && items.length > 0" class="my-10 border-blueGray-200">
+
+          <!-- Section 2: Recommended Items (Similar Objects) -->
+          <div *ngIf="items.length > 0" class="recommended-section">
+            <h2 class="text-2xl font-bold mb-4 text-blueGray-700">Tin đăng liên quan</h2>
+            <div class="sug-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <article *ngFor="let item of items" class="sug-card bg-white rounded-lg shadow overflow-hidden">
+                <div class="sug-card-head p-4">
+                  <div class="sug-card-top flex justify-between items-start mb-2">
+                    <span class="sug-badge-type px-2 py-1 text-xs font-bold rounded" [ngClass]="getItemTypeClass(item.type || item.post_type)">
                       {{ getItemTypeLabel(item.type || item.post_type) }}
                     </span>
-                    <span class="sug-badge-match">Phù hợp</span>
+                    <span class="sug-badge-match text-xs text-blue-600 font-bold uppercase">Gợi ý</span>
                   </div>
-                  <span class="sug-card-time">{{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'short' }}</span>
-                  <h2 class="sug-card-title">{{ item.title }}</h2>
+                  <span class="sug-card-time text-xs text-blueGray-400 block mb-1">
+                    {{ (item.lost_found_date || item.metadata?.lost_found_date) | date:'dd/MM/yyyy' }}
+                  </span>
+                  <h2 class="sug-card-title font-bold text-lg line-clamp-1 h-7">{{ item.title }}</h2>
                 </div>
 
-                <div class="sug-card-image">
+                <div class="sug-card-image h-48 bg-gray-100 flex items-center justify-center relative">
                   <img
                     *ngIf="item.images && item.images.length && item.images[0]"
                     [src]="item.images[0]"
                     [alt]="item.title"
-                    class="sug-card-img"
+                    class="sug-card-img w-full h-full object-cover"
                   />
-                  <div *ngIf="!item.images || !item.images.length || !item.images[0]" class="sug-card-placeholder">
-                    <i class="fas fa-image" aria-hidden="true"></i>
+                  <div *ngIf="!item.images || !item.images.length || !item.images[0]" class="sug-card-placeholder text-blueGray-300 flex flex-col items-center">
+                    <i class="fas fa-image text-3xl mb-2" aria-hidden="true"></i>
                     <span>Chưa có ảnh</span>
                   </div>
                 </div>
 
-                <div class="sug-card-body">
-                  <div class="sug-meta">
-                    <div class="sug-meta-line">
-                      <i class="fas fa-map-marker-alt sug-meta-icon" aria-hidden="true"></i>
-                      <span class="sug-meta-text line-clamp-2">{{ item.location_text || item.location?.address || 'Chưa có địa điểm' }}</span>
+                <div class="sug-card-body p-4">
+                  <div class="sug-meta mb-4">
+                    <div class="sug-meta-line flex items-center text-sm text-blueGray-600 mb-1">
+                      <i class="fas fa-map-marker-alt w-5" aria-hidden="true"></i>
+                      <span class="sug-meta-text line-clamp-1 flex-1">{{ item.location_text || item.location?.address || 'Chưa có địa điểm' }}</span>
                     </div>
-                    <div class="sug-meta-line">
-                      <i class="fas fa-tag sug-meta-icon" aria-hidden="true"></i>
+                    <div class="sug-meta-line flex items-center text-sm text-blueGray-600">
+                      <i class="fas fa-tag w-5" aria-hidden="true"></i>
                       <span class="sug-meta-text">{{ item.category || '—' }} · {{ item.color || item.metadata?.color || '—' }}</span>
                     </div>
                   </div>
-                  <button type="button" (click)="viewItemDetail(item._id)" class="sug-btn-detail">
+                  <button type="button" (click)="viewItemDetail(item._id)" class="sug-btn-detail w-full bg-blueGray-700 text-white py-2 rounded hover:bg-blueGray-800 transition flex items-center justify-center gap-2">
                     Xem chi tiết
-                    <i class="fas fa-arrow-right sug-btn-icon" aria-hidden="true"></i>
+                    <i class="fas fa-arrow-right text-xs" aria-hidden="true"></i>
                   </button>
                 </div>
               </article>
             </div>
-          </ng-container>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="groupedSuggestions.length === 0 && items.length === 0" class="sug-empty-state text-center py-20">
+            <i class="fas fa-search text-5xl text-blueGray-200 mb-4"></i>
+            <p class="sug-empty-text sug-empty-title font-bold text-xl mb-2">Hiện chưa có bài đăng phù hợp.</p>
+            <p class="sug-empty-text text-blueGray-500">Hãy quay lại sau hoặc thử cập nhật thông tin bài đăng của bạn để nhận gợi ý.</p>
+          </div>
+
         </ng-container>
 
         <ng-template #loadingTpl>
-          <div class="sug-loading">
-            <i class="fas fa-spinner sug-spinner" aria-hidden="true"></i>
-            <p class="sug-loading-text">Đang tải gợi ý...</p>
+          <div class="sug-loading text-center py-20">
+            <i class="fas fa-circle-notch fa-spin text-4xl text-blue-600 mb-4" aria-hidden="true"></i>
+            <p class="sug-loading-text text-blueGray-500 font-medium">Đang tìm kiếm gợi ý phù hợp cho bạn...</p>
           </div>
-        </div>
+        </ng-template>
+      </div>
 
-        <hr class="divider">
-
-        <!-- Match List -->
-        <div class="match-list">
-          <div class="match-card" *ngFor="let s of group.matches">
-
-            <img [src]="s.matched_post?.images?.length ? s.matched_post!.images[0] : 'https://ui-avatars.com/api/?name=No+Image&background=f1f5f9&color=94a3b8&size=150'"
-                 [alt]="s.matched_post?.title"
-                 class="match-img">
-
-            <div class="match-details">
-              <h3>{{ s.matched_post?.title }}</h3>
-              <div class="match-tags">
-                <span>
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line></svg>
-                  {{ s.matched_post?.category }}
-                </span>
-                <span *ngIf="s.distance_km != null">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="10" r="3"></circle><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path></svg>
-                  Cách {{ s.distance_km }} km
-                </span>
-              </div>
-            </div>
-
-            <div class="match-action">
-              <div class="score-label">Độ khớp</div>
-              <div class="score-value" [style]="getScoreColorStyle(s.score)">
-                {{ scorePercent(s.score) }}%
-              </div>
-              <button class="btn-view" (click)="goToPost(s.matched_post?._id)">
-                Xem bài
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-              </button>
-            </div>
-
-        <ng-template #emptyTpl>
-          <div class="sug-empty-state">
-            <p class="sug-empty-text sug-empty-title">Hiện chưa có bài đăng phù hợp từ người dùng khác.</p>
-            <p class="sug-empty-text">Hãy quay lại sau hoặc thử cập nhật thông tin bài đăng của bạn để nhận gợi ý.</p>
-          </div>
-        </div>
-
-      </section>
-    </ng-container>
-
-  </div>
+    </div>
+  </section>
 </main>
 
 <app-footer></app-footer>

@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { HttpClient, HttpHeaders } from "@angular/common/http";
+import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 import { environment } from "../../../environments/environment";
 import { ItemService, Item } from "../../services/item.service";
@@ -58,9 +58,7 @@ export class ProfileComponent implements OnInit {
       return;
     }
     this.http
-      .get<{ message: string; user: MeUser }>(`${environment.apiUrl}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .get<{ message: string; user: MeUser }>(`${environment.apiUrl}/me`)
       .subscribe({
         next: (res) => {
           this.user = res.user || null;
@@ -231,9 +229,7 @@ export class ProfileComponent implements OnInit {
       phone: this.editForm.phone.trim() || undefined,
     };
     this.http
-      .patch<{ message: string; user: MeUser }>(`${environment.apiUrl}/me`, body, {
-        headers: new HttpHeaders({ Authorization: `Bearer ${token}` }),
-      })
+      .patch<{ message: string; user: MeUser }>(`${environment.apiUrl}/me`, body)
       .subscribe({
         next: (res) => {
           this.saving = false;

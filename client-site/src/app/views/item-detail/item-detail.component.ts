@@ -6,7 +6,6 @@ import { AuthService } from "../../services/auth.service";
 import { ToastService } from "../../services/toast.service";
 import {
   HttpClient,
-  HttpHeaders,
   HttpErrorResponse,
 } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
@@ -219,15 +218,10 @@ export class ItemDetailComponent implements OnInit {
     this.isSubmitting = true;
 
     try {
-      const token = localStorage.getItem("access_token");
-      const headers = new HttpHeaders({
-        Authorization: `Bearer ${token}`,
-      });
-
       const body = { post_id: this.item._id };
-
+ 
       await this.http
-        .post(`${environment.apiUrl}/claims`, body, { headers })
+        .post(`${environment.apiUrl}/claims`, body)
         .toPromise();
 
       this.onClaimSuccess();
