@@ -1,1 +1,85 @@
-// This file is intentionally left empty to allow customers to add custom CSS if needed.
+.auth-wrapper {
+    .auth-content:not(.container) {
+        width: 760px; // tăng thêm chiều rộng form đăng nhập
+        max-width: calc(100vw - 2rem);
+
+
+        .card-body {
+            padding: 60px 52px; // spacing thoáng hơn
+        }
+    }
+
+
+    .input-group {
+        .form-control {
+            font-size: 1.3rem;    // chữ trong ô nhập lớn hơn
+            height: 64px;         // input cao hơn
+            padding: 0 22px;      // khoảng cách trong input
+            line-height: 1.2;
+            border-radius: 8px;
+        }
+
+
+        .form-control::placeholder {
+            font-size: 1.15rem; // placeholder lớn hơn
+        }
+    }
+
+
+    .d-grid {
+        .btn {
+            font-size: 1.2rem;   // tăng kích thước chữ "Đăng nhập"
+            padding: 14px 20px;
+        }
+    }
+}
+
+
+@media only screen and (max-width: 767px) {
+    .auth-wrapper {
+        .auth-content:not(.container) {
+            width: 100%;
+
+
+            .card-body {
+                padding: 40px 26px;
+            }
+        }
+
+
+        .input-group {
+            .form-control {
+                font-size: 1.1rem;
+                height: 58px;
+            }
+        }
+
+
+        .d-grid {
+            .btn {
+                font-size: 1.05rem;
+            }
+        }
+    }
+}
+
+
+.auth-options {
+    .form-check-label {
+        font-size: 1.2rem;
+        color: #6c757d;
+    }
+}
+
+
+.forgot-password-link {
+    font-size: 1.2rem;
+    color: #6c757d;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+
+    &:hover {
+        color: var(--bs-primary);
+    }
+}

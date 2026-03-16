@@ -6,8 +6,10 @@ import { email, Field, form, minLength, required } from '@angular/forms/signals'
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 
+
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+
 
 @Component({
   selector: 'app-sign-in',
@@ -20,15 +22,18 @@ export class SignInComponent {
   private http = inject(HttpClient);
   private router = inject(Router);
 
+
   submitted = signal(false);
   error = signal('');
   showPassword = signal(false);
   loading = signal(false);
 
+
   loginModal = signal<{ email: string; password: string }>({
     email: '',
     password: ''
   });
+
 
   loginForm = form(this.loginModal, (schemaPath) => {
     required(schemaPath.email, { message: 'Email is required' });
@@ -37,11 +42,13 @@ export class SignInComponent {
     minLength(schemaPath.password, 8, { message: 'Password must be at least 8 characters' });
   });
 
+
   onSubmit(event: Event) {
     this.submitted.set(true);
     this.error.set('');
     this.loading.set(true);
     event.preventDefault();
+
 
     const credentials = this.loginModal();
     this.http.post<{ accessToken: string; user: any }>(`${environment.apiUrl}/auth/login`, credentials).subscribe({
@@ -74,6 +81,7 @@ export class SignInComponent {
       }
     });
   }
+
 
   togglePasswordVisibility() {
     this.showPassword.set(!this.showPassword());
