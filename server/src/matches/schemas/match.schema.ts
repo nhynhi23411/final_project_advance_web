@@ -19,6 +19,14 @@ export class Match {
   @Prop({ default: null })
   distance_km?: number;
 
+  /** text_score: combined Dice + Cosine similarity (0–1), null for manual matches */
+  @Prop({ default: null })
+  text_score?: number;
+
+  /** source: 'auto' = computed by cron job, 'manual' = triggered by Finder */
+  @Prop({ enum: ["auto", "manual"], default: "auto" })
+  source!: string;
+
   @Prop({ required: true, default: "ACTIVE" })
   status!: string;
 }

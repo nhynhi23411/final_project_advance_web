@@ -1,13 +1,10 @@
-<div
-  class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-96 overflow-y-auto overscroll-contain"
->
-  <div
-    class="px-6 py-4 flex items-center justify-between sticky top-0 border-b"
-    style="background-color: #F0F5FA; border-color: #E3E8EE"
-  >
+<div class="claim-modal-shell">
+
+  <!-- Sticky header -->
+  <div class="claim-modal-header">
     <h2 class="text-xl font-bold text-blueGray-800">
       <i class="fas fa-check-circle mr-3 text-uel-accent"></i>
-      Gửi yêu cầu xác minh
+      {{ modalTitle }}
     </h2>
     <button
       (click)="closeModal()"
@@ -19,6 +16,8 @@
     </button>
   </div>
 
+  <!-- Scrollable form body -->
+  <div class="claim-modal-scroll">
   <form [formGroup]="form" (ngSubmit)="onSubmit()" class="p-6 space-y-6">
     <!-- Error Message -->
     <div
@@ -35,7 +34,7 @@
         Ghi chú hoàn cảnh (Tùy chọn)
       </label>
       <p class="text-xs text-blueGray-500 mb-2">
-        Mô tả hoàn cảnh mất/nhặt được đồ để giúp chủ bài đăng đối chiếu thêm.
+        {{ modalDescription }}
       </p>
       <textarea
         formControlName="note"
@@ -168,8 +167,10 @@
           "
           class="mr-2"
         ></i>
-        {{ isSubmitting ? "Đang gửi…" : "Gửi yêu cầu" }}
+        {{ isSubmitting ? "Đang gửi…" : submitLabel }}
       </button>
     </div>
   </form>
-</div>
+  </div><!-- /claim-modal-scroll -->
+
+</div><!-- /claim-modal-shell -->

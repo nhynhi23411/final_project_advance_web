@@ -8,7 +8,7 @@
         <i class="fas fa-arrow-left" aria-hidden="true"></i>
         <span>Quay lại</span>
       </button>
-      <h1 class="item-detail-page-title">Chi tiết đồ thất lạc</h1>
+      <h1 class="item-detail-page-title">{{ getPageTitle() }}</h1>
       <div class="item-detail-header-spacer"></div>
     </div>
   </header>
@@ -208,35 +208,26 @@
 
       <!-- Right column: sidebar -->
       <aside class="item-detail-sidebar">
-        <!-- Card: Gửi yêu cầu xác minh -->
-        <div *ngIf="isClaimButtonVisible() || isOwner()" class="item-detail-sidebar-card">
-          <h3 class="item-detail-sidebar-title">Gửi yêu cầu xác minh</h3>
+        <div *ngIf="shouldShowPrimaryActionCard()" class="item-detail-sidebar-card">
+          <h3 class="item-detail-sidebar-title">{{ getPrimaryActionTitle() }}</h3>
           <p class="item-detail-sidebar-desc">
-            Nếu bạn nghĩ đây là đồ của mình, hãy gửi yêu cầu xác minh về món đồ này.
+            {{ getPrimaryActionDescription() }}
           </p>
           <button
             type="button"
             (click)="handleClaimClick()"
-            [disabled]="isOwner() || isClaimButtonDisabled() || isSubmitting"
+            [disabled]="isPrimaryActionDisabled()"
             [ngClass]="{
               'item-detail-btn-claim': true,
-              'item-detail-btn-claim-submitted': hasClaimed,
-              'item-detail-btn-claim-disabled': isOwner() || isClaimButtonDisabled() || isSubmitting
+              'item-detail-btn-claim-submitted': hasClaimed || hasFinderSuggestion,
+              'item-detail-btn-claim-disabled': isPrimaryActionDisabled()
             }"
           >
             <i *ngIf="isSubmitting" class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
-            <i *ngIf="hasClaimed && !isSubmitting" class="fas fa-check-circle" aria-hidden="true"></i>
-            {{
-              isSubmitting
-                ? "Đang gửi yêu cầu..."
-                : hasClaimed
-                  ? "Đã gửi yêu cầu"
-                  : isOwner()
-                    ? "Bạn là chủ bài đăng"
-                    : "Gửi yêu cầu xác minh"
-            }}
+            <i *ngIf="!isSubmitting && (hasClaimed || hasFinderSuggestion)" class="fas fa-check-circle" aria-hidden="true"></i>
+            {{ getPrimaryActionButtonLabel() }}
           </button>
-          <p *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT" class="item-detail-claim-limit">
+          <p *ngIf="!isLostItem() && activeClaimsCount >= MAX_CLAIMS_LIMIT" class="item-detail-claim-limit">
             Bạn đã đạt giới hạn yêu cầu
           </p>
         </div>

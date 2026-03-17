@@ -11,6 +11,7 @@ import {
 import { environment } from "../../../environments/environment";
 import { MatDialog } from "@angular/material/dialog";
 import { ClaimModalComponent } from "../../components/claim-modal/claim-modal.component";
+import { LinkFoundPostModalComponent } from "../../components/link-found-post-modal/link-found-post-modal.component";
 
 @Component({
   selector: "app-item-detail",
@@ -28,6 +29,8 @@ export class ItemDetailComponent implements OnInit {
   selectedImage: string | null = null;
   selectedImageIndex = 0;
   hasClaimed = false;
+  hasFinderSuggestion = false;
+  hasOwnerSuggestionForThisPost = false;
   postClaims: any[] = [];
 
   constructor(
@@ -42,28 +45,49 @@ export class ItemDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadItemDetail();
-    this.loadActiveClaimsCount();
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.resetState();
+        this.loadItemDetail(id);
+        this.loadActiveClaimsCount();
+      }
+    });
   }
 
-  loadItemDetail(): void {
-    const itemId = this.route.snapshot.paramMap.get("id");
-    if (!itemId) {
+  private resetState(): void {
+    this.item = null;
+    this.relatedItems = [];
+    this.isLoading = true;
+    this.error = null;
+    this.successMessage = null;
+    this.hasClaimed = false;
+    this.hasFinderSuggestion = false;
+    this.hasOwnerSuggestionForThisPost = false;
+    this.postClaims = [];
+    this.selectedImageIndex = 0;
+    this.selectedImage = null;
+  }
+
+  loadItemDetail(itemId?: string): void {
+    const id = itemId || this.route.snapshot.paramMap.get("id");
+    if (!id) {
       this.error = "Item ID not found";
       this.isLoading = false;
       return;
     }
+    const resolvedId = id;
 
-    this.itemService.getItemById(itemId).subscribe({
+    this.itemService.getItemById(resolvedId).subscribe({
       next: (item) => {
         this.item = item;
         this.selectedImageIndex = 0;
         this.isLoading = false;
         this.loadRelatedItems(item);
         if (this.authService.isLoggedIn) {
-          this.checkIfClaimed(itemId);
+          this.loadViewerActionState(resolvedId);
           if (this.isOwner()) {
-            this.loadClaimsForPost(itemId);
+            this.loadClaimsForPost(resolvedId);
           }
         }
       },
@@ -98,12 +122,34 @@ export class ItemDetailComponent implements OnInit {
         const active = claims.find(
           (c: any) => c.status !== "REJECTED" && c.status !== "CANCELLED",
         );
-        if (active) {
-          this.hasClaimed = true;
-        }
+        this.hasClaimed = !!active;
       },
       error: (err) => {
         console.error("Error checking claim status:", err);
+      },
+    });
+  }
+
+  loadViewerActionState(itemId: string): void {
+    this.checkIfClaimed(itemId);
+    this.itemService.getMatchSuggestions().subscribe({
+      next: (suggestions) => {
+        const list = Array.isArray(suggestions) ? suggestions : [];
+        this.hasFinderSuggestion = list.some(
+          (suggestion) =>
+            suggestion?.matched_post?._id === itemId &&
+            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) === "FOUND",
+        );
+        this.hasOwnerSuggestionForThisPost = list.some(
+          (suggestion) =>
+            suggestion?.matched_post?._id === itemId &&
+            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) === "LOST",
+        );
+      },
+      error: (err) => {
+        console.error("Error loading suggestion state:", err);
+        this.hasFinderSuggestion = false;
+        this.hasOwnerSuggestionForThisPost = false;
       },
     });
   }
@@ -171,11 +217,52 @@ export class ItemDetailComponent implements OnInit {
 
     const ownerId = this.item.created_by_user_id || this.item.created_by;
     const myId = this.authService.currentUserId;
-
-    // Ẩn bảng claim nếu user hiện tại chính là Chủ bài viết
     if (myId && ownerId && String(ownerId) === String(myId)) return false;
 
     return true;
+  }
+
+  shouldShowPrimaryActionCard(): boolean {
+    return !!this.item && this.item.status === "APPROVED" && !this.isOwner();
+  }
+
+  isLostItem(): boolean {
+    return (this.item?.type || this.item?.post_type) === "LOST";
+  }
+
+  isFoundItem(): boolean {
+    return (this.item?.type || this.item?.post_type) === "FOUND";
+  }
+
+  getPrimaryActionTitle(): string {
+    return this.isLostItem() ? "Tôi đang giữ món đồ này" : "Xác nhận quyền sở hữu";
+  }
+
+  getPrimaryActionDescription(): string {
+    if (this.isLostItem()) {
+      return "Nếu bạn đang giữ món đồ này, hãy chọn một bài nhặt được của bạn để gửi gợi ý khớp tới chủ bài mất đồ.";
+    }
+    return this.hasOwnerSuggestionForThisPost
+      ? "Bạn đã nhận được gợi ý khớp cho bài nhặt được này. Nếu đúng là đồ của bạn, hãy xác nhận để bắt đầu quy trình đối chiếu."
+      : "Nếu bạn nghĩ đây là đồ của mình, hãy xác nhận để gửi yêu cầu đối chiếu tới người đang giữ món đồ.";
+  }
+
+  isPrimaryActionDisabled(): boolean {
+    if (this.isLostItem()) {
+      return this.isSubmitting || this.hasFinderSuggestion;
+    }
+    return this.isClaimButtonDisabled() || this.isSubmitting;
+  }
+
+  getPrimaryActionButtonLabel(): string {
+    if (this.isLostItem()) {
+      if (this.isSubmitting) return "Đang gửi gợi ý...";
+      if (this.hasFinderSuggestion) return "Đã gửi gợi ý";
+      return "Tôi đang giữ món đồ này";
+    }
+    if (this.isSubmitting) return "Đang gửi xác nhận...";
+    if (this.hasClaimed) return "Đã gửi xác nhận";
+    return "Xác nhận đây là đồ của tôi";
   }
 
   goToLogin(): void {
@@ -190,11 +277,45 @@ export class ItemDetailComponent implements OnInit {
   isSubmitting = false;
 
   handleClaimClick(): void {
-    if (this.authService.isLoggedIn) {
-      this.openClaimModal();
-    } else {
+    if (!this.authService.isLoggedIn) {
       this.goToLogin();
+      return;
     }
+
+    if (this.isLostItem()) {
+      this.openLinkFoundPostModal();
+      return;
+    }
+
+    this.openClaimModal();
+  }
+
+  openLinkFoundPostModal(): void {
+    if (!this.item || this.hasFinderSuggestion) return;
+
+    const dialogRef = this.dialog.open(LinkFoundPostModalComponent, {
+      width: "760px",
+      maxWidth: "95vw",
+      disableClose: true,
+      data: { lostItem: this.item },
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { success?: boolean; createNew?: boolean }) => {
+      if (result?.createNew && this.item?._id) {
+        this.router.navigate(["/post-item"], {
+          queryParams: { type: "FOUND", linkLostId: this.item._id },
+        });
+        return;
+      }
+
+      if (result?.success) {
+        this.hasFinderSuggestion = true;
+        this.successMessage = "Đã gửi gợi ý khớp tới chủ bài mất đồ.";
+        setTimeout(() => {
+          this.successMessage = null;
+        }, 5000);
+      }
+    });
   }
 
   openClaimModal(): void {
@@ -293,6 +414,10 @@ export class ItemDetailComponent implements OnInit {
     this.router.navigate(["/"]);
   }
 
+  getPageTitle(): string {
+    return this.isFoundItem() ? "Chi tiết đồ nhặt được" : "Chi tiết đồ thất lạc";
+  }
+
   getItemTypeLabel(): string {
     return this.item?.type === "LOST" ? "Bị mất" : "Nhặt được";
   }
@@ -366,8 +491,10 @@ export class ItemDetailComponent implements OnInit {
     return this.item.images[this.selectedImageIndex] ?? this.item.images[0];
   }
 
-  formatDate(date: Date | string): string {
+  formatDate(date: Date | string | undefined | null): string {
+    if (!date) return "—";
     const d = new Date(date);
+    if (Number.isNaN(d.getTime())) return "—";
     return d.toLocaleString("vi-VN", {
       day: "2-digit",
       month: "2-digit",

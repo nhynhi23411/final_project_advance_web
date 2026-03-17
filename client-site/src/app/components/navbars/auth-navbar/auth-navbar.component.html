@@ -38,11 +38,26 @@
             </button>
             <div class="app-nav-notif-dropdown" *ngIf="notifOpen">
               <div class="app-nav-notif-title">Thông báo</div>
-              <ng-container *ngIf="notifCount > 0">
-                <div class="app-nav-notif-item"><i class="fas fa-check-circle text-emerald-500 mr-2"></i> Bài đăng của bạn đã được duyệt</div>
-                <div class="app-nav-notif-item"><i class="fas fa-bell text-uel-primary mr-2"></i> Bạn có yêu cầu xác minh mới</div>
+              <div *ngIf="notifLoading" class="app-nav-notif-item text-blueGray-400">Đang tải thông báo...</div>
+              <ng-container *ngIf="!notifLoading && notifications.length > 0">
+                <button
+                  *ngFor="let notification of notifications"
+                  type="button"
+                  class="app-nav-notif-item app-nav-notif-entry"
+                  [class.is-unread]="!notification.isRead"
+                  (click)="openNotification(notification)"
+                >
+                  <span class="app-nav-notif-icon" aria-hidden="true">
+                    <i class="fas fa-check-circle text-emerald-500"></i>
+                  </span>
+                  <span class="app-nav-notif-copy">
+                    <span class="app-nav-notif-heading">{{ notification.title }}</span>
+                    <span class="app-nav-notif-message">{{ notification.message }}</span>
+                    <span class="app-nav-notif-time">{{ notification.occurredAt | date:'HH:mm dd/MM/yyyy' }}</span>
+                  </span>
+                </button>
               </ng-container>
-              <div *ngIf="notifCount === 0" class="app-nav-notif-item text-blueGray-400">Chưa có thông báo mới</div>
+              <div *ngIf="!notifLoading && notifications.length === 0" class="app-nav-notif-item text-blueGray-400">Chưa có thông báo mới</div>
             </div>
           </div>
           <div class="app-nav-user-wrap" [class.open]="userMenuOpen">

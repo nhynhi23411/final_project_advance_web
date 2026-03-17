@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 /** Lỗi đã chuẩn hóa từ API, luôn có message */
@@ -43,6 +43,7 @@ export interface Item {
     images: string[];
     image_public_ids: string[];
     status?: string;
+    approved_at?: Date | string;
     created_by?: string;
     created_by_user_id?: string;
     created_at: Date;
@@ -54,10 +55,22 @@ export interface Item {
 export interface MatchSuggestion {
     _id: string;
     score: number;
+    text_score: number | null;
     distance_km: number | null;
+    source: 'auto' | 'manual';
     created_at: string;
     my_post: Item | null;
     matched_post: Item | null;
+}
+
+export interface ManualMatchSuggestionPayload {
+    lost_post_id: string;
+    found_post_id: string;
+}
+
+export interface ManualMatchSuggestionResult {
+    message: string;
+    created: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -108,21 +121,71 @@ export class ItemService {
                 .join('&');
             if (qs) params = '?' + qs;
         }
-        return this.http.get<Item[]>(`${this.base}/items${params}`);
+        return this.http
+            .get<Item[] | { data?: Item[] }>(`${this.base}/items${params}`)
+            .pipe(map((response) => this.normalizeItemArrayResponse(response)));
     }
 
     /** Fetch a single item by ID. */
     getItemById(id: string): Observable<Item> {
-        return this.http.get<Item>(`${this.base}/items/${id}`);
+        return this.http
+            .get<Item>(`${this.base}/items/${id}`)
+            .pipe(map((item) => this.normalizeItem(item)));
     }
 
     /** Fetch current user's posts (requires auth). */
     getMyItems(): Observable<Item[]> {
-        return this.http.get<Item[]>(`${this.base}/items/my`);
+        return this.http
+            .get<Item[] | { data?: Item[] }>(`${this.base}/items/my`)
+            .pipe(map((response) => this.normalizeItemArrayResponse(response)));
     }
 
     /** Fetch match suggestions for the current user (score > 60%). */
     getMatchSuggestions(): Observable<MatchSuggestion[]> {
-        return this.http.get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`);
+        return this.http
+            .get<MatchSuggestion[]>(`${this.base}/matches/my-suggestions`)
+            .pipe(
+                map((suggestions) =>
+                    (Array.isArray(suggestions) ? suggestions : []).map((suggestion) => ({
+                        ...suggestion,
+                        my_post: suggestion?.my_post ? this.normalizeItem(suggestion.my_post) : null,
+                        matched_post: suggestion?.matched_post ? this.normalizeItem(suggestion.matched_post) : null,
+                    }))
+                )
+            );
+    }
+
+    createManualMatchSuggestion(payload: ManualMatchSuggestionPayload): Observable<ManualMatchSuggestionResult> {
+        return this.http.post<ManualMatchSuggestionResult>(`${this.base}/matches/manual-suggestion`, payload);
+    }
+
+    private normalizeItemArrayResponse(response: Item[] | { data?: Item[] } | null | undefined): Item[] {
+        const items = Array.isArray(response)
+            ? response
+            : Array.isArray(response?.data)
+                ? response.data
+                : [];
+        return items.map((item) => this.normalizeItem(item));
+    }
+
+    private normalizeItem(item: Item | null | undefined): Item {
+        const normalizedType = item?.type || item?.post_type || 'LOST';
+        const createdAt = item?.created_at || (item as any)?.createdAt;
+        const updatedAt = item?.updated_at || (item as any)?.updatedAt;
+        const lostFoundDate = item?.lost_found_date || (item as any)?.metadata?.lost_found_date;
+        return {
+            ...(item as Item),
+            type: normalizedType,
+            post_type: item?.post_type || normalizedType,
+            created_at: createdAt,
+            updated_at: updatedAt,
+            lost_found_date: lostFoundDate,
+            color: item?.color || (item as any)?.metadata?.color || '',
+            brand: item?.brand || (item as any)?.metadata?.brand,
+            distinctive_marks: item?.distinctive_marks || (item as any)?.metadata?.distinctive_marks,
+            location_text: item?.location_text || item?.location?.address || '',
+            images: Array.isArray(item?.images) ? item!.images : [],
+            image_public_ids: Array.isArray(item?.image_public_ids) ? item!.image_public_ids : [],
+        };
     }
 }

@@ -1,0 +1,127 @@
+<div class="lfm">
+
+  <!-- ── Header ── -->
+  <div class="lfm__header">
+    <div class="lfm__header-icon">🤝</div>
+    <div class="lfm__header-text">
+      <h2 class="lfm__title">Tôi đang giữ món đồ này</h2>
+      <p class="lfm__subtitle">Sắp tìm thấy chủ nhân rồi! Chọn bài nhặt được của bạn để kết nối với người đang tìm.</p>
+    </div>
+    <button type="button" class="lfm__close" (click)="closeModal()" aria-label="Đóng">
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <!-- ── Error banner ── -->
+  <div *ngIf="error" class="lfm__error">
+    <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <!-- ── Loading state ── -->
+  <div *ngIf="isLoading" class="lfm__loading">
+    <span class="lfm__spin-circle"></span>
+    <span>Đang tải bài nhặt được của bạn…</span>
+  </div>
+
+  <!-- ── Main body: 2 zones ── -->
+  <ng-container *ngIf="!isLoading">
+    <div class="lfm__body" [class.lfm__body--empty]="myFoundPosts.length === 0">
+
+      <!-- Zone A: Owner's lost item -->
+      <div class="lfm__zone-owner">
+        <div class="lfm__zone-label">
+          <span class="lfm__badge lfm__badge--lost">🔍 Đồ cần tìm chủ nhân</span>
+        </div>
+        <div *ngIf="lostItem" class="lfm__owner-card">
+          <div class="lfm__owner-thumb">
+            <img *ngIf="lostItem.images && lostItem.images[0]" [src]="lostItem.images[0]" [alt]="lostItem.title" />
+            <div *ngIf="!lostItem.images || !lostItem.images.length" class="lfm__thumb-ph">
+              <i class="fas fa-image" aria-hidden="true"></i>
+            </div>
+          </div>
+          <div class="lfm__owner-info">
+            <p class="lfm__owner-title">{{ lostItem.title }}</p>
+            <p class="lfm__owner-meta">
+              <span *ngIf="lostItem.category"><i class="fas fa-tag" aria-hidden="true"></i> {{ lostItem.category }}</span>
+              <span *ngIf="lostItem.location_text"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ lostItem.location_text | slice:0:45 }}{{ (lostItem.location_text?.length || 0) > 45 ? '…' : '' }}</span>
+            </p>
+          </div>
+        </div>
+        <div class="lfm__connector">
+          <div class="lfm__connector-line"></div>
+          <span class="lfm__connector-icon">🔗</span>
+          <div class="lfm__connector-line"></div>
+        </div>
+        <p class="lfm__zone-hint">Ghép nối với bài nhặt được của bạn bên cạnh →</p>
+      </div>
+
+      <!-- Zone B: Finder's FOUND posts -->
+      <div class="lfm__zone-finder">
+        <div class="lfm__zone-label">
+          <span class="lfm__badge lfm__badge--found">📦 Bài nhặt được của bạn</span>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="myFoundPosts.length === 0" class="lfm__empty">
+          <div class="lfm__empty-icon">📭</div>
+          <p class="lfm__empty-title">Bạn chưa có bài nhặt được nào</p>
+          <p class="lfm__empty-desc">Hãy đăng bài nhặt được trước để gửi gợi ý ghép nối.</p>
+          <button type="button" class="lfm__btn-create-big" (click)="createNewFoundPost()">
+            <i class="fas fa-plus-circle" aria-hidden="true"></i>
+            Tạo bài nhặt được mới
+          </button>
+        </div>
+
+        <!-- Post list -->
+        <div *ngIf="myFoundPosts.length > 0" class="lfm__post-list">
+          <label
+            *ngFor="let post of myFoundPosts"
+            class="lfm__post-card"
+            [class.is-selected]="selectedFoundPostId === post._id"
+          >
+            <input type="radio" name="found-post" [value]="post._id" [(ngModel)]="selectedFoundPostId" hidden />
+            <div class="lfm__post-thumb">
+              <img *ngIf="post.images && post.images[0]" [src]="post.images[0]" [alt]="post.title" />
+              <div *ngIf="!post.images || !post.images.length" class="lfm__thumb-ph lfm__thumb-ph--sm">
+                <i class="fas fa-image" aria-hidden="true"></i>
+              </div>
+            </div>
+            <div class="lfm__post-info">
+              <p class="lfm__post-title">{{ post.title }}</p>
+              <p class="lfm__post-meta">{{ post.category || '—' }} · {{ post.location_text | slice:0:35 }}{{ (post.location_text?.length || 0) > 35 ? '…' : '' }}</p>
+            </div>
+            <div class="lfm__post-check" [class.is-visible]="selectedFoundPostId === post._id">
+              <i class="fas fa-check-circle" aria-hidden="true"></i>
+            </div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+  </ng-container>
+
+  <!-- ── Footer ── -->
+  <div class="lfm__footer" *ngIf="!isLoading && myFoundPosts.length > 0">
+    <button type="button" class="lfm__btn-secondary" (click)="createNewFoundPost()">
+      <i class="fas fa-plus" aria-hidden="true"></i>
+      Tạo bài nhặt được mới
+    </button>
+    <button
+      type="button"
+      class="lfm__btn-primary"
+      (click)="submit()"
+      [disabled]="isSubmitting || !selectedFoundPostId"
+    >
+      <ng-container *ngIf="!isSubmitting">
+        <i class="fas fa-paper-plane" aria-hidden="true"></i>
+        Gửi gợi ý cho chủ bài mất đồ
+      </ng-container>
+      <ng-container *ngIf="isSubmitting">
+        <span class="lfm__spin-inline"></span>
+        Đang gửi gợi ý…
+      </ng-container>
+    </button>
+  </div>
+
+</div>
