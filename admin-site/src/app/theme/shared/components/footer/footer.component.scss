@@ -1,4 +1,11 @@
+:host {
+  position: relative;
+  z-index: 1030;
+}
+
 footer {
+  position: relative;
+  z-index: 1030;
   background-color: #f8f9fa;
   border-top: 1px solid #e3e3e3;
   padding: 20px;

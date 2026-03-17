@@ -1,8 +1,32 @@
 .detail-header {
+  margin-bottom: 0.5rem !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+
+  > .btn {
+    margin-bottom: 0;
+  }
+
   h4 {
+    margin-bottom: 0 !important;
     color: #1f2937;
     font-weight: 700;
   }
+
+  > .d-flex {
+    row-gap: 0.4rem;
+  }
+}
+
+:host ::ng-deep app-card .card .card-header {
+  padding-top: 18px;
+  padding-bottom: 10px;
+}
+
+:host ::ng-deep app-card .card .card-body {
+  padding-top: 8px;
 }
 
 .metadata-grid {
