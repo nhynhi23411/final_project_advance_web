@@ -1,35 +1,40 @@
 .auth-wrapper {
     .auth-content:not(.container) {
-        width: 760px; // tăng thêm chiều rộng form đăng nhập
+        width: 460px;
         max-width: calc(100vw - 2rem);
 
 
         .card-body {
-            padding: 60px 52px; // spacing thoáng hơn
+            padding: 36px 30px;
+        }
+
+        .img-fluid {
+            width: 220px;
+            margin-bottom: 24px !important;
         }
     }
 
 
     .input-group {
         .form-control {
-            font-size: 1.3rem;    // chữ trong ô nhập lớn hơn
-            height: 64px;         // input cao hơn
-            padding: 0 22px;      // khoảng cách trong input
+            font-size: 0.98rem;
+            height: 50px;
+            padding: 0 16px;
             line-height: 1.2;
             border-radius: 8px;
         }
 
 
         .form-control::placeholder {
-            font-size: 1.15rem; // placeholder lớn hơn
+            font-size: 0.92rem;
         }
     }
 
 
     .d-grid {
         .btn {
-            font-size: 1.2rem;   // tăng kích thước chữ "Đăng nhập"
-            padding: 14px 20px;
+            font-size: 0.98rem;
+            padding: 11px 16px;
         }
     }
 }
@@ -42,22 +47,27 @@
 
 
             .card-body {
-                padding: 40px 26px;
+                padding: 28px 20px;
+            }
+
+            .img-fluid {
+                width: 180px;
+                margin-bottom: 20px !important;
             }
         }
 
 
         .input-group {
             .form-control {
-                font-size: 1.1rem;
-                height: 58px;
+                font-size: 0.95rem;
+                height: 46px;
             }
         }
 
 
         .d-grid {
             .btn {
-                font-size: 1.05rem;
+                font-size: 0.95rem;
             }
         }
     }
@@ -66,14 +76,14 @@
 
 .auth-options {
     .form-check-label {
-        font-size: 1.2rem;
+        font-size: 0.9rem;
         color: #6c757d;
     }
 }
 
 
 .forgot-password-link {
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     color: #6c757d;
     text-decoration: none;
     transition: color 0.2s ease;
