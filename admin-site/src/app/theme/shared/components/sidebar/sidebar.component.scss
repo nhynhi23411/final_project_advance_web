@@ -1,10 +1,11 @@
 .pcoded-navbar {
   margin-top: 0;
   height: 100vh;
-  transition: all 0.28s ease;
-  border-right: 1px solid #e9eef5;
+  width: 240px;
+  transition: width 0.25s ease, box-shadow 0.25s ease;
+  border-right: 1px solid #e6edf5;
   background: #ffffff;
-  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
 
   &.navbar-collapsed {
     width: 72px;
@@ -18,19 +19,19 @@
     }
 
     .pcoded-navbar-nav {
-      padding-left: 8px;
-      padding-right: 8px;
+      padding-left: 6px;
+      padding-right: 6px;
 
       .nav-item {
         .nav-link {
           justify-content: center;
-          padding: 10px;
+          padding: 10px 8px;
         }
 
         &.active > .nav-link {
           border-left-width: 0;
-          padding-left: 10px;
-          box-shadow: inset 0 0 0 1px #d4e4ff;
+          padding-left: 8px;
+          box-shadow: inset 0 0 0 1px #cfe0ff;
         }
       }
 
@@ -44,24 +45,25 @@
   .scroll-div {
     height: 100%;
     overflow-y: auto;
-    padding: calc(var(--admin-layout-header-height, 92px) + 8px) 0 14px;
+    padding: calc(var(--admin-layout-header-height, 70px) + 12px) 8px 16px;
   }
 
   .pcoded-navbar-nav {
     list-style: none;
-    padding: 0 10px;
+    padding: 0;
     margin: 0;
 
     .nav-item {
-      margin: 2px 0;
+      margin: 0 0 6px;
 
       &.active {
         > .nav-link {
-          background-color: #eaf3ff;
-          color: #1d5fbe;
+          background-color: #e8f0ff;
+          color: #1d4ed8;
           font-weight: 600;
-          border-left: 3px solid #2a72df;
-          padding-left: 11px;
+          border-left: 3px solid #3b82f6;
+          box-shadow: inset 0 0 0 1px #cfe0ff;
+          padding-left: 10px;
         }
       }
 
@@ -72,22 +74,24 @@
         padding: 10px 12px;
         color: #334155;
         text-decoration: none;
-        transition: all 0.2s ease;
+        transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
         position: relative;
         border-radius: 10px;
+        border: 1px solid transparent;
 
         &:hover {
-          background-color: #f4f7fb;
+          background-color: #f6f9ff;
           color: #0f172a;
-          transform: translateX(1px);
+          border-color: #e6edf6;
         }
 
         .pcoded-micon {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 20px;
+          width: 18px;
           margin-right: 0;
+          color: #64748b;
 
           i {
             font-size: 16px;
@@ -101,6 +105,7 @@
           text-overflow: ellipsis;
           font-size: 13px;
           font-weight: 500;
+          line-height: 1.4;
         }
 
         .pcoded-arrow {
@@ -121,7 +126,7 @@
 
       .pcoded-submenu {
         list-style: none;
-        padding: 4px 0 2px;
+        padding: 4px 0 0;
         margin: 0 0 4px;
         background-color: transparent;
 
@@ -147,10 +152,10 @@
   @media (max-width: 768px) {
     position: fixed;
     left: -100%;
-    top: var(--admin-layout-header-height, 92px);
+    top: var(--admin-layout-header-height, 70px);
     margin-top: 0;
     width: 260px;
-    height: calc(100vh - var(--admin-layout-header-height, 92px));
+    height: calc(100vh - var(--admin-layout-header-height, 70px));
     z-index: 1040;
     background: #ffffff;
     box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22);
@@ -175,7 +180,7 @@
     top: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(15, 23, 42, 0.32);
     z-index: 1035;
   }
 }

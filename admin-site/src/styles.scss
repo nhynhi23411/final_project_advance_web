@@ -52,3 +52,64 @@ File: style.css
 
 // custom
 @import 'scss/themes/custom';
+
+/* Admin dashboard design system */
+:root {
+	--space-1: 4px;
+	--space-2: 8px;
+	--space-3: 12px;
+	--space-4: 16px;
+	--space-5: 24px;
+	--space-6: 32px;
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-lg: 16px;
+	--admin-header-height: 70px;
+	--admin-surface: #ffffff;
+	--admin-surface-soft: #f8fafc;
+	--admin-border-subtle: #e6edf5;
+	--admin-text-primary: #0f172a;
+	--admin-text-secondary: #475569;
+	--admin-shadow-card: 0 6px 18px rgba(15, 23, 42, 0.06);
+}
+
+body {
+	font-family: 'Inter', 'Poppins', sans-serif;
+	color: var(--admin-text-primary);
+	background: #f5f7fb;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.main-wrapper,
+.pcoded-main-container,
+.pcoded-content,
+.page-wrapper {
+	font-family: 'Inter', 'Poppins', sans-serif;
+}
+
+.card {
+	border: 1px solid var(--admin-border-subtle);
+	border-radius: var(--radius-lg);
+	box-shadow: var(--admin-shadow-card);
+
+	.card-header {
+		padding: var(--space-4) 20px var(--space-2);
+	}
+
+	.card-body {
+		padding: var(--space-3) 20px 20px;
+	}
+}
+
+@media (max-width: 991.98px) {
+	:root {
+		--admin-header-height: 88px;
+	}
+}
+
+@media (max-width: 575.98px) {
+	:root {
+		--admin-header-height: 76px;
+	}
+}
