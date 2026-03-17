@@ -75,6 +75,18 @@ export class AdminService {
     });
   }
 
+  getNeedsUpdateItems(): Observable<Item[]> {
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
+      params: { status: 'NEEDS_UPDATE' }
+    });
+  }
+
+  getRejectedItems(): Observable<Item[]> {
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
+      params: { status: 'REJECTED' }
+    });
+  }
+
   changeStatus(
     id: string | number,
     status: PostStatus,

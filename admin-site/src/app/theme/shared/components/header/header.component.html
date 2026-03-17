@@ -1,13 +1,16 @@
-<nav class="navbar pcoded-header navbar-expand-lg navbar-light header-blue headerPos-fixed">
+<nav class="navbar pcoded-header navbar-expand-lg navbar-light">
   <div class="container-fluid">
     <!-- Logo Section -->
-    <a class="navbar-brand" href="#">
-      <i class="feather icon-layers"></i> Admin Panel
+    <a class="app-brand" [routerLink]="['/analytics']">
+      <span class="brand-logo" aria-hidden="true">
+        <i class="feather icon-layers"></i>
+      </span>
+      <span class="brand-text">Lost &amp; Found</span>
     </a>
 
     <!-- Mobile Toggle -->
     <button
-      class="btn btn-link d-lg-none"
+      class="btn btn-link sidebar-toggle-btn d-lg-none"
       type="button"
       (click)="onToggleMobileSidebar()"
       aria-label="Toggle navigation"
@@ -15,29 +18,21 @@
       <i class="feather icon-menu"></i>
     </button>
 
-    <!-- Desktop Toggle -->
-    <button
-      class="btn btn-link d-none d-lg-block"
-      type="button"
-      (click)="onToggleSidebar()"
-      aria-label="Toggle sidebar"
-    >
-      <i class="feather icon-menu"></i>
-    </button>
-
     <!-- Right Side Items -->
-    <div class="ml-auto d-flex align-items-center">
+    <div class="header-actions ms-auto d-flex align-items-center">
       <!-- User Menu -->
-      <div class="nav-item dropdown">
+      <div class="nav-item dropdown user-dropdown">
         <a
-          class="nav-link dropdown-toggle"
+          class="nav-link dropdown-toggle user-trigger"
           href="javascript:void(0)"
           role="button"
           (click)="toggleUserMenu(); $event.stopPropagation()"
           [attr.aria-expanded]="isUserMenuOpen"
         >
-          <i class="feather icon-user"></i>
-          <span class="ms-1 d-none d-sm-inline">{{ authHelper.getDisplayName() }}</span>
+          <span class="user-avatar" aria-hidden="true">
+            <i class="feather icon-user"></i>
+          </span>
+          <span class="user-name ms-1 d-none d-sm-inline">{{ authHelper.getDisplayName() }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-end" [class.show]="isUserMenuOpen">
           <div class="dropdown-header">{{ authHelper.getDisplayName() }}</div>
