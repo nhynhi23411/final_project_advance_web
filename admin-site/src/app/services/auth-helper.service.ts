@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthStateService } from './auth-state.service';
 
 export interface AdminUser {
   id: string;
@@ -13,16 +14,15 @@ export interface AdminUser {
 
 @Injectable({ providedIn: 'root' })
 export class AuthHelperService {
-  constructor(private router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authState: AuthStateService
+  ) {}
 
   getAdminUser(): AdminUser | null {
-    try {
-      const raw = localStorage.getItem('admin_user');
-      if (!raw) return null;
-      return JSON.parse(raw) as AdminUser;
-    } catch {
-      return null;
-    }
+    const snapshot = this.authState.getCurrentUserSnapshot();
+    if (!snapshot) return null;
+    return snapshot as AdminUser;
   }
 
   getDisplayName(): string {
@@ -31,8 +31,7 @@ export class AuthHelperService {
   }
 
   logout(): void {
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('admin_user');
+    this.authState.logout();
     this.router.navigate(['/login']);
   }
 }

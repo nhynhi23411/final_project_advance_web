@@ -28,6 +28,8 @@ import { ArchiveComponent } from "./views/archive/archive.component";
 import { GuidePostingComponent } from "./views/guide-posting/guide-posting.component";
 import { ReturnProcessComponent } from "./views/return-process/return-process.component";
 import { TermsComponent } from "./views/terms/terms.component";
+import { EditItemComponent } from "./views/edit-item/edit-item.component";
+import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
 
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
@@ -78,6 +80,8 @@ import { GlobalErrorHandler } from "./global-error.handler";
     GuidePostingComponent,
     ReturnProcessComponent,
     TermsComponent,
+    EditItemComponent,
+    MyClaimsComponent,
   ],
   imports: [
     BrowserModule,

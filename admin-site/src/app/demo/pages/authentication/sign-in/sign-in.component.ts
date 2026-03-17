@@ -9,6 +9,7 @@ import { environment } from 'src/environments/environment';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { AuthStateService } from 'src/app/services/auth-state.service';
 
 
 @Component({
@@ -21,6 +22,7 @@ export class SignInComponent {
   private cd = inject(ChangeDetectorRef);
   private http = inject(HttpClient);
   private router = inject(Router);
+  private authState = inject(AuthStateService);
 
 
   submitted = signal(false);
@@ -67,10 +69,7 @@ export class SignInComponent {
           this.cd.detectChanges();
           return;
         }
-        localStorage.setItem('access_token', token);
-        if (res.user) {
-          localStorage.setItem('admin_user', JSON.stringify(res.user));
-        }
+        this.authState.loginSuccess(token, res.user);
         this.router.navigate(['/analytics']);
       },
       error: (err) => {

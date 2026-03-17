@@ -9,13 +9,21 @@ import {
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { AuthStateService } from '../services/auth-state.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  constructor(private router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authState: AuthStateService
+  ) {}
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = localStorage.getItem('access_token');
+  intercept(
+    req: HttpRequest<unknown>,
+    next: HttpHandler
+  ): Observable<HttpEvent<unknown>> {
+    const token = this.authState.getToken();
+
     const authReq = token
       ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
       : req;
@@ -23,8 +31,7 @@ export class AuthInterceptor implements HttpInterceptor {
     return next.handle(authReq).pipe(
       catchError((err: HttpErrorResponse) => {
         if (err.status === 401) {
-          localStorage.removeItem('access_token');
-          localStorage.removeItem('admin_user');
+          this.authState.logout();
           this.router.navigate(['/login']);
         }
         return throwError(() => err);

@@ -102,9 +102,11 @@ export class PostsController {
 
   @Patch(":id")
   @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor("file", uploadOpts))
   async update(
     @Param("id") id: string,
     @Body() dto: UpdatePostDto,
+    @UploadedFile() file: File | undefined,
     @Request() req: { user: { userId: string } },
   ) {
     if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
@@ -121,6 +123,15 @@ export class PostsController {
     }
     if (dto.description && this.keywordService.checkProfanity(dto.description)) {
       throw new BadRequestException("Mô tả chứa từ ngữ không phù hợp");
+    }
+
+    // Nếu có file mới, upload lên Cloudinary và cập nhật dto.images / dto.image_public_ids
+    if (file?.buffer) {
+      const result = await this.cloudinary.uploadBuffer(file.buffer, {
+        folder: "lost-found",
+      });
+      dto.images = [result.secure_url];
+      dto.image_public_ids = [result.public_id];
     }
 
     return this.postsService.update(id, dto);

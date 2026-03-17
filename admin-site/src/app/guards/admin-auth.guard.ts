@@ -1,43 +1,34 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, Router } from '@angular/router';
-
-function clearAuth(): void {
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('admin_user');
-}
+import {
+  ActivatedRouteSnapshot,
+  CanActivate,
+  Router,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+import { AuthStateService } from '../services/auth-state.service';
 
 @Injectable({ providedIn: 'root' })
 export class AdminAuthGuard implements CanActivate {
-  constructor(private router: Router) {}
+  constructor(
+    private readonly router: Router,
+    private readonly authState: AuthStateService
+  ) {}
 
-  canActivate(): boolean {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      clearAuth();
-      this.router.navigate(['/login']);
-      return false;
-    }
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (payload.role !== 'ADMIN') {
-        clearAuth();
-        this.router.navigate(['/login']);
-        return false;
-      }
-
-      const now = Math.floor(Date.now() / 1000);
-      if (payload.exp && payload.exp < now) {
-        clearAuth();
-        this.router.navigate(['/login']);
-        return false;
-      }
-
-      return true;
-    } catch {
-      clearAuth();
-      this.router.navigate(['/login']);
-      return false;
-    }
+  canActivate(
+    _route: ActivatedRouteSnapshot,
+    _state: RouterStateSnapshot
+  ): Observable<boolean | UrlTree> {
+    return this.authState.isAuthenticated$.pipe(
+      take(1),
+      map((isAuthenticated) => {
+        if (isAuthenticated) {
+          return true;
+        }
+        return this.router.createUrlTree(['/login']);
+      })
+    );
   }
 }

@@ -20,6 +20,8 @@ import { ArchiveComponent } from "./views/archive/archive.component";
 import { GuidePostingComponent } from "./views/guide-posting/guide-posting.component";
 import { ReturnProcessComponent } from "./views/return-process/return-process.component";
 import { TermsComponent } from "./views/terms/terms.component";
+import { EditItemComponent } from "./views/edit-item/edit-item.component";
+import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
 
 import { AuthGuard } from "./guards/auth.guard";
 
@@ -37,6 +39,8 @@ const routes: Routes = [
   // application views
   { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "archive", component: ArchiveComponent, canActivate: [AuthGuard] },
+  { path: "edit-item/:id", component: EditItemComponent, canActivate: [AuthGuard] },
+  { path: "my-claims", component: MyClaimsComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent },
   { path: "posts", component: PostsComponent },
   { path: "suggestions", component: SuggestionsComponent },

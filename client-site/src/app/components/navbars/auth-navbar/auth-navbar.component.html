@@ -69,6 +69,7 @@
           <div class="app-nav-user-dropdown" *ngIf="userMenuOpen">
             <a routerLink="/profile" routerLinkActive="app-nav-user-item-active" [routerLinkActiveOptions]="{exact: false}" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-user" aria-hidden="true"></i><span>Profile</span></a>
             <a routerLink="/profile" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-list" aria-hidden="true"></i><span>My Posts</span></a>
+            <a routerLink="/my-claims" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-file-contract" aria-hidden="true"></i><span>My Claims</span></a>
             <a routerLink="/archive" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-archive" aria-hidden="true"></i><span>Archive</span></a>
             <hr class="app-nav-user-divider" />
             <button type="button" class="app-nav-user-item app-nav-user-item-logout" (click)="logout(); closeUserMenu()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>Đăng xuất</span></button>

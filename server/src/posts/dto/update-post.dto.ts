@@ -43,4 +43,9 @@ export class UpdatePostDto {
   @IsArray()
   @IsString({ each: true })
   images?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  image_public_ids?: string[];
 }

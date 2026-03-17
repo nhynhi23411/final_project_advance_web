@@ -244,7 +244,8 @@ export class ClaimsService {
     async findByUser(userId: string) {
         return this.claimModel
             .find({ claimant_user_id: new Types.ObjectId(userId) })
-            .sort({ createdAt: -1 });
+            .populate("target_post_id", "title status")
+            .sort({ created_at: -1 });
     }
 
     async countActive(userId: string) {

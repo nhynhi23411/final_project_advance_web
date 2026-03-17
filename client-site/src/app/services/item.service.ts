@@ -140,6 +140,21 @@ export class ItemService {
             .pipe(map((response) => this.normalizeItemArrayResponse(response)));
     }
 
+    /** Cập nhật bài đăng (PATCH /items/:id). Chấp nhận JSON thường hoặc FormData. */
+    updateItem(id: string, payload: any): Observable<Item> {
+        return this.http.patch<Item>(`${this.base}/items/${id}`, payload).pipe(
+            catchError((err: HttpErrorResponse) => {
+                const msg = this.getApiErrorMessage(err);
+                return throwError({ message: msg } as ApiError);
+            }),
+        );
+    }
+
+    /** Xóa một bài đăng của người dùng hiện tại. */
+    deleteItem(id: string): Observable<void> {
+        return this.http.delete<void>(`${this.base}/items/${id}`);
+    }
+
     /** Fetch match suggestions for the current user (score > 60%). */
     getMatchSuggestions(): Observable<MatchSuggestion[]> {
         return this.http
