@@ -132,6 +132,28 @@ export class ProfileComponent implements OnInit {
     return new Date(d).toLocaleDateString("vi-VN");
   }
 
+  /** Xóa bài đăng */
+  onDeletePost(id: string): void {
+    if (!id) return;
+    const confirmed = window.confirm("Bạn có chắc muốn xóa bài đăng này?");
+    if (!confirmed) return;
+
+    this.itemService.deleteItem(id).subscribe({
+      next: () => {
+        this.myPosts = this.myPosts.filter((p) => p._id !== id);
+        this.toastService.success("Đã xóa bài đăng.");
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa bài đăng:", err);
+        const msg =
+          err?.error?.message ||
+          err?.error?.error ||
+          "Không thể xóa bài đăng. Vui lòng thử lại.";
+        this.toastService.error(msg);
+      },
+    });
+  }
+
   goToPostItem(): void {
     this.router.navigate(["/post-item"]);
   }

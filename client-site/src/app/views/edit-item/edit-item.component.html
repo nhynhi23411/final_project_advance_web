@@ -1,0 +1,123 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="edit-item-page">
+  <section class="edit-item-card" *ngIf="!loading; else loadingTpl">
+    <h1 class="edit-item-title">Chỉnh sửa bài đăng</h1>
+
+    <div *ngIf="rejectReason" class="edit-item-alert">
+      <i class="fas fa-info-circle" aria-hidden="true"></i>
+      <div>
+        <p class="edit-item-alert-title">Admin yêu cầu cập nhật</p>
+        <p class="edit-item-alert-text">{{ rejectReason }}</p>
+      </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="edit-item-form">
+      <div class="edit-item-grid">
+        <div class="edit-item-field">
+          <label for="title">Tiêu đề</label>
+          <input id="title" type="text" formControlName="title" placeholder="Nhập tiêu đề bài đăng" />
+          <p *ngIf="form.get('title')?.invalid && form.get('title')?.touched" class="edit-item-error">
+            Tiêu đề không được để trống.
+          </p>
+        </div>
+
+        <div class="edit-item-field">
+          <label for="category">Danh mục</label>
+          <select id="category" formControlName="category">
+            <option value="">-- Chọn danh mục --</option>
+            <option *ngFor="let c of categories" [value]="c">
+              {{ c }}
+            </option>
+          </select>
+          <p *ngIf="form.get('category')?.invalid && form.get('category')?.touched" class="edit-item-error">
+            Vui lòng chọn danh mục.
+          </p>
+        </div>
+
+        <div class="edit-item-field">
+          <label for="color">Màu sắc</label>
+          <input id="color" type="text" formControlName="color" placeholder="Ví dụ: Đen, Xanh dương…" />
+        </div>
+
+        <div class="edit-item-field">
+          <label for="brand">Thương hiệu</label>
+          <input id="brand" type="text" formControlName="brand" placeholder="Ví dụ: Apple, Samsung…" />
+        </div>
+
+        <div class="edit-item-field">
+          <label for="distinctive_marks">Đặc điểm nhận dạng</label>
+          <textarea
+            id="distinctive_marks"
+            rows="3"
+            formControlName="distinctive_marks"
+            placeholder="Vết xước, sticker, dây đeo đặc biệt…"
+          ></textarea>
+        </div>
+
+        <div class="edit-item-field">
+          <label for="lost_found_date">Ngày mất / nhặt được</label>
+          <input id="lost_found_date" type="date" formControlName="lost_found_date" />
+        </div>
+
+        <div class="edit-item-field edit-item-field-full">
+          <label for="description">Mô tả chi tiết</label>
+          <textarea
+            id="description"
+            rows="4"
+            formControlName="description"
+            placeholder="Mô tả chi tiết hơn về món đồ, hoàn cảnh mất / nhặt được…"
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="edit-item-images">
+        <p class="edit-item-label">Ảnh minh họa</p>
+        <div class="edit-item-images-inner">
+          <div class="edit-item-preview" *ngIf="previewImage; else noImageTpl">
+            <img [src]="previewImage" alt="Ảnh bài đăng" />
+          </div>
+          <ng-template #noImageTpl>
+            <div class="edit-item-preview edit-item-preview-empty">
+              <i class="fas fa-image" aria-hidden="true"></i>
+              <p>Chưa có ảnh</p>
+            </div>
+          </ng-template>
+
+          <div class="edit-item-upload">
+            <label class="edit-item-upload-btn">
+              <i class="fas fa-upload" aria-hidden="true"></i>
+              <span>Chọn ảnh mới</span>
+              <input type="file" accept="image/*" (change)="onImageSelected($event)" hidden />
+            </label>
+            <p class="edit-item-upload-hint">
+              Bạn có thể giữ lại ảnh cũ hoặc chọn ảnh mới để thay thế.
+            </p>
+            <p *ngIf="uploadError" class="edit-item-error">{{ uploadError }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="edit-item-actions">
+        <button type="button" class="prof-btn prof-btn-secondary" (click)="onCancel()" [disabled]="saving">
+          Hủy
+        </button>
+        <button type="submit" class="prof-btn prof-btn-primary" [disabled]="saving || form.invalid">
+          <i *ngIf="saving" class="fas fa-spinner prof-spinner" aria-hidden="true"></i>
+          <i *ngIf="!saving" class="fas fa-save" aria-hidden="true"></i>
+          {{ saving ? "Đang lưu…" : "Lưu thay đổi" }}
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <ng-template #loadingTpl>
+    <div class="prof-loading">
+      <i class="fas fa-spinner prof-spinner" aria-hidden="true"></i>
+      <p class="prof-loading-text">Đang tải bài đăng…</p>
+    </div>
+  </ng-template>
+</main>
+
+<app-footer></app-footer>
+

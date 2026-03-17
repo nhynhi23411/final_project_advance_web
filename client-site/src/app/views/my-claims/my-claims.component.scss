@@ -1,0 +1,54 @@
+@import "../profile/profile.component.scss";
+
+.my-claims-page {
+  @extend .prof-page;
+}
+
+.my-claims-card {
+  @extend .prof-container;
+  max-width: 900px;
+  margin: 0 auto 2rem;
+}
+
+.my-claims-list {
+  @extend .prof-post-list;
+}
+
+.my-claims-item {
+  @extend .prof-post-card;
+}
+
+.my-claims-item .prof-post-main {
+  @extend .prof-post-main;
+}
+
+.my-claims-item .prof-post-title {
+  @extend .prof-post-title;
+}
+
+.my-claims-item .prof-post-meta {
+  @extend .prof-post-meta;
+}
+
+.my-claims-item .prof-post-date {
+  @extend .prof-post-date;
+}
+
+.my-claims-item .prof-post-status {
+  @extend .prof-post-status;
+}
+
+.my-claims-item .prof-post-location {
+  @extend .prof-post-location;
+}
+
+.my-claims-item .prof-post-actions {
+  @extend .prof-post-actions;
+}
+
+@media (max-width: 639px) {
+  .my-claims-card {
+    padding: 1rem;
+  }
+}
+

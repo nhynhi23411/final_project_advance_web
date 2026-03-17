@@ -168,6 +168,23 @@
               <i class="fas fa-eye" aria-hidden="true"></i>
               Xem
             </button>
+            <button
+              type="button"
+              class="prof-btn prof-btn-secondary"
+              (click)="router.navigate(['/edit-item', post._id])"
+            >
+              <i class="fas fa-pen" aria-hidden="true"></i>
+              Sửa
+            </button>
+            <button
+              type="button"
+              class="prof-btn prof-btn-secondary"
+              *ngIf="$any(post).status !== 'RETURNED'"
+              (click)="onDeletePost(post._id)"
+            >
+              <i class="fas fa-trash-alt" aria-hidden="true"></i>
+              Xóa
+            </button>
           </div>
         </article>
       </div>

@@ -4,7 +4,7 @@
   <!-- Page header -->
   <header class="item-detail-header">
     <div class="item-detail-container item-detail-header-inner">
-      <button type="button" (click)="goBack()" class="item-detail-back">
+      <button type="button" routerLink="/profile" class="item-detail-back">
         <i class="fas fa-arrow-left" aria-hidden="true"></i>
         <span>Quay lại</span>
       </button>
@@ -77,6 +77,24 @@
               <span class="item-detail-badge item-detail-badge-status" [ngClass]="getStatusUelClass()">
                 {{ getStatusLabel() }}
               </span>
+              <button
+                *ngIf="isOwner()"
+                type="button"
+                class="item-detail-btn item-detail-btn-secondary item-detail-btn-sm"
+                (click)="editItem()"
+              >
+                <i class="fas fa-pen" aria-hidden="true"></i>
+                Sửa
+              </button>
+              <button
+                *ngIf="isOwner()"
+                type="button"
+                class="item-detail-btn item-detail-btn-danger item-detail-btn-sm"
+                (click)="deleteItem()"
+              >
+                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                Xóa
+              </button>
             </div>
           </div>
 
