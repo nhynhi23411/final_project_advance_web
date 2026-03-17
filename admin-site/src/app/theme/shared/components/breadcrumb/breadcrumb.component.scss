@@ -1,1 +1,84 @@
-// This file is intentionally left empty to allow customers to add custom CSS if needed.
+:host {
+	display: block;
+}
+
+:host .page-header {
+	margin-bottom: 16px;
+	padding: 14px 20px;
+	border-radius: 14px;
+	border: 1px solid #e6edf5;
+	background: #ffffff;
+	box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+:host .page-header .page-block {
+	padding: 0;
+}
+
+:host .page-header .row {
+	--bs-gutter-x: 0;
+	--bs-gutter-y: 0;
+}
+
+:host .page-header .page-header-title h5 {
+	margin: 0 0 8px;
+	padding: 0;
+	border-bottom: 0;
+	font-size: 27px;
+	font-weight: 700;
+	line-height: 1.25;
+	color: #0f172a;
+	letter-spacing: -0.01em;
+}
+
+:host .page-header .breadcrumb {
+	margin: 0;
+	padding: 0;
+	gap: 8px;
+	align-items: center;
+}
+
+:host .page-header .breadcrumb-item {
+	font-size: 14px;
+	line-height: 1.2;
+}
+
+:host .page-header .breadcrumb-item a {
+	color: #64748b;
+	font-weight: 500;
+}
+
+:host .page-header .breadcrumb-item:first-child a {
+	color: #94a3b8;
+}
+
+:host .page-header .breadcrumb-item:first-child i {
+	font-size: 14px;
+}
+
+:host .page-header .breadcrumb-item:last-child a {
+	color: #334155;
+	font-weight: 600;
+}
+
+:host .page-header .breadcrumb-item + .breadcrumb-item::before {
+	color: #cbd5e1;
+	padding-right: 8px;
+}
+
+@media (max-width: 767px) {
+	:host .page-header {
+		padding: 12px 14px;
+		border-radius: 12px;
+		margin-bottom: 12px;
+	}
+
+	:host .page-header .page-header-title h5 {
+		font-size: 24px;
+		margin-bottom: 6px;
+	}
+
+	:host .page-header .breadcrumb-item {
+		font-size: 13px;
+	}
+}

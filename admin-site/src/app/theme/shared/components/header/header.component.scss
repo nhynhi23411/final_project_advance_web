@@ -25,7 +25,7 @@
   padding: 0 var(--space-5);
   background: rgba(255, 255, 255, 0.96);
   border-bottom: 1px solid var(--admin-border-subtle);
-  box-shadow: 0 2px 12px rgba(15, 23, 42, 0.05);
+  box-shadow: 2px 5px 12px rgba(15, 23, 42, 0.05);
   backdrop-filter: blur(8px);
   z-index: 1200;
   overflow: visible;
@@ -45,35 +45,18 @@
   .app-brand {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-3);
+    gap: 0;
     text-decoration: none;
     color: var(--admin-text-primary);
     font-weight: 700;
     margin-right: var(--space-4);
     flex-shrink: 0;
 
-    .brand-logo {
-      width: 36px;
-      height: 36px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-md);
-      color: #ffffff;
-      background: linear-gradient(135deg, #2f80ed, #56ccf2);
-      box-shadow: 0 8px 16px rgba(47, 128, 237, 0.25);
-
-      i {
-        font-size: 16px;
-      }
-    }
-
-    .brand-text {
-      line-height: 1;
-      font-size: 20px;
-      letter-spacing: 0;
-      white-space: nowrap;
-      color: var(--admin-text-primary);
+    .brand-image {
+      display: block;
+      height: 44px;
+      width: auto;
+      object-fit: contain;
     }
   }
 
@@ -216,8 +199,8 @@
     height: 88px;
     padding: 0 var(--space-4);
 
-    .app-brand .brand-text {
-      font-size: 18px;
+    .app-brand .brand-image {
+      height: 40px;
     }
 
     .sidebar-toggle-btn {
@@ -234,8 +217,8 @@
     height: 76px;
     padding: 0 var(--space-3);
 
-    .app-brand .brand-text {
-      display: none;
+    .app-brand .brand-image {
+      height: 34px;
     }
 
     .user-trigger {
