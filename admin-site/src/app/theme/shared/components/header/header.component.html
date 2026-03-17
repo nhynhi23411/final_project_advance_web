@@ -5,15 +5,26 @@
       <img src="assets/images/logo_signin.jpg" alt="Lost and Found" class="brand-image" />
     </a>
 
-    <!-- Mobile Toggle -->
-    <button
-      class="btn btn-link sidebar-toggle-btn d-lg-none"
-      type="button"
-      (click)="onToggleMobileSidebar()"
-      aria-label="Toggle navigation"
-    >
-      <i class="feather icon-menu"></i>
-    </button>
+    <!-- Header Navigation -->
+    <nav class="header-nav" aria-label="Main navigation">
+      <a
+        class="header-nav-item"
+        [routerLink]="['/analytics']"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <i class="feather icon-home" aria-hidden="true"></i>
+        <span>Dashboard</span>
+      </a>
+      <a class="header-nav-item" [routerLink]="['/users']" routerLinkActive="active">
+        <i class="feather icon-users" aria-hidden="true"></i>
+        <span>Quản lý Người Dùng</span>
+      </a>
+      <a class="header-nav-item" [routerLink]="['/moderation']" routerLinkActive="active">
+        <i class="feather icon-file-text" aria-hidden="true"></i>
+        <span>Quản lý Bài Đăng</span>
+      </a>
+    </nav>
 
     <!-- Right Side Items -->
     <div class="header-actions ms-auto d-flex align-items-center">

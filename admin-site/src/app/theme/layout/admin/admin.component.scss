@@ -16,17 +16,15 @@
   background-color: #f5f7fb;
 
   .content-area {
-    display: flex;
+    display: block;
     flex: 1;
     overflow: visible;
     min-height: calc(100vh - var(--admin-layout-header-height));
 
-    app-sidebar {
-      flex-shrink: 0;
-    }
-
     .pcoded-main-container {
       flex: 1;
+      width: 100%;
+      margin-left: 0 !important;
       overflow-y: auto;
       margin-top: var(--admin-layout-header-height);
       min-height: calc(100vh - var(--admin-layout-header-height));
@@ -43,7 +41,7 @@
 @media (max-width: 768px) {
   .main-wrapper {
     .content-area {
-      flex-direction: column;
+      display: block;
     }
   }
 }
