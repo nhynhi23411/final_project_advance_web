@@ -18,7 +18,7 @@ export interface Claim {
     user_id: string;
     evidence_text: string;
     evidence_images: string[];
-    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    status: 'PENDING' | 'APPROVED' | 'REJECTED' | 'UNDER_VERIFICATION' | 'SUCCESSFUL' | 'CANCELLED';
     created_at: Date;
     updated_at: Date;
 }
@@ -52,6 +52,11 @@ export class ClaimService {
     /** Count active claims (PENDING + APPROVED) for current user. */
     getActiveClaimsCount(): Observable<{ count: number }> {
         return this.http.get<{ count: number }>(`${this.base}/claims/count/active`);
+    }
+
+    /** Lấy toàn bộ claims của user hiện tại. */
+    getMyClaims(): Observable<Claim[]> {
+        return this.http.get<Claim[]>(`${this.base}/claims/my`);
     }
 
     /** Lấy danh sách claims của một post (Dành cho chủ bài đăng). */

@@ -42,18 +42,21 @@ export class ItemDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadItemDetail();
+    // Lắng nghe thay đổi id trên route để khi click bài liên quan, component được reload dữ liệu
+    this.route.paramMap.subscribe((params) => {
+      const itemId = params.get("id");
+      if (!itemId) {
+        this.error = "Item ID not found";
+        this.isLoading = false;
+        return;
+      }
+      this.loadItemDetail(itemId);
+    });
     this.loadActiveClaimsCount();
   }
 
-  loadItemDetail(): void {
-    const itemId = this.route.snapshot.paramMap.get("id");
-    if (!itemId) {
-      this.error = "Item ID not found";
-      this.isLoading = false;
-      return;
-    }
-
+  loadItemDetail(itemId: string): void {
+    this.isLoading = true;
     this.itemService.getItemById(itemId).subscribe({
       next: (item) => {
         this.item = item;
@@ -362,8 +365,38 @@ export class ItemDetailComponent implements OnInit {
   }
 
   getMainImageUrl(): string | null {
-    if (!this.item?.images?.length) return null;
-    return this.item.images[this.selectedImageIndex] ?? this.item.images[0];
+    if (!this.item) return null;
+    const imgs = (this.item as any).images as string[] | undefined;
+    if (!imgs || !imgs.length) return null;
+    return imgs[this.selectedImageIndex] ?? imgs[0];
+  }
+
+  /** Điều hướng sang trang chỉnh sửa bài đăng */
+  editItem(): void {
+    if (!this.item?._id) return;
+    this.router.navigate(["/edit-item", this.item._id]);
+  }
+
+  /** Xóa bài đăng ngay từ trang chi tiết */
+  deleteItem(): void {
+    if (!this.item?._id) return;
+    const confirmed = window.confirm("Bạn có chắc muốn xóa bài đăng này?");
+    if (!confirmed) return;
+
+    this.itemService.deleteItem(this.item._id).subscribe({
+      next: () => {
+        this.toastService.success("Đã xóa bài đăng.");
+        this.router.navigate(["/profile"]);
+      },
+      error: (err) => {
+        console.error("Lỗi khi xóa bài đăng:", err);
+        const msg =
+          err?.error?.message ||
+          err?.error?.error ||
+          "Không thể xóa bài đăng. Vui lòng thử lại.";
+        this.toastService.error(msg);
+      },
+    });
   }
 
   formatDate(date: Date | string): string {

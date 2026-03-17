@@ -173,4 +173,42 @@ export class PostsService extends BaseCrudService<
     const intersection = [...wordsA].filter((w) => wordsB.has(w)).length;
     return (2 * intersection) / (wordsA.size + wordsB.size);
   }
+
+  /**
+   * Ghi đè update để luôn đồng bộ lại metadata + images.
+   * Cho phép cập nhật ảnh (images, image_public_ids) và các trường mô tả cơ bản.
+   */
+  override async update(id: string, dto: UpdatePostDto): Promise<PostDocument | null> {
+    const existing = await this.model.findById(id).exec();
+    if (!existing) return null;
+
+    // Merge metadata cũ với metadata mới từ dto
+    const metadata: Record<string, any> = { ...(existing.metadata || {}) };
+    if (dto.color !== undefined) metadata.color = dto.color;
+    if (dto.brand !== undefined) metadata.brand = dto.brand;
+    if (dto.distinctive_marks !== undefined)
+      metadata.distinctive_marks = dto.distinctive_marks;
+    if (dto.lost_found_date !== undefined)
+      metadata.lost_found_date = dto.lost_found_date;
+
+    const updateDoc: any = {
+      ...dto,
+      metadata,
+    };
+
+    // Nếu client gửi images / image_public_ids thì cập nhật, nếu không giữ nguyên
+    if (dto.images) {
+      updateDoc.images = dto.images;
+    }
+    if ((dto as any).image_public_ids) {
+      updateDoc.image_public_ids = (dto as any).image_public_ids;
+    }
+
+    return this.model
+      .findByIdAndUpdate(id, updateDoc, {
+        new: true,
+        runValidators: true,
+      })
+      .exec();
+  }
 }

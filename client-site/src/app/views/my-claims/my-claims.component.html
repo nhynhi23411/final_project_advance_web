@@ -1,0 +1,69 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="my-claims-page">
+  <section class="prof-content-card my-claims-card">
+    <div class="prof-content-head">
+      <h2 class="prof-content-title">Yêu cầu xác minh của tôi</h2>
+      <a routerLink="/posts" class="prof-btn prof-btn-secondary">
+        <i class="fas fa-search" aria-hidden="true"></i>
+        Xem bài đăng
+      </a>
+    </div>
+
+    <div *ngIf="loading" class="prof-loading-inline">
+      <i class="fas fa-spinner prof-spinner" aria-hidden="true"></i>
+      <span>Đang tải…</span>
+    </div>
+
+    <div *ngIf="!loading && myClaims.length === 0" class="prof-empty prof-empty-tab">
+      <i class="fas fa-file-contract prof-empty-icon" aria-hidden="true"></i>
+      <p class="prof-empty-text">Bạn chưa gửi yêu cầu xác minh nào.</p>
+      <a routerLink="/" class="prof-btn prof-btn-primary">
+        <i class="fas fa-home" aria-hidden="true"></i>
+        Về trang chủ tìm đồ
+      </a>
+    </div>
+
+    <div *ngIf="!loading && myClaims.length > 0" class="my-claims-list">
+      <article *ngFor="let c of myClaims" class="prof-post-card my-claims-item">
+        <div class="prof-post-main">
+          <h3 class="prof-post-title">
+            <a
+              *ngIf="getPostId(c) as postId"
+              [routerLink]="['/items', postId]"
+              class="prof-link"
+            >
+              {{ getPostTitle(c) }}
+            </a>
+            <span *ngIf="!getPostId(c)">{{ getPostTitle(c) }}</span>
+          </h3>
+          <div class="prof-post-meta">
+            <span class="prof-post-date">
+              Gửi lúc: {{ formatDate(c.created_at || $any(c).createdAt) }}
+            </span>
+            <span class="prof-post-status" [ngClass]="getStatusClass(c.status)">
+              {{ getStatusLabel(c.status) }}
+            </span>
+          </div>
+          <p *ngIf="c.evidence_text" class="prof-post-location">
+            {{ c.evidence_text }}
+          </p>
+        </div>
+        <div class="prof-post-actions">
+          <button
+            type="button"
+            class="prof-btn prof-btn-secondary"
+            *ngIf="canCancel(c)"
+            (click)="onCancelClaim(c)"
+          >
+            <i class="fas fa-times-circle" aria-hidden="true"></i>
+            Hủy yêu cầu
+          </button>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<app-footer></app-footer>
+
