@@ -17,6 +17,7 @@ import { AdminModule } from "./admin/admin.module";
 import { ModerationModule } from "./moderation/moderation.module";
 import { TasksModule } from "./tasks/tasks.module";
 import { MatchesModule } from "./matches/matches.module";
+import { NotificationsModule } from "./notifications/notifications.module";
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { MatchesModule } from "./matches/matches.module";
     AuditLogModule,
     AdminModule,
     TasksModule,
+    NotificationsModule,
   ],
   controllers: [AppController, MeController],
   providers: [],

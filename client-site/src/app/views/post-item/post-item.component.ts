@@ -56,6 +56,8 @@ export class PostItemComponent implements OnInit {
     submitting = false;
     submitError = '';
     submitSuccess = false;
+    submitSuccessMessage = 'Bài đăng của bạn đang chờ kiểm duyệt.';
+    private linkLostId: string | null = null;
 
     private uploadedUrls: string[] = [];
     private uploadedPublicIds: string[] = [];
@@ -69,6 +71,7 @@ export class PostItemComponent implements OnInit {
 
     ngOnInit(): void {
         const typeParam = this.route.snapshot.queryParamMap.get('type');
+        this.linkLostId = this.route.snapshot.queryParamMap.get('linkLostId');
         const initialType = (typeParam === 'LOST' || typeParam === 'FOUND') ? typeParam : '';
         this.form = this.fb.group({
             type: [initialType, Validators.required],
@@ -155,14 +158,27 @@ export class PostItemComponent implements OnInit {
         };
 
         this.itemService.createItem(payload).subscribe({
-            next: () => {
-                this.submitting = false;
-                this.submitSuccess = true;
-                this.submitError = '';
-                // Redirect to home page after 3 seconds
-                setTimeout(() => {
-                    this.router.navigate(['/']);
-                }, 3000);
+            next: (res: any) => {
+                const createdId = res?.data?._id;
+                const shouldAutoLink = raw.type === 'FOUND' && !!this.linkLostId && !!createdId;
+
+                if (shouldAutoLink) {
+                    this.itemService.createManualMatchSuggestion({
+                        lost_post_id: this.linkLostId as string,
+                        found_post_id: createdId,
+                    }).subscribe({
+                        next: () => {
+                            this.handleSubmitSuccess('Bài nhặt được đã được tạo và gửi gợi ý khớp tới chủ bài mất đồ.');
+                        },
+                        error: (linkErr: any) => {
+                            console.error('Auto link error', linkErr);
+                            this.handleSubmitSuccess('Bài nhặt được đã được tạo, nhưng chưa liên kết tự động. Bạn có thể mở lại bài mất đồ để gửi gợi ý.');
+                        },
+                    });
+                    return;
+                }
+
+                this.handleSubmitSuccess();
             },
             error: (err: any) => {
                 this.submitting = false;
@@ -174,6 +190,16 @@ export class PostItemComponent implements OnInit {
         });
     }
 
+    private handleSubmitSuccess(message?: string): void {
+        this.submitting = false;
+        this.submitSuccess = true;
+        this.submitError = '';
+        this.submitSuccessMessage = message || 'Bài đăng của bạn đang chờ kiểm duyệt.';
+        setTimeout(() => {
+            this.router.navigate(['/']);
+        }, 3000);
+    }
+
     resetForm(): void {
         this.form.reset({ type: '', category: '', ward: '', address_detail: '' });
         this.dynamicFields = [];
@@ -181,6 +207,7 @@ export class PostItemComponent implements OnInit {
         this.uploadedPublicIds = [];
         this.submitError = '';
         this.submitSuccess = false;
+        this.submitSuccessMessage = 'Bài đăng của bạn đang chờ kiểm duyệt.';
         if (this.imageUploader) this.imageUploader.reset();
     }
 

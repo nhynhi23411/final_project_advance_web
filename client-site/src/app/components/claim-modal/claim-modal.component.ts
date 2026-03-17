@@ -149,6 +149,24 @@ export class ClaimModalComponent implements OnInit {
     });
   }
 
+  get isFoundItem(): boolean {
+    return (this.item?.type || this.item?.post_type) === "FOUND";
+  }
+
+  get modalTitle(): string {
+    return this.isFoundItem ? "Xác nhận đây là đồ của tôi" : "Gửi yêu cầu xác minh";
+  }
+
+  get modalDescription(): string {
+    return this.isFoundItem
+      ? "Điền thông tin đối chiếu để người đang giữ món đồ xác minh rằng đây là tài sản của bạn."
+      : "Mô tả hoàn cảnh mất hoặc bằng chứng liên quan để chủ bài đăng đối chiếu thêm.";
+  }
+
+  get submitLabel(): string {
+    return this.isFoundItem ? "Gửi xác nhận" : "Gửi yêu cầu";
+  }
+
   closeModal(): void {
     if (this.dialogRef) {
       this.dialogRef.close({ success: false });

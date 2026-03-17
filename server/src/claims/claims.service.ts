@@ -4,12 +4,14 @@ import {
     ForbiddenException,
     NotFoundException,
 } from "@nestjs/common";
+import { EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { Claim, ClaimDocument } from "./schemas/claim.schema";
 import { CreateClaimDto } from "./dto/create-claim.dto";
 import { ReviewClaimDto } from "./dto/review-claim.dto";
 import { Post, PostDocument } from "../posts/schemas/post.schema";
+import { User, UserDocument } from "../users/schemas/user.schema";
 import { KeywordService } from "../keyword/keyword.service";
 import { MAX_CLAIMS_LIMIT } from "../common/config/constants";
 
@@ -18,7 +20,9 @@ export class ClaimsService {
     constructor(
         @InjectModel(Claim.name) private claimModel: Model<ClaimDocument>,
         @InjectModel(Post.name) private postModel: Model<PostDocument>,
+        @InjectModel(User.name) private userModel: Model<UserDocument>,
         private readonly keywordService: KeywordService,
+        private readonly eventEmitter: EventEmitter2,
     ) { }
 
     async create(dto: CreateClaimDto, claimerId: string) {
@@ -67,6 +71,15 @@ export class ClaimsService {
             $inc: { active_claim_count: 1 },
         });
 
+        // Emit claim.created event for notification system
+        const claimer = await this.userModel.findById(claimerId).select("name").exec();
+        this.eventEmitter.emit("claim.created", {
+            claimId: claim._id.toString(),
+            postId: dto.post_id,
+            claimerId: claimerId,
+            claimerName: claimer?.name || "người dùng",
+        });
+
         return claim;
     }
 
@@ -110,6 +123,40 @@ export class ClaimsService {
                 });
             }
 
+            // Emit notification for selected claim
+            const reviewer = await this.userModel.findById(userId).select("name").exec();
+            this.eventEmitter.emit("claim.reviewed", {
+                claimId: claim._id.toString(),
+                postId: claim.target_post_id.toString(),
+                claimerId: claim.claimant_user_id.toString(),
+                reviewerName: reviewer?.name || "chủ bài",
+                action: "UNDER_VERIFICATION",
+                postTitle: post.title,
+            });
+
+            // Notify rejected claimers
+            if (rejectedCount > 0) {
+                const rejectedClaims = await this.claimModel
+                    .find({
+                        target_post_id: claim.target_post_id,
+                        _id: { $ne: claim._id },
+                        status: "REJECTED"
+                    })
+                    .select("claimant_user_id")
+                    .exec();
+
+                for (const rejectedClaim of rejectedClaims) {
+                    this.eventEmitter.emit("claim.reviewed", {
+                        claimId: rejectedClaim._id.toString(),
+                        postId: claim.target_post_id.toString(),
+                        claimerId: rejectedClaim.claimant_user_id.toString(),
+                        reviewerName: reviewer?.name || "chủ bài",
+                        action: "REJECTED",
+                        postTitle: post.title,
+                    });
+                }
+            }
+
         } else if (dto.action === "SUCCESSFUL") {
             claim.status = "SUCCESSFUL";
             await claim.save();
@@ -129,12 +176,58 @@ export class ClaimsService {
                 status: "RETURNED",
                 $inc: { active_claim_count: -rejectedCount },
             });
+
+            // Emit notification for successful claim
+            const reviewer = await this.userModel.findById(userId).select("name").exec();
+            this.eventEmitter.emit("claim.reviewed", {
+                claimId: claim._id.toString(),
+                postId: claim.target_post_id.toString(),
+                claimerId: claim.claimant_user_id.toString(),
+                reviewerName: reviewer?.name || "chủ bài",
+                action: "SUCCESSFUL",
+                postTitle: post.title,
+            });
+
+            // Notify rejected claimers
+            if (rejectedCount > 0) {
+                const rejectedClaims = await this.claimModel
+                    .find({
+                        target_post_id: claim.target_post_id,
+                        _id: { $ne: claim._id },
+                        status: "REJECTED"
+                    })
+                    .select("claimant_user_id")
+                    .exec();
+
+                for (const rejectedClaim of rejectedClaims) {
+                    this.eventEmitter.emit("claim.reviewed", {
+                        claimId: rejectedClaim._id.toString(),
+                        postId: claim.target_post_id.toString(),
+                        claimerId: rejectedClaim.claimant_user_id.toString(),
+                        reviewerName: reviewer?.name || "chủ bài",
+                        action: "REJECTED",
+                        postTitle: post.title,
+                    });
+                }
+            }
+
         } else if (dto.action === "REJECTED" || dto.action === "CANCELLED") {
             claim.status = dto.action;
             await claim.save();
 
             await this.postModel.findByIdAndUpdate(claim.post_id, {
                 $inc: { active_claim_count: -1 },
+            });
+
+            // Emit notification for rejected/cancelled claim
+            const reviewer = await this.userModel.findById(userId).select("name").exec();
+            this.eventEmitter.emit("claim.reviewed", {
+                claimId: claim._id.toString(),
+                postId: claim.target_post_id.toString(),
+                claimerId: claim.claimant_user_id.toString(),
+                    reviewerName: reviewer?.name || (dto.action === "CANCELLED" ? "bạn" : "chủ bài"),
+                action: dto.action,
+                postTitle: post.title,
             });
         }
 
