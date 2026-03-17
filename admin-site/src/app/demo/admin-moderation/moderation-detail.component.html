@@ -1,0 +1,153 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div class="detail-header mb-3">
+      <button class="btn btn-link btn-sm ps-0" type="button" (click)="goBackToPending()">&larr; Quay lại danh sách chờ duyệt</button>
+      <h4 class="mb-1">{{ pageTitle }}</h4>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <span class="text-muted">ID: {{ itemIdLabel }}</span>
+        <app-status-badge [status]="currentStatus"></app-status-badge>
+      </div>
+    </div>
+
+    <div *ngIf="statusNotice" [class]="statusNoticeClass" role="alert">
+      {{ statusNotice }}
+    </div>
+
+    <div *ngIf="loading" class="text-center py-4">
+      <span class="spinner-border spinner-border-sm text-primary" role="status" aria-hidden="true"></span>
+      Đang tải dữ liệu bài đăng...
+    </div>
+
+    <ng-container *ngIf="!loading && item as currentItem; else emptyState">
+      <div class="row g-3">
+        <div class="col-lg-8">
+          <app-card cardTitle="Thông tin chi tiết">
+            <div class="metadata-grid">
+              <div class="metadata-row" *ngFor="let row of metadataRows">
+                <div class="metadata-label">{{ row.label }}</div>
+                <div class="metadata-value">{{ row.value }}</div>
+              </div>
+            </div>
+          </app-card>
+
+          <app-card *ngIf="showNeedsUpdateBox" cardTitle="Nội dung cần cập nhật từ Admin">
+            <div class="needs-update-message">
+              {{ needsUpdateContent }}
+            </div>
+          </app-card>
+
+          <app-card cardTitle="Audit Log / Lịch sử người dùng">
+            <div class="audit-list">
+              <div class="audit-item" *ngFor="let entry of auditEntries">
+                <div class="audit-head">
+                  <strong>{{ entry.action }}</strong>
+                  <span class="text-muted">{{ entry.time }}</span>
+                </div>
+                <div class="audit-actor">Người thực hiện: {{ entry.actor }}</div>
+                <div class="audit-note">{{ entry.note }}</div>
+              </div>
+            </div>
+          </app-card>
+        </div>
+
+        <div class="col-lg-4">
+          <app-card cardTitle="Ảnh gốc của bài đăng">
+            <div class="original-image-wrapper">
+              <img [src]="originalImageUrl" class="original-image" alt="Ảnh gốc bài đăng" />
+            </div>
+          </app-card>
+
+          <app-card cardTitle="Thao tác thẩm định">
+            <div class="d-grid gap-2">
+              <button class="btn btn-success" type="button" (click)="approve()" [disabled]="submitting || !canModerate">
+                Chấp nhận
+              </button>
+              <button class="btn btn-warning text-dark" type="button" (click)="openNeedsUpdateModal()" [disabled]="submitting || !canModerate">
+                Cần cập nhật
+              </button>
+              <button class="btn btn-danger" type="button" (click)="openRejectModal()" [disabled]="submitting || !canModerate">
+                Từ chối
+              </button>
+            </div>
+
+            <div class="text-muted small mt-2" *ngIf="!canModerate">
+              Bài đăng rời khỏi trạng thái chờ duyệt, không thể thực hiện thao tác mới.
+            </div>
+          </app-card>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #emptyState>
+      <div class="alert alert-warning mb-0">Không tìm thấy thông tin bài đăng cần duyệt.</div>
+    </ng-template>
+  </div>
+</div>
+
+<div
+  *ngIf="showActionModal"
+  class="modal d-block moderation-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="moderationActionTitle"
+  aria-describedby="moderationActionDesc"
+  (keydown.escape)="cancelActionModal()"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="moderationActionTitle">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" aria-label="Dong" (click)="cancelActionModal()"></button>
+      </div>
+
+      <div class="modal-body">
+        <p id="moderationActionDesc" class="mb-2">{{ modalDescription }}</p>
+
+        <label class="form-label fw-semibold" for="actionMessageInput">
+          {{ rejectReasonRequired ? 'Lý do (bắt buộc)' : 'Thông báo cho người đăng (không bắt buộc)' }}
+        </label>
+        <textarea
+          id="actionMessageInput"
+          class="form-control"
+          rows="4"
+          [(ngModel)]="actionMessage"
+          placeholder="Nhập nội dung..."
+          #actionInput
+        ></textarea>
+
+        <div class="text-danger small mt-2" *ngIf="modalTouched && rejectReasonRequired && !actionMessage.trim()">
+          Trường lý do là bắt buộc.
+        </div>
+        <div class="text-muted small mt-2" *ngIf="modalTouched && !rejectReasonRequired && !actionMessage.trim()">
+         Bạn có thể bấm "Gửi mà không có lời nhắn" để tiếp tục.
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelActionModal()" [disabled]="submitting">
+          Hủy
+        </button>
+
+        <button
+          *ngIf="showSendWithoutMessage"
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="sendWithoutMessage()"
+          [disabled]="submitting"
+        >
+          Gửi mà không có lời nhắn
+        </button>
+
+        <button
+          type="button"
+          [class]="modalConfirmClass"
+          (click)="confirmActionModal()"
+          [disabled]="submitting || !canConfirmAction"
+        >
+          Xác nhận
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

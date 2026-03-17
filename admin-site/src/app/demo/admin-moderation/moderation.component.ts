@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
-import { finalize } from 'rxjs';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { AdminService, Item } from 'src/app/services/admin.service';
-import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-badge.component';
 
 @Component({
   selector: 'app-moderation',
@@ -12,58 +12,102 @@ import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-
   templateUrl: './moderation.component.html',
   styleUrls: ['./moderation.component.scss']
 })
-export class ModerationComponent implements OnInit, AfterViewChecked {
-  @ViewChild('reasonInput') reasonInput?: ElementRef<HTMLTextAreaElement>;
-
-  activeTab: 'pending' | 'approved' = 'pending';
+export class ModerationComponent implements OnInit {
+  activeTab: 'pending' | 'approved' | 'rejected' = 'pending';
   pendingItems: Item[] = [];
   approvedItems: Item[] = [];
+  rejectedItems: Item[] = [];
   loading = false;
   searchTerm = '';
-  showReasonModal = false;
-  modalReason = '';
-  modalItem: Item | null = null;
-  modalStatus: PostStatus | null = null;
-  private focusReasonNextCheck = false;
 
   constructor(
     private adminService: AdminService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router: Router
   ) { }
 
   ngOnInit() {
     this.loadPending();
   }
 
-  ngAfterViewChecked() {
-    if (this.focusReasonNextCheck && this.showReasonModal && this.reasonInput?.nativeElement) {
-      this.focusReasonNextCheck = false;
-      this.reasonInput.nativeElement.focus();
-    }
-  }
-
   get filteredItems(): Item[] {
-    const list = this.activeTab === 'pending' ? this.pendingItems : this.approvedItems;
+    let list: Item[] = [];
+    if (this.activeTab === 'pending') {
+      list = this.pendingItems;
+    } else if (this.activeTab === 'approved') {
+      list = this.approvedItems;
+    } else {
+      list = this.rejectedItems;
+    }
+
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) return list;
 
     return list.filter((item) => {
       const id = String(item.id || item._id || '').toLowerCase();
       const title = (item.title || '').toLowerCase();
-      return id.includes(term) || title.includes(term);
+      const reason = this.getRejectedReason(item).toLowerCase();
+      return id.includes(term) || title.includes(term) || reason.includes(term);
     });
+  }
+
+  getItemId(item: Item): string {
+    const id = item._id ?? item.id;
+    return id === undefined || id === null ? '' : String(id);
+  }
+
+  getRejectedReason(item: Item): string {
+    const reason =
+      item['reject_reason'] ??
+      item['rejectReason'] ??
+      item['reason'] ??
+      item['moderation_reason'] ??
+      item['moderationReason'] ??
+      item['note'];
+
+    if (typeof reason === 'string' && reason.trim()) {
+      return reason.trim();
+    }
+
+    return '-';
+  }
+
+  getListTitle(): string {
+    if (this.activeTab === 'pending') {
+      return 'Danh sách bài đăng chờ duyệt';
+    }
+
+    if (this.activeTab === 'approved') {
+      return 'Danh sách bài đăng đã duyệt';
+    }
+
+    return 'Danh sách bài đăng bị từ chối';
   }
 
   loadPending() {
     this.loading = true;
-    this.adminService.getPendingItems().pipe(
+    forkJoin({
+      pending: this.adminService.getPendingItems().pipe(
+        catchError((err) => {
+          console.error('Failed to fetch pending admin items', err);
+          return of([] as Item[]);
+        })
+      ),
+      needsUpdate: this.adminService.getNeedsUpdateItems().pipe(
+        catchError((err) => {
+          console.error('Failed to fetch needs-update items', err);
+          return of([] as Item[]);
+        })
+      )
+    }).pipe(
       finalize(() => {
         this.loading = false;
         this.cdr.markForCheck();
       })
     ).subscribe({
-      next: (items) => {
-        this.pendingItems = items;
+      next: ({ pending, needsUpdate }) => {
+        const merged = [...pending, ...needsUpdate];
+        this.pendingItems = this.uniqueByItemId(merged);
       },
       error: (err) => {
         console.error('Failed to fetch pending items', err);
@@ -90,60 +134,57 @@ export class ModerationComponent implements OnInit, AfterViewChecked {
     });
   }
 
-  private updateStatus(item: Item, status: PostStatus, reason?: string) {
-    if (!item || !item.id && !item._id) {
-      return;
-    }
-
-    item.isUpdating = true;
-    this.adminService.changeStatus(item._id || item.id!, status, reason).subscribe({
-      next: () => {
-        this.loadPending();
+  loadRejected() {
+    this.loading = true;
+    this.adminService.getRejectedItems().pipe(
+      finalize(() => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (items) => {
+        this.rejectedItems = items;
       },
       error: (err) => {
-        console.error('Failed to update status', err);
-        alert('Không thể cập nhật trạng thái. Vui lòng thử lại.');
-        item.isUpdating = false;
+        console.error('Failed to fetch rejected items', err);
+        this.rejectedItems = [];
       }
     });
   }
 
-  approve(item: Item) {
-    this.updateStatus(item, 'APPROVED');
-  }
+  openPendingDetail(item: Item, event?: Event) {
+    if (event) {
+      event.stopPropagation();
+    }
 
-  reject(item: Item) {
-    this.openReasonModal(item, 'REJECTED');
-  }
-
-  requestUpdate(item: Item) {
-    this.openReasonModal(item, 'NEEDS_UPDATE');
-  }
-
-  openReasonModal(item: Item, status: PostStatus) {
-    this.modalItem = item;
-    this.modalStatus = status;
-    this.modalReason = '';
-    this.showReasonModal = true;
-    this.focusReasonNextCheck = true;
-  }
-
-  cancelReasonModal() {
-    this.showReasonModal = false;
-    this.modalItem = null;
-    this.modalStatus = null;
-    this.modalReason = '';
-  }
-
-  confirmReasonModal() {
-    if (!this.modalItem || !this.modalStatus) return;
-    const reason = (this.modalReason || '').trim();
-    if (!reason) {
-      alert('Vui lòng nhập lý do.');
+    if (this.activeTab !== 'pending') {
       return;
     }
-    this.updateStatus(this.modalItem, this.modalStatus, reason);
-    this.cancelReasonModal();
+
+    const id = this.getItemId(item);
+    if (!id) {
+      return;
+    }
+
+    this.router.navigate(['/moderation/pending', id], {
+      state: { item }
+    });
+  }
+
+  private uniqueByItemId(items: Item[]): Item[] {
+    const map = new Map<string, Item>();
+    for (const item of items) {
+      const id = this.getItemId(item);
+      if (!id) {
+        continue;
+      }
+
+      if (!map.has(id)) {
+        map.set(id, item);
+      }
+    }
+
+    return Array.from(map.values());
   }
 }
 

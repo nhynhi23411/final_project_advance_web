@@ -28,6 +28,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/users/users.component').then((c) => c.UsersComponent)
       },
       {
+        path: 'moderation/pending/:id',
+        loadComponent: () => import('./demo/admin-moderation/moderation-detail.component').then((c) => c.ModerationDetailComponent)
+      },
+      {
         path: 'moderation',
         loadComponent: () => import('./demo/admin-moderation/moderation.component').then((c) => c.ModerationComponent)
       }

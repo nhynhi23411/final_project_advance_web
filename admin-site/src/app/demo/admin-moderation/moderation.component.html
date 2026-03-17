@@ -23,12 +23,21 @@
           <span class="badge bg-success ms-1" *ngIf="approvedItems.length">{{ approvedItems.length }}</span>
         </a>
       </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'rejected'"
+          href="javascript:void(0)"
+          (click)="activeTab = 'rejected'; loadRejected()"
+        >
+          Bài đăng bị reject
+          <span class="badge bg-danger ms-1" *ngIf="rejectedItems.length">{{ rejectedItems.length }}</span>
+        </a>
+      </li>
     </ul>
 
     <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">
-        {{ activeTab === 'pending' ? 'Danh sách bài đăng chờ duyệt' : 'Danh sách bài đăng đã duyệt' }}
-      </h5>
+      <h5 class="mb-0">{{ getListTitle() }}</h5>
       <div class="d-flex align-items-center">
         <input
           type="text"
@@ -41,53 +50,40 @@
 
     <app-card blockClass="table-border-style">
       <div class="table-responsive">
-        <table class="table table-striped table-hover" *ngIf="!loading">
+        <table class="table table-hover moderation-table" *ngIf="!loading">
           <thead>
             <tr>
               <th>ID</th>
               <th>Tiêu đề</th>
               <th>Trạng thái</th>
+              <th *ngIf="activeTab === 'rejected'">Lý do bị reject</th>
               <th>Thao tác</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let item of filteredItems">
-              <td>{{ item.id || item._id }}</td>
-              <td>{{ item.title }}</td>
+            <tr
+              *ngFor="let item of filteredItems"
+              [class.pending-row]="activeTab === 'pending'"
+              [class.pending-row--clickable]="activeTab === 'pending'"
+              (click)="activeTab === 'pending' && openPendingDetail(item)"
+            >
+              <td class="id-cell">{{ getItemId(item) || '—' }}</td>
+              <td class="title-cell">{{ item.title || 'Không có tiêu đề' }}</td>
               <td>
                 <app-status-badge [status]="item.status || 'DRAFT'"></app-status-badge>
               </td>
+              <td *ngIf="activeTab === 'rejected'" class="reason-cell">{{ getRejectedReason(item) }}</td>
               <td>
                 <ng-container *ngIf="activeTab === 'pending'">
                   <button
-                    class="btn btn-success btn-sm me-1"
-                    (click)="approve(item)"
-                    [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
+                    class="btn btn-outline-primary btn-sm"
+                    (click)="openPendingDetail(item, $event)"
+                    [disabled]="loading"
                   >
-                    <span
-                      *ngIf="item.isUpdating"
-                      class="spinner-border spinner-border-sm me-1"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                    Duyệt
-                  </button>
-                  <button
-                    class="btn btn-danger btn-sm me-1"
-                    (click)="reject(item)"
-                    [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
-                  >
-                    Từ chối
-                  </button>
-                  <button
-                    class="btn btn-warning btn-sm"
-                    (click)="requestUpdate(item)"
-                    [disabled]="loading || item.isUpdating || item.status !== 'PENDING_ADMIN'"
-                  >
-                    Yêu cầu cập nhật
+                    Xem chi tiết
                   </button>
                 </ng-container>
-                <span *ngIf="activeTab === 'approved'" class="text-muted">—</span>
+                <span *ngIf="activeTab !== 'pending'" class="text-muted">—</span>
               </td>
             </tr>
           </tbody>
@@ -97,45 +93,15 @@
           Đang tải...
         </div>
         <div *ngIf="!loading && filteredItems.length === 0" class="text-center p-3 text-muted">
-          {{ activeTab === 'pending' ? 'Không có bài đăng nào chờ duyệt.' : 'Không có bài đăng nào đã duyệt.' }}
+          {{
+            activeTab === 'pending'
+              ? 'Không có bài đăng nào chờ duyệt.'
+              : activeTab === 'approved'
+                ? 'Không có bài đăng nào đã duyệt.'
+                : 'Không có bài đăng nào bị reject.'
+          }}
         </div>
       </div>
     </app-card>
-  </div>
-</div>
-<!-- Reason modal: backdrop click không đóng, bắt buộc Hủy hoặc nhập lý do + Xác nhận -->
-<div
-  *ngIf="showReasonModal"
-  class="modal d-block"
-  tabindex="-1"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="reasonModalTitle"
-  aria-describedby="reasonModalDesc"
-  style="background: rgba(0,0,0,0.5);"
-  (keydown.escape)="cancelReasonModal()"
->
-  <div class="modal-dialog modal-dialog-centered" role="document" (click)="$event.stopPropagation()">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="reasonModalTitle">Nhập lý do</h5>
-        <button type="button" class="btn-close" aria-label="Đóng" (click)="cancelReasonModal()"></button>
-      </div>
-      <div class="modal-body">
-        <p id="reasonModalDesc">Vui lòng nhập lý do cho hành động này (bắt buộc):</p>
-        <textarea
-          class="form-control"
-          rows="4"
-          [(ngModel)]="modalReason"
-          placeholder="Nhập lý do..."
-          #reasonInput
-          (keydown.escape)="$event.preventDefault(); cancelReasonModal()"
-        ></textarea>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="cancelReasonModal()">Hủy</button>
-        <button type="button" class="btn btn-primary" (click)="confirmReasonModal()" [disabled]="!(modalReason && modalReason.trim())">Xác nhận</button>
-      </div>
-    </div>
   </div>
 </div>
