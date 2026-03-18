@@ -3,7 +3,12 @@ import { Document, Types } from "mongoose";
 
 export type NotificationDocument = Notification & Document;
 
-export type NotificationType = "claim" | "match_suggestion";
+export type NotificationType =
+  | "claim"
+  | "match_suggestion"
+  | "post_approved"
+  | "post_needs_update"
+  | "post_rejected";
 
 @Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
 export class Notification {
@@ -13,7 +18,10 @@ export class Notification {
   @Prop({ type: Types.ObjectId, ref: "User", required: true })
   sender_user_id!: Types.ObjectId;
 
-  @Prop({ enum: ["claim", "match_suggestion"], required: true })
+  @Prop({
+    enum: ["claim", "match_suggestion", "post_approved", "post_needs_update", "post_rejected"],
+    required: true,
+  })
   notification_type!: NotificationType;
 
   @Prop({ type: Types.ObjectId, ref: "Post", required: true })

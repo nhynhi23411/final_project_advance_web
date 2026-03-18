@@ -206,5 +206,86 @@ export class NotificationsService {
       `Notification sent: claim ${claimId} reviewed (action: ${action})`,
     );
   }
+
+  /**
+   * Notify post owner when admin approves their post.
+   */
+  @OnEvent("post.approved")
+  async handlePostApproved(payload: {
+    postId: string;
+    userId: string;
+    adminUserId: string;
+  }): Promise<void> {
+    const { postId, userId, adminUserId } = payload;
+    const post = await this.postModel
+      .findById(postId)
+      .select("title")
+      .lean()
+      .exec();
+    const title = (post as any)?.title ?? "Bài đăng";
+    await this.createNotification(
+      userId,
+      adminUserId,
+      "post_approved",
+      postId,
+      "Bài đăng của bạn đã được duyệt",
+      `"${title}" đã được phê duyệt và hiển thị công khai.`,
+    );
+    this.logger.log(`Notification sent: post approved ${postId} to user ${userId}`);
+  }
+
+  /**
+   * Notify post owner when admin sets status to NEEDS_UPDATE.
+   */
+  @OnEvent("post.needs_update")
+  async handlePostNeedsUpdate(payload: {
+    postId: string;
+    userId: string;
+    adminUserId: string;
+  }): Promise<void> {
+    const { postId, userId, adminUserId } = payload;
+    const post = await this.postModel
+      .findById(postId)
+      .select("title")
+      .lean()
+      .exec();
+    const title = (post as any)?.title ?? "Bài đăng";
+    await this.createNotification(
+      userId,
+      adminUserId,
+      "post_needs_update",
+      postId,
+      "Bài đăng cần cập nhật",
+      `Bài đăng "${title}" cần được chỉnh sửa theo góp ý của quản trị viên. Vui lòng xem và cập nhật.`,
+    );
+    this.logger.log(`Notification sent: post needs_update ${postId} to user ${userId}`);
+  }
+
+  /**
+   * Notify post owner when admin rejects their post.
+   */
+  @OnEvent("post.rejected")
+  async handlePostRejected(payload: {
+    postId: string;
+    userId: string;
+    adminUserId: string;
+  }): Promise<void> {
+    const { postId, userId, adminUserId } = payload;
+    const post = await this.postModel
+      .findById(postId)
+      .select("title")
+      .lean()
+      .exec();
+    const title = (post as any)?.title ?? "Bài đăng";
+    await this.createNotification(
+      userId,
+      adminUserId,
+      "post_rejected",
+      postId,
+      "Bài đăng của bạn đã bị từ chối",
+      `Bài đăng "${title}" đã bị từ chối. Vui lòng xem lý do và đăng lại nếu cần.`,
+    );
+    this.logger.log(`Notification sent: post rejected ${postId} to user ${userId}`);
+  }
 }
 

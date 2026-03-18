@@ -34,7 +34,9 @@
           <div class="app-nav-notif-wrap" [class.open]="notifOpen">
             <button type="button" class="app-nav-notif-btn" (click)="toggleNotif()" aria-label="Thông báo">
               <i class="fas fa-bell"></i>
-              <span *ngIf="notifCount > 0" class="app-nav-notif-dot">{{ notifCount }}</span>
+              <ng-container *ngIf="(notificationService.unreadCount$ | async) as count">
+              <span *ngIf="count > 0" class="app-nav-notif-dot">{{ count }}</span>
+            </ng-container>
             </button>
             <div class="app-nav-notif-dropdown" *ngIf="notifOpen">
               <div class="app-nav-notif-title">Thông báo</div>

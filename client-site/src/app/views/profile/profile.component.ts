@@ -4,6 +4,7 @@ import { Router } from "@angular/router";
 import { environment } from "../../../environments/environment";
 import { ItemService, Item } from "../../services/item.service";
 import { ToastService } from "../../services/toast.service";
+import { NotificationService } from "../../services/notification.service";
 
 export interface MeUser {
   userId?: string;
@@ -41,11 +42,14 @@ export class ProfileComponent implements OnInit {
     private http: HttpClient,
     private itemService: ItemService,
     private router: Router,
-    private toastService: ToastService
+    private toastService: ToastService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
     this.loadProfile();
+    // Mark all notifications as read when user opens Profile (e.g. NEEDS_UPDATE / REJECTED from admin)
+    this.notificationService.markAllAsRead();
   }
 
   loadProfile(): void {
