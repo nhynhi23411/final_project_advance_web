@@ -175,6 +175,57 @@ export class PostsService extends BaseCrudService<
   }
 
   /**
+   * Đóng bài đăng do chủ bài thực hiện (chuyển sang ARCHIVED, lưu lý do, emit event cho admin).
+   */
+  async closeByUser(
+    id: string,
+    userId: string,
+    reason: string,
+    customReason?: string,
+  ): Promise<PostDocument | null> {
+    const post = await this.model.findById(id).exec();
+    if (!post) return null;
+
+    const createdBy = (post as any).created_by_user_id?.toString?.();
+    if (createdBy !== userId) {
+      throw new BadRequestException("Chỉ chủ bài đăng mới được đóng bài này.");
+    }
+
+    const status = (post as any).status;
+    if (status !== "APPROVED" && status !== "NEEDS_UPDATE") {
+      throw new BadRequestException(
+        "Chỉ có thể đóng bài đăng đang ở trạng thái đã duyệt hoặc cần cập nhật.",
+      );
+    }
+
+    const archivedReason = customReason?.trim()
+      ? `${reason}${customReason ? `: ${customReason}` : ""}`
+      : reason;
+
+    const updated = await this.model
+      .findByIdAndUpdate(
+        id,
+        {
+          status: "ARCHIVED",
+          archived_reason: archivedReason,
+          updated_at: new Date(),
+        },
+        { new: true, runValidators: true },
+      )
+      .exec();
+
+    if (updated) {
+      this.eventEmitter.emit("post.closed_by_user", {
+        postId: id,
+        userId,
+        reason: archivedReason,
+        postTitle: (post as any).title,
+      });
+    }
+    return updated as PostDocument | null;
+  }
+
+  /**
    * Ghi đè update để luôn đồng bộ lại metadata + images.
    * Cho phép cập nhật ảnh (images, image_public_ids) và các trường mô tả cơ bản.
    */

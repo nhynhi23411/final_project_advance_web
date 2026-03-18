@@ -19,6 +19,7 @@ import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { PostsService } from "./posts.service";
 import { CreatePostDto } from "./dto/create-post.dto";
 import { UpdatePostDto } from "./dto/update-post.dto";
+import { ClosePostDto } from "./dto/close-post.dto";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { KeywordService } from "../keyword/keyword.service";
 
@@ -98,6 +99,28 @@ export class PostsController {
   async create(@Body() dto: CreatePostDto, @Request() req: any) {
     const created = await this.postsService.createPostWithUser(dto, req.user.userId, req.body.status);
     return { message: 'Bài đăng đang được kiểm duyệt', data: created };
+  }
+
+  /** Đóng bài đăng (chủ bài). Yêu cầu lý do, thông báo tới admin. */
+  @Patch(":id/close")
+  @UseGuards(JwtAuthGuard)
+  async close(
+    @Param("id") id: string,
+    @Body() dto: ClosePostDto,
+    @Request() req: { user: { userId: string } },
+  ) {
+    if (!isValidObjectId(id)) throw new BadRequestException("Id không hợp lệ");
+    const updated = await this.postsService.closeByUser(
+      id,
+      req.user.userId,
+      dto.reason,
+      dto.custom_reason,
+    );
+    if (!updated) return null;
+    return {
+      message: "Bài đăng đã được đóng. Quản trị viên đã được thông báo.",
+      data: updated,
+    };
   }
 
   @Patch(":id")

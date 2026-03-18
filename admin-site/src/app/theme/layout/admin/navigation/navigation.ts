@@ -41,10 +41,10 @@ export const NavigationItems: NavigationItem[] = [
       },
       {
         id: 'posts',
-        title: 'Quản lý Bài Đăng',
+        title: 'Quản lý Nội dung',
         type: 'item',
         url: '/moderation',
-        icon: 'feather icon-file-text'
+        icon: 'feather icon-edit-2'
       }
     ]
   },

@@ -12,6 +12,7 @@ import { environment } from "../../../environments/environment";
 import { MatDialog } from "@angular/material/dialog";
 import { ClaimModalComponent } from "../../components/claim-modal/claim-modal.component";
 import { LinkFoundPostModalComponent } from "../../components/link-found-post-modal/link-found-post-modal.component";
+import { ClosePostModalComponent } from "../../components/close-post-modal/close-post-modal.component";
 
 @Component({
   selector: "app-item-detail",
@@ -400,9 +401,27 @@ export class ItemDetailComponent implements OnInit {
     this.router.navigate(["/items", id]);
   }
 
+  /** Chỉ cho phép đóng khi bài đang APPROVED hoặc NEEDS_UPDATE. */
+  canClosePost(): boolean {
+    if (!this.item) return false;
+    const s = this.item.status;
+    return s === "APPROVED" || s === "NEEDS_UPDATE";
+  }
+
   closePost(): void {
-    if (!this.item) return;
-    this.toastService.info("Chức năng đóng bài đăng đang được cập nhật. Vui lòng liên hệ quản trị viên.");
+    if (!this.item || !this.canClosePost()) return;
+    const dialogRef = this.dialog.open(ClosePostModalComponent, {
+      width: "520px",
+      maxWidth: "95vw",
+      disableClose: false,
+      data: { item: this.item },
+    });
+    dialogRef.afterClosed().subscribe((result?: { success?: boolean }) => {
+      if (result?.success) {
+        this.toastService.success("Bài đăng đã được đóng. Quản trị viên đã được thông báo.");
+        this.loadItemDetail(this.item!._id);
+      }
+    });
   }
 
   goBack(): void {

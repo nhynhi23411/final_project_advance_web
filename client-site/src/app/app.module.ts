@@ -35,6 +35,7 @@ import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
 import { ClaimModalComponent } from "./components/claim-modal/claim-modal.component";
 import { LinkFoundPostModalComponent } from "./components/link-found-post-modal/link-found-post-modal.component";
+import { ClosePostModalComponent } from "./components/close-post-modal/close-post-modal.component";
 import { ToastComponent } from "./components/toast/toast.component";
 import { AuthNavbarComponent } from "./components/navbars/auth-navbar/auth-navbar.component";
 import { IndexNavbarComponent } from "./components/navbars/index-navbar/index-navbar.component";
@@ -72,6 +73,7 @@ import { GlobalErrorHandler } from "./global-error.handler";
     ItemDetailComponent,
     ClaimModalComponent,
     LinkFoundPostModalComponent,
+    ClosePostModalComponent,
     ToastComponent,
     PostsComponent,
     SuggestionsComponent,

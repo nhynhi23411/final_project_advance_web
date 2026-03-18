@@ -25,6 +25,18 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
+  /** Lấy danh sách user có role ADMIN (để gửi thông báo). */
+  async findAdmins(): Promise<{ _id: string }[]> {
+    const docs = await this.userModel
+      .find({ role: "ADMIN" })
+      .select("_id")
+      .lean()
+      .exec();
+    return docs.map((d) => ({
+      _id: String((d as any)._id ?? ""),
+    }));
+  }
+
   async create(data: Partial<User>): Promise<User> {
     const now = new Date();
     const dataWithTimestamps = {

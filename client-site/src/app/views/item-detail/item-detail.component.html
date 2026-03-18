@@ -259,7 +259,7 @@
             <li><span class="item-detail-sidebar-label">Ngày đăng</span><span class="item-detail-sidebar-value">{{ formatDate(item.created_at) }}</span></li>
             <li><span class="item-detail-sidebar-label">Cập nhật</span><span class="item-detail-sidebar-value">{{ formatDate(item.updated_at) }}</span></li>
           </ul>
-          <div *ngIf="isOwner()" class="item-detail-sidebar-close">
+          <div *ngIf="isOwner() && canClosePost()" class="item-detail-sidebar-close">
             <button type="button" (click)="closePost()" class="item-detail-btn item-detail-btn-secondary item-detail-btn-block">
               <i class="fas fa-lock" aria-hidden="true"></i> Đóng bài đăng
             </button>

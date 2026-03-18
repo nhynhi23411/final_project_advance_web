@@ -287,5 +287,37 @@ export class NotificationsService {
     );
     this.logger.log(`Notification sent: post rejected ${postId} to user ${userId}`);
   }
+
+  /**
+   * Notify all admins when a user closes their own post (archived with reason).
+   */
+  @OnEvent("post.closed_by_user")
+  async handlePostClosedByUser(payload: {
+    postId: string;
+    userId: string;
+    reason: string;
+    postTitle: string;
+  }): Promise<void> {
+    const { postId, userId, reason, postTitle } = payload;
+    const admins = await this.userModel
+      .find({ role: "ADMIN" })
+      .select("_id")
+      .lean()
+      .exec();
+    const senderName = "Người dùng";
+    for (const admin of admins) {
+      const adminId = (admin as any)._id?.toString?.();
+      if (!adminId || adminId === userId) continue;
+      await this.createNotification(
+        adminId,
+        userId,
+        "post_closed_by_user",
+        postId,
+        "Người dùng đã đóng bài đăng",
+        `Bài đăng "${postTitle}" đã được chủ đăng đóng. Lý do: ${reason}`,
+      );
+    }
+    this.logger.log(`Notifications sent: post closed by user ${postId} to ${admins.length} admin(s)`);
+  }
 }
 
