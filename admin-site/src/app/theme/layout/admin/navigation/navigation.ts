@@ -45,6 +45,13 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         url: '/moderation',
         icon: 'feather icon-edit-2'
+      },
+      {
+        id: 'audit-logs',
+        title: 'Nhật ký Hoạt động',
+        type: 'item',
+        url: '/audit-logs',
+        icon: 'feather icon-file-text'
       }
     ]
   },

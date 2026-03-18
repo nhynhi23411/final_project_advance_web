@@ -55,7 +55,7 @@
               class="posts-select"
               [(ngModel)]="filterPostType"
               name="filterPostType"
-              (ngModelChange)="applyFilters()"
+              (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả</option>
               <option value="LOST">Đồ bị mất</option>
@@ -69,7 +69,7 @@
               class="posts-select"
               [(ngModel)]="filterCategory"
               name="filterCategory"
-              (ngModelChange)="applyFilters()"
+              (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả danh mục</option>
               <option *ngFor="let c of (categories || [])" [value]="c">{{ c }}</option>
@@ -84,7 +84,7 @@
               class="posts-select"
               [(ngModel)]="filterWard"
               name="filterWard"
-              (ngModelChange)="applyFilters()"
+              (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả phường</option>
               <option *ngFor="let w of (wards || [])" [value]="w">{{ w }}</option>
@@ -97,7 +97,7 @@
               class="posts-select"
               [(ngModel)]="filterTimeRange"
               name="filterTimeRange"
-              (ngModelChange)="applyFilters()"
+              (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả thời gian</option>
               <option value="today">Hôm nay</option>
@@ -113,7 +113,7 @@
               class="posts-select"
               [(ngModel)]="sortBy"
               name="sortBy"
-              (ngModelChange)="applyFilters()"
+              (ngModelChange)="updateFilter()"
             >
               <option value="newest">Mới nhất</option>
               <option value="oldest">Cũ nhất</option>
@@ -139,7 +139,7 @@
             type="button"
             class="posts-chip"
             [class.is-active]="chipHasImage"
-            (click)="chipHasImage = !chipHasImage; applyFilters()"
+            (click)="chipHasImage = !chipHasImage; updateFilter()"
           >
             <i class="fas fa-image"></i> Có hình ảnh
           </button>
@@ -147,7 +147,7 @@
             type="button"
             class="posts-chip"
             [class.is-active]="chipRecent"
-            (click)="chipRecent = !chipRecent; applyFilters()"
+            (click)="chipRecent = !chipRecent; updateFilter()"
           >
             <i class="fas fa-clock"></i> Gần đây (7 ngày)
           </button>

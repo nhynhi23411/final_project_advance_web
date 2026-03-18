@@ -1,5 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
+import { BehaviorSubject, Observable, Subject } from "rxjs";
+import { debounceTime, switchMap, map, takeUntil, startWith } from "rxjs/operators";
 import { ItemService, Item } from "../../services/item.service";
 import { CATEGORIES } from "../../config/category-metadata.config";
 import { THU_DUC_WARDS } from "../post-item/post-item.component";
@@ -8,11 +10,21 @@ type PostTypeFilter = "" | "LOST" | "FOUND";
 type TimeRangeKey = "" | "today" | "3days" | "7days" | "30days";
 type SortKey = "newest" | "oldest" | "title" | "hasImage";
 
+interface FilterState {
+  type: PostTypeFilter;
+  category: string;
+  ward: string;
+  timeRange: TimeRangeKey;
+  hasImage: boolean;
+  recent: boolean;
+  sort: SortKey;
+}
+
 @Component({
   selector: "app-posts",
   templateUrl: "./posts.component.html",
 })
-export class PostsComponent implements OnInit {
+export class PostsComponent implements OnInit, OnDestroy {
   /** Full list from API (status APPROVED, optional q). */
   allItems: Item[] = [];
   /** Filtered + sorted list for display. */
@@ -34,6 +46,19 @@ export class PostsComponent implements OnInit {
   chipHasImage = false;
   chipRecent = false;
 
+  /** BehaviorSubject for reactive filtering */
+  private filterSubject = new BehaviorSubject<FilterState>({
+    type: "",
+    category: "",
+    ward: "",
+    timeRange: "",
+    hasImage: false,
+    recent: false,
+    sort: "newest",
+  } as FilterState);
+
+  private destroy$ = new Subject<void>();
+
   constructor(
     private router: Router,
     private route: ActivatedRoute,
@@ -41,10 +66,15 @@ export class PostsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe((params) => {
+    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       this.searchQuery = params["q"] || "";
       this.loadItems();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   loadItems(): void {
@@ -82,6 +112,20 @@ export class PostsComponent implements OnInit {
         this.isLoading = false;
       },
     });
+  }
+
+  /** Trigger filter updates with debouncing */
+  updateFilter(): void {
+    this.filterSubject.next({
+      type: this.filterPostType,
+      category: this.filterCategory,
+      ward: this.filterWard,
+      timeRange: this.filterTimeRange,
+      hasImage: this.chipHasImage,
+      recent: this.chipRecent,
+      sort: this.sortBy,
+    });
+    this.applyFilters();
   }
 
   private normalizeItem(it: any): Item {
@@ -159,23 +203,49 @@ export class PostsComponent implements OnInit {
 
     switch (this.sortBy) {
       case "oldest":
-        list.sort((a, b) => this.compareDate(this.getItemDate(a), this.getItemDate(b), true));
+        // Sort ascending: oldest first (smallest dates first)
+        list.sort((a, b) => {
+          const dateA = this.getItemDate(a);
+          const dateB = this.getItemDate(b);
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return 1; // null dates go to end
+          if (!dateB) return -1;
+          return dateA.getTime() - dateB.getTime(); // ascending
+        });
         break;
       case "title":
+        // Alphabetical sort
         list.sort((a, b) =>
           (a.title || "").localeCompare(b.title || "", "vi")
         );
         break;
       case "hasImage":
+        // Items with images first, then by newest
         list.sort((a, b) => {
           const ah = this.hasImage(a) ? 1 : 0;
           const bh = this.hasImage(b) ? 1 : 0;
           if (bh !== ah) return bh - ah;
-          return this.compareDate(this.getItemDate(b), this.getItemDate(a), false);
+          // Then by date descending (newest first)
+          const dateA = this.getItemDate(a);
+          const dateB = this.getItemDate(b);
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return 1;
+          if (!dateB) return -1;
+          return dateB.getTime() - dateA.getTime(); // descending
         });
         break;
+      case "newest":
       default:
-        list.sort((a, b) => this.compareDate(this.getItemDate(b), this.getItemDate(a), false));
+        // Sort descending: newest first (largest dates first)
+        list.sort((a, b) => {
+          const dateA = this.getItemDate(a);
+          const dateB = this.getItemDate(b);
+          if (!dateA && !dateB) return 0;
+          if (!dateA) return 1; // null dates go to end
+          if (!dateB) return -1;
+          return dateB.getTime() - dateA.getTime(); // descending (b before a if b is newer)
+        });
+        break;
     }
 
       this.filteredItems = list;
@@ -186,18 +256,41 @@ export class PostsComponent implements OnInit {
   }
 
   private getItemDate(item: Item): Date | null {
-    const raw =
-      item.lost_found_date ||
-      (item as any).metadata?.lost_found_date ||
-      item.created_at;
-    if (!raw) return null;
-    const d = new Date(raw);
-    return isNaN(d.getTime()) ? null : d;
+    try {
+      // Try lost_found_date first, then metadata, then created_at
+      let raw = item.lost_found_date || (item as any).metadata?.lost_found_date || item.created_at;
+      
+      if (!raw) return null;
+      
+      // If already a Date object, validate and return
+      if (raw instanceof Date) {
+        return isNaN(raw.getTime()) ? null : raw;
+      }
+      
+      // If it's a string, parse it
+      if (typeof raw === "string") {
+        const d = new Date(raw);
+        return isNaN(d.getTime()) ? null : d;
+      }
+      
+      return null;
+    } catch (e) {
+      console.error("Error parsing date:", e, item);
+      return null;
+    }
   }
 
   private compareDate(a: Date | null, b: Date | null, ascending: boolean): number {
-    const ta = a ? a.getTime() : 0;
-    const tb = b ? b.getTime() : 0;
+    // Both null -> equal
+    if (!a && !b) return 0;
+    // a is null -> put at end (positive for ascending, negative for descending)
+    if (!a) return ascending ? 1 : -1;
+    // b is null -> put at end
+    if (!b) return ascending ? -1 : 1;
+    
+    // Both have dates -> compare them
+    const ta = a.getTime();
+    const tb = b.getTime();
     return ascending ? ta - tb : tb - ta;
   }
 
@@ -219,7 +312,7 @@ export class PostsComponent implements OnInit {
     this.sortBy = "newest";
     this.chipHasImage = false;
     this.chipRecent = false;
-    this.applyFilters();
+    this.updateFilter();
   }
 
   get hasActiveFilters(): boolean {

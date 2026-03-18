@@ -1,0 +1,137 @@
+<div class="audit-log-container">
+  <!-- Header -->
+  <div class="audit-log-header">
+    <h1 class="audit-log-title">Nhật ký hoạt động</h1>
+    <p class="audit-log-desc">Xem lịch sử toàn bộ hoạt động quản lý trên hệ thống</p>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="audit-log-filters">
+    <div class="filter-group">
+      <label for="filter-action">Loại hành động</label>
+      <select
+        id="filter-action"
+        [(ngModel)]="filterAction"
+        (change)="onFilterChange()"
+        class="filter-select"
+      >
+        <option value="">Tất cả hành động</option>
+        <option *ngFor="let action of actionOptions" [value]="action">
+          {{ getActionLabel(action) }}
+        </option>
+      </select>
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-user">Người dùng bị ảnh hưởng</label>
+      <input
+        id="filter-user"
+        type="text"
+        [(ngModel)]="filterUserId"
+        (change)="onFilterChange()"
+        placeholder="ID hoặc tên người dùng"
+        class="filter-input"
+      />
+    </div>
+
+    <div class="filter-group">
+      <label for="filter-performed">Người thực hiện</label>
+      <input
+        id="filter-performed"
+        type="text"
+        [(ngModel)]="filterPerformedBy"
+        (change)="onFilterChange()"
+        placeholder="ID hoặc tên admin"
+        class="filter-input"
+      />
+    </div>
+
+    <button (click)="onFilterChange()" class="filter-btn-search">
+      <i class="fas fa-search"></i> Tìm kiếm
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="audit-log-loading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <p>Đang tải dữ liệu...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && error" class="audit-log-error">
+    <i class="fas fa-exclamation-circle"></i>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!isLoading && !error && logs.length > 0" class="audit-log-table-wrapper">
+    <table class="audit-log-table">
+      <thead>
+        <tr>
+          <th>Thời gian</th>
+          <th>Hành động</th>
+          <th>Người thực hiện</th>
+          <th>Đối tượng tác động</th>
+          <th>Lý do</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs" class="audit-log-row">
+          <td class="col-timestamp">
+            <span class="timestamp">{{ formatDate(log.createdAt) }}</span>
+          </td>
+          <td class="col-action">
+            <span class="action-badge" [ngClass]="getActionClass(log.action)">
+              {{ getActionLabel(log.action) }}
+            </span>
+          </td>
+          <td class="col-performer">
+            <span class="performer-name">{{ getPerformedByUser(log) }}</span>
+          </td>
+          <td class="col-target">
+            <span class="target-info">{{ getTargetInfo(log) }}</span>
+          </td>
+          <td class="col-reason">
+            <span class="reason-text" *ngIf="log.reason; else noReason">
+              {{ log.reason }}
+            </span>
+            <ng-template #noReason>
+              <span class="reason-empty">--</span>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && logs.length === 0" class="audit-log-empty">
+    <i class="fas fa-inbox"></i>
+    <p>Không có nhật ký hoạt động</p>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && logs.length > 0" class="audit-log-pagination">
+    <button
+      (click)="onPageChange(currentPage - 1)"
+      [disabled]="currentPage <= 1"
+      class="pagination-btn"
+    >
+      <i class="fas fa-chevron-left"></i> Trước
+    </button>
+
+    <div class="pagination-info">
+      Trang <span class="current-page">{{ currentPage }}</span> /
+      <span class="total-pages">{{ totalPages }}</span>
+      ({{ totalRecords }} bản ghi)
+    </div>
+
+    <button
+      (click)="onPageChange(currentPage + 1)"
+      [disabled]="currentPage >= totalPages"
+      class="pagination-btn"
+    >
+      Sau <i class="fas fa-chevron-right"></i>
+    </button>
+  </div>
+</div>

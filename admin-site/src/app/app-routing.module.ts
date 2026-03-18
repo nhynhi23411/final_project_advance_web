@@ -34,6 +34,10 @@ const routes: Routes = [
       {
         path: 'moderation',
         loadComponent: () => import('./demo/admin-moderation/content-management.component').then((c) => c.ContentManagementComponent)
+      },
+      {
+        path: 'audit-logs',
+        loadComponent: () => import('./demo/admin-moderation/audit-log.component').then((c) => c.AuditLogComponent)
       }
     ]
   },

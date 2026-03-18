@@ -37,7 +37,6 @@ export class MeController {
     const userId = req.user.userId;
     const updated = await this.usersService.update(userId, {
       name: dto.name,
-      email: dto.email,
       phone: dto.phone,
     });
     if (!updated) {
