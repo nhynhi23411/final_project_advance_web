@@ -8,7 +8,13 @@ export interface Item {
   _id?: string;
   id?: string | number;
   title?: string;
+  description?: string;
+  category?: string;
   status?: PostStatus;
+  createdAt?: string | Date;
+  created_at?: string | Date;
+  updatedAt?: string | Date;
+  updated_at?: string | Date;
   isUpdating?: boolean;
   [key: string]: any;
 }
@@ -85,6 +91,31 @@ export class AdminService {
     return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, {
       params: { status: 'REJECTED' }
     });
+  }
+
+  /** Get posts with optional status (use 'all' for all) and filters. */
+  getPosts(params?: {
+    status?: string;
+    category?: string;
+    dateFrom?: string;
+    dateTo?: string;
+  }): Observable<Item[]> {
+    const p: Record<string, string> = {};
+    if (params?.status != null) p['status'] = params.status;
+    if (params?.category?.trim()) p['category'] = params.category.trim();
+    if (params?.dateFrom) p['dateFrom'] = params.dateFrom;
+    if (params?.dateTo) p['dateTo'] = params.dateTo;
+    return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, { params: p });
+  }
+
+  /** Admin override: update post content (title, description, category). */
+  updatePost(id: string, dto: { title?: string; description?: string; category?: string }): Observable<Item> {
+    return this.http.patch<Item>(`${this.baseUrl}/admin/posts/${id}`, dto);
+  }
+
+  /** Soft delete post (sets status to ARCHIVED). */
+  deletePost(id: string): Observable<Item> {
+    return this.http.delete<Item>(`${this.baseUrl}/admin/posts/${id}`);
   }
 
   changeStatus(

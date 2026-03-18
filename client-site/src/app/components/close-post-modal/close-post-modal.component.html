@@ -1,0 +1,72 @@
+<div class="close-post-modal-shell">
+  <div class="close-post-modal-header">
+    <h2 class="close-post-modal-title">
+      <i class="fas fa-lock mr-3 text-uel-accent" aria-hidden="true"></i>
+      Đóng bài đăng
+    </h2>
+    <button
+      type="button"
+      (click)="closeModal()"
+      aria-label="Đóng"
+      class="close-post-modal-close"
+    >
+      <i class="fas fa-times" aria-hidden="true"></i>
+    </button>
+  </div>
+
+  <div class="close-post-modal-body">
+    <p class="close-post-modal-desc">
+      Bạn đang đóng bài "<strong>{{ item?.title }}</strong>". Quản trị viên sẽ nhận thông báo. Vui lòng chọn lý do đóng bài.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="close-post-form">
+      <div *ngIf="error" class="close-post-error">
+        <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
+        <span>{{ error }}</span>
+      </div>
+
+      <div class="close-post-field">
+        <label class="close-post-label">
+          <span class="text-red-500">*</span> Lý do đóng bài
+        </label>
+        <select
+          formControlName="reason"
+          class="close-post-select"
+          required
+        >
+          <option value="">-- Chọn lý do --</option>
+          <option *ngFor="let opt of reasonOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+      </div>
+
+      <div *ngIf="isOtherReason" class="close-post-field">
+        <label class="close-post-label">Mô tả lý do (tối đa 500 ký tự)</label>
+        <textarea
+          formControlName="custom_reason"
+          rows="3"
+          placeholder="Nhập lý do đóng bài..."
+          class="close-post-textarea"
+          maxlength="500"
+        ></textarea>
+      </div>
+
+      <div class="close-post-actions">
+        <button
+          type="button"
+          (click)="closeModal()"
+          class="close-post-btn close-post-btn-secondary"
+        >
+          Hủy
+        </button>
+        <button
+          type="submit"
+          [disabled]="isSubmitting"
+          class="close-post-btn close-post-btn-primary"
+        >
+          <span *ngIf="!isSubmitting">Xác nhận đóng bài</span>
+          <span *ngIf="isSubmitting">Đang xử lý...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

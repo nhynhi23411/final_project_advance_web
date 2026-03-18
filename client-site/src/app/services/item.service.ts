@@ -155,6 +155,19 @@ export class ItemService {
         return this.http.delete<void>(`${this.base}/items/${id}`);
     }
 
+    /** Đóng bài đăng (chủ bài). Gửi lý do, backend sẽ chuyển sang ARCHIVED và thông báo admin. */
+    closePost(id: string, reason: string, customReason?: string): Observable<Item> {
+        const body: { reason: string; custom_reason?: string } = { reason };
+        if (customReason?.trim()) body.custom_reason = customReason.trim();
+        return this.http.patch<{ data: Item; message?: string }>(`${this.base}/items/${id}/close`, body).pipe(
+            map((res) => (res?.data ? this.normalizeItem(res.data) : res as any)),
+            catchError((err: HttpErrorResponse) => {
+                const msg = this.getApiErrorMessage(err);
+                return throwError({ message: msg } as ApiError);
+            }),
+        );
+    }
+
     /** Fetch match suggestions for the current user (score > 60%). */
     getMatchSuggestions(): Observable<MatchSuggestion[]> {
         return this.http

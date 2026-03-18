@@ -1,0 +1,259 @@
+<div class="row">
+  <div class="col-xl-12">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'all'"
+          href="javascript:void(0)"
+          (click)="onTabChange('all')"
+        >
+          Tất cả bài đăng
+          <span class="badge bg-secondary ms-1" *ngIf="activeTab === 'all' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'pending'"
+          href="javascript:void(0)"
+          (click)="onTabChange('pending')"
+        >
+          Chờ duyệt
+          <span class="badge bg-warning ms-1" *ngIf="activeTab === 'pending' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'approved'"
+          href="javascript:void(0)"
+          (click)="onTabChange('approved')"
+        >
+          Đã duyệt
+          <span class="badge bg-success ms-1" *ngIf="activeTab === 'approved' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'needs_update'"
+          href="javascript:void(0)"
+          (click)="onTabChange('needs_update')"
+        >
+          Cần cập nhật
+          <span class="badge bg-info ms-1" *ngIf="activeTab === 'needs_update' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'rejected'"
+          href="javascript:void(0)"
+          (click)="onTabChange('rejected')"
+        >
+          Bị từ chối
+          <span class="badge bg-danger ms-1" *ngIf="activeTab === 'rejected' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'returned'"
+          href="javascript:void(0)"
+          (click)="onTabChange('returned')"
+        >
+          Đã trả lại
+          <span class="badge bg-primary ms-1" *ngIf="activeTab === 'returned' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="activeTab === 'archived'"
+          href="javascript:void(0)"
+          (click)="onTabChange('archived')"
+        >
+          Đã đóng
+          <span class="badge bg-dark ms-1" *ngIf="activeTab === 'archived' && items.length">{{ items.length }}</span>
+        </a>
+      </li>
+    </ul>
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+      <h5 class="mb-0">{{ getListTitle() }}</h5>
+      <div class="d-flex flex-wrap align-items-center gap-2">
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          style="max-width: 140px;"
+          placeholder="Danh mục"
+          [(ngModel)]="filterCategory"
+        />
+        <input
+          type="date"
+          class="form-control form-control-sm"
+          style="max-width: 150px;"
+          placeholder="Từ ngày"
+          [(ngModel)]="filterDateFrom"
+        />
+        <input
+          type="date"
+          class="form-control form-control-sm"
+          style="max-width: 150px;"
+          placeholder="Đến ngày"
+          [(ngModel)]="filterDateTo"
+        />
+        <button class="btn btn-sm btn-outline-primary" (click)="applyFilters()" [disabled]="loading">
+          Lọc
+        </button>
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          style="max-width: 200px;"
+          placeholder="Tìm ID, tiêu đề..."
+          [(ngModel)]="searchTerm"
+        />
+      </div>
+    </div>
+
+    <app-card blockClass="table-border-style">
+      <div class="table-responsive">
+        <table class="table table-hover content-table" *ngIf="!loading">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Tiêu đề</th>
+              <th>Danh mục</th>
+              <th>Trạng thái</th>
+              <th>Ngày tạo</th>
+              <th *ngIf="activeTab === 'rejected' || activeTab === 'needs_update'">Lý do</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              *ngFor="let item of filteredItems"
+              [class.pending-row]="activeTab === 'pending'"
+              [class.pending-row--clickable]="activeTab === 'pending'"
+              (click)="activeTab === 'pending' && openPendingDetail(item)"
+            >
+              <td class="id-cell">{{ getItemId(item) || '—' }}</td>
+              <td class="title-cell">{{ item.title || 'Không có tiêu đề' }}</td>
+              <td class="category-cell">{{ item.category || '—' }}</td>
+              <td>
+                <app-status-badge [status]="item.status || 'DRAFT'"></app-status-badge>
+              </td>
+              <td>{{ getCreatedAt(item) }}</td>
+              <td *ngIf="activeTab === 'rejected' || activeTab === 'needs_update'" class="reason-cell">{{ getRejectedReason(item) }}</td>
+              <td>
+                <div class="d-flex gap-1 flex-wrap">
+                  <ng-container *ngIf="activeTab === 'pending'">
+                    <button
+                      class="btn btn-outline-primary btn-sm"
+                      (click)="openPendingDetail(item, $event)"
+                      [disabled]="loading"
+                    >
+                      Xem chi tiết
+                    </button>
+                  </ng-container>
+                  <button
+                    class="btn btn-outline-secondary btn-sm"
+                    (click)="openQuickEdit(item, $event)"
+                    title="Chỉnh sửa nhanh"
+                  >
+                    Sửa
+                  </button>
+                  <button
+                    class="btn btn-outline-danger btn-sm"
+                    (click)="openDeleteConfirm(item, $event)"
+                    title="Xóa (soft)"
+                  >
+                    Xóa
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div *ngIf="loading" class="text-center p-3">
+          <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+          Đang tải...
+        </div>
+        <div *ngIf="!loading && filteredItems.length === 0" class="text-center p-3 text-muted">
+          Không có bài đăng nào.
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>
+
+<!-- Quick edit modal -->
+<div
+  class="modal d-block"
+  *ngIf="showQuickEditModal"
+  style="background: rgba(0,0,0,0.4);"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Chỉnh sửa nhanh</h5>
+        <button type="button" class="btn-close" (click)="closeQuickEdit()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <label class="form-label">Tiêu đề</label>
+          <input type="text" class="form-control" [(ngModel)]="quickEditForm.title" maxlength="500" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Mô tả</label>
+          <textarea class="form-control" [(ngModel)]="quickEditForm.description" rows="3" maxlength="5000"></textarea>
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Danh mục</label>
+          <input type="text" class="form-control" [(ngModel)]="quickEditForm.category" maxlength="100" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeQuickEdit()">Hủy</button>
+        <button type="button" class="btn btn-primary" (click)="saveQuickEdit()" [disabled]="saving">
+          <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+          Lưu
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm modal -->
+<div
+  class="modal d-block"
+  *ngIf="showDeleteModal"
+  style="background: rgba(0,0,0,0.4);"
+  tabindex="-1"
+  role="dialog"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Xác nhận xóa</h5>
+        <button type="button" class="btn-close" (click)="closeDeleteModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="deleteItem">
+          Bạn có chắc muốn xóa bài đăng &quot;{{ deleteItem.title || 'Không có tiêu đề' }}&quot;?
+          Bài sẽ được chuyển sang trạng thái Đã đóng (soft delete).
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeDeleteModal()">Hủy</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()" [disabled]="deleting">
+          <span *ngIf="deleting" class="spinner-border spinner-border-sm me-1"></span>
+          Xóa
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

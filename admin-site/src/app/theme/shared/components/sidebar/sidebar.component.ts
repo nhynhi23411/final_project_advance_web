@@ -36,8 +36,8 @@ export class SidebarComponent {
       route: '/users'
     },
     {
-      label: 'Quản lý Bài Đăng',
-      icon: 'file-text',
+      label: 'Quản lý Nội dung',
+      icon: 'edit-2',
       route: '/moderation'
     }
   ];

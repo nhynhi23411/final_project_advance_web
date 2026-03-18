@@ -8,6 +8,7 @@ import { Claim, ClaimDocument } from "../claims/schemas/claim.schema";
 import { AuditLogService } from "../audit-log/audit-log.service";
 import { UsersService } from "../users/users.service";
 import { UpdatePostStatusDto } from "./dto/update-post-status.dto";
+import { AdminUpdatePostDto } from "./dto/admin-update-post.dto";
 
 @Injectable()
 export class AdminPostsService {
@@ -20,8 +21,70 @@ export class AdminPostsService {
     private readonly eventEmitter: EventEmitter2,
   ) {}
 
-  async getPosts(status: string = "PENDING_ADMIN"): Promise<PostDocument[]> {
-    return this.postModel.find({ status }).sort({ createdAt: -1 }).exec();
+  /**
+   * Get posts by status. Use status=all to get all posts.
+   * Optional filters: category, dateFrom, dateTo (ISO date strings).
+   */
+  async getPosts(
+    status: string = "PENDING_ADMIN",
+    filters?: { category?: string; dateFrom?: string; dateTo?: string },
+  ): Promise<PostDocument[]> {
+    const query: Record<string, unknown> = {};
+    if (status && status.toLowerCase() !== "all") {
+      query.status = status;
+    }
+    if (filters?.category?.trim()) {
+      query.category = filters.category.trim();
+    }
+    if (filters?.dateFrom || filters?.dateTo) {
+      query.createdAt = {};
+      if (filters.dateFrom) {
+        (query.createdAt as Record<string, Date>).$gte = new Date(filters.dateFrom + "T00:00:00.000Z");
+      }
+      if (filters.dateTo) {
+        (query.createdAt as Record<string, Date>).$lte = new Date(filters.dateTo + "T23:59:59.999Z");
+      }
+    }
+    return this.postModel.find(query).sort({ createdAt: -1 }).exec();
+  }
+
+  /** Admin override: update post content (title, description, category). */
+  async updatePostContent(
+    postId: string,
+    dto: AdminUpdatePostDto,
+  ): Promise<PostDocument> {
+    const post = await this.postModel.findById(postId).exec();
+    if (!post) throw new NotFoundException("Post not found");
+    const update: Record<string, unknown> = {};
+    if (dto.title !== undefined) update.title = dto.title.trim();
+    if (dto.description !== undefined) update.description = dto.description;
+    if (dto.category !== undefined) update.category = dto.category.trim();
+    if (Object.keys(update).length === 0) return post;
+    const updated = await this.postModel
+      .findByIdAndUpdate(postId, { $set: update }, { new: true })
+      .exec();
+    if (!updated) throw new NotFoundException("Post not found");
+    return updated;
+  }
+
+  /** Soft delete: set status to ARCHIVED. */
+  async deletePost(postId: string): Promise<PostDocument> {
+    const post = await this.postModel.findById(postId).exec();
+    if (!post) throw new NotFoundException("Post not found");
+    const updated = await this.postModel
+      .findByIdAndUpdate(
+        postId,
+        {
+          $set: {
+            status: "ARCHIVED",
+            archived_reason: "Đã xóa bởi quản trị viên",
+          },
+        },
+        { new: true },
+      )
+      .exec();
+    if (!updated) throw new NotFoundException("Post not found");
+    return updated;
   }
 
   async getDashboardStats(): Promise<{
