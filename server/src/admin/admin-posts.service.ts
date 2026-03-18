@@ -59,7 +59,7 @@ export class AdminPostsService {
           reject_reason: null,
         })
         .exec();
-      this.eventEmitter.emit("post.approved", { postId, userId });
+      this.eventEmitter.emit("post.approved", { postId, userId, adminUserId });
     } else if (dto.status === "NEEDS_UPDATE") {
       await this.postModel
         .findByIdAndUpdate(postId, {
@@ -67,7 +67,7 @@ export class AdminPostsService {
           reject_reason: dto.reject_reason ?? null,
         })
         .exec();
-      this.eventEmitter.emit("post.needs_update", { postId, userId });
+      this.eventEmitter.emit("post.needs_update", { postId, userId, adminUserId });
     } else if (dto.status === "REJECTED") {
       await this.auditLogService.createRejectLog(
         postId,
@@ -82,6 +82,8 @@ export class AdminPostsService {
           reject_reason: dto.reject_reason ?? null,
         })
         .exec();
+
+      this.eventEmitter.emit("post.rejected", { postId, userId, adminUserId });
 
       const appConfig = this.configService.get<{ maxRejects24h: number }>("app");
       const maxRejects = appConfig?.maxRejects24h ?? 3;
