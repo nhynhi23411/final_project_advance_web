@@ -44,6 +44,11 @@ export class SidebarComponent {
       label: 'Nhật ký Hoạt động',
       icon: 'file-text',
       route: '/audit-logs'
+    },
+    {
+      label: 'Báo cáo hàng tháng',
+      icon: 'bar-chart-2',
+      route: '/reports'
     }
   ];
 
