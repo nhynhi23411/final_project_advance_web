@@ -51,13 +51,13 @@ export class UsersComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]],
       phone: ['', Validators.required],
-      role: ['FINDER'],
+      role: ['USER'],
     });
     this.editForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       phone: ['', Validators.required],
-      role: ['FINDER'],
+      role: ['USER'],
     });
     this.loadUsers();
   }
@@ -101,8 +101,7 @@ export class UsersComponent implements OnInit {
   getRoleLabel(role: string | undefined): string {
     const map: Record<string, string> = {
       ADMIN: 'Admin',
-      USER: 'User',
-      FINDER: 'Finder'
+      USER: 'Thành viên'
     };
     return map[role || ''] || role || '-';
   }
@@ -117,7 +116,7 @@ export class UsersComponent implements OnInit {
   }
 
   openAddModal(): void {
-    this.addForm.reset({ name: '', username: '', email: '', password: '', phone: '', role: 'FINDER' });
+    this.addForm.reset({ name: '', username: '', email: '', password: '', phone: '', role: 'USER' });
     this.addError = '';
     this.showAddModal = true;
   }
@@ -159,7 +158,7 @@ export class UsersComponent implements OnInit {
       name: u.name,
       email: u.email,
       phone: u.phone || '',
-      role: u.role || 'FINDER',
+      role: u.role || 'USER',
     });
     this.editError = '';
     this.showEditModal = true;

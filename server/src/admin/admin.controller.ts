@@ -64,7 +64,7 @@ export class AdminController {
       email: dto.email,
       password: hashedPassword,
       phone: dto.phone,
-      role: dto.role || "FINDER",
+      role: dto.role || "USER",
       status: "ACTIVE",
       warning_count: 0,
     } as any);
