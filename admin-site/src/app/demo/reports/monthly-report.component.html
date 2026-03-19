@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+      <h5 class="mb-0">Báo cáo hàng tháng</h5>
+      <select
+        class="form-select form-select-sm"
+        style="width: 120px;"
+        [(ngModel)]="selectedYear"
+        (ngModelChange)="onPeriodChange()"
+      >
+        @for (y of years; track y) {
+          <option [ngValue]="y">{{ y }}</option>
+        }
+      </select>
+      <select
+        class="form-select form-select-sm"
+        style="width: 140px;"
+        [(ngModel)]="selectedMonth"
+        (ngModelChange)="onPeriodChange()"
+      >
+        @for (m of months; track m.value) {
+          <option [ngValue]="m.value">{{ m.label }}</option>
+        }
+      </select>
+      <button
+        type="button"
+        class="btn btn-primary btn-sm"
+        (click)="loadReport()"
+        [disabled]="loading"
+      >
+        <i class="feather icon-refresh-cw"></i> Tải lại
+      </button>
+    </div>
+
+    @if (error) {
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+      </div>
+    }
+
+    @if (loading && !report) {
+      <div class="text-center py-5">
+        <span class="spinner-border text-primary" role="status"></span>
+        <p class="mt-2 mb-0">Đang tải báo cáo...</p>
+      </div>
+    }
+
+    @if (report && !loading) {
+      <!-- Tổng quan -->
+      <app-card [cardTitle]="'Tổng quan ' + getMonthLabel()" cardClass="mb-3">
+        <div class="row">
+          <div class="col-md-4 col-6 mb-2">
+            <div class="border rounded p-2">
+              <small class="text-muted">User đăng ký mới</small>
+              <h5 class="mb-0">{{ report.summary.newUsersCount }}</h5>
+            </div>
+          </div>
+          <div class="col-md-4 col-6 mb-2">
+            <div class="border rounded p-2">
+              <small class="text-muted">Bài đăng mới</small>
+              <h5 class="mb-0">{{ report.summary.newPostsCount }}</h5>
+            </div>
+          </div>
+          <div class="col-md-4 col-6 mb-2">
+            <div class="border rounded p-2">
+              <small class="text-muted">Yêu cầu nhận đồ (claims)</small>
+              <h5 class="mb-0">{{ report.summary.newClaimsCount }}</h5>
+            </div>
+          </div>
+          <div class="col-md-4 col-6 mb-2">
+            <div class="border rounded p-2">
+              <small class="text-muted">Claims thành công trong tháng</small>
+              <h5 class="mb-0">{{ report.summary.successfulClaimsCount }}</h5>
+            </div>
+          </div>
+          <div class="col-md-4 col-6 mb-2">
+            <div class="border rounded p-2">
+              <small class="text-muted">Bài đăng được duyệt trong tháng</small>
+              <h5 class="mb-0">{{ report.summary.approvedPostsCount }}</h5>
+            </div>
+          </div>
+        </div>
+      </app-card>
+
+      <!-- Bảng chi tiết: User mới -->
+      <app-card cardTitle="User đăng ký mới" cardClass="mb-3">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>Họ tên</th>
+                <th>Email</th>
+                <th>Ngày đăng ký</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (report.newUsers.length === 0) {
+                <tr>
+                  <td colspan="3" class="text-muted text-center py-3">Không có user mới trong tháng.</td>
+                </tr>
+              }
+              @for (u of report.newUsers; track u._id) {
+                <tr>
+                  <td>{{ u.name }}</td>
+                  <td>{{ u.email }}</td>
+                  <td>{{ formatDate(u.created_at) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-card>
+
+      <!-- Bảng chi tiết: Bài đăng mới -->
+      <app-card cardTitle="Bài đăng mới" cardClass="mb-3">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>Tiêu đề</th>
+                <th>Loại</th>
+                <th>Category</th>
+                <th>Trạng thái</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (report.newPosts.length === 0) {
+                <tr>
+                  <td colspan="5" class="text-muted text-center py-3">Không có bài đăng mới trong tháng.</td>
+                </tr>
+              }
+              @for (p of report.newPosts; track p._id) {
+                <tr>
+                  <td>{{ p.title }}</td>
+                  <td>{{ p.post_type }}</td>
+                  <td>{{ p.category }}</td>
+                  <td><span [ngClass]="getPostStatusBadge(p.status)">{{ p.status }}</span></td>
+                  <td>{{ formatDate(p.createdAt) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-card>
+
+      <!-- Bảng chi tiết: Claims -->
+      <app-card cardTitle="Yêu cầu nhận đồ (Claims)">
+        <div class="table-responsive">
+          <table class="table table-sm table-striped">
+            <thead>
+              <tr>
+                <th>Trạng thái</th>
+                <th>Post ID</th>
+                <th>User ID (người claim)</th>
+                <th>Ngày tạo</th>
+              </tr>
+            </thead>
+            <tbody>
+              @if (report.claims.length === 0) {
+                <tr>
+                  <td colspan="4" class="text-muted text-center py-3">Không có claim nào trong tháng.</td>
+                </tr>
+              }
+              @for (c of report.claims; track c._id) {
+                <tr>
+                  <td><span [ngClass]="getClaimStatusBadge(c.status)">{{ c.status }}</span></td>
+                  <td><code class="small">{{ c.target_post_id }}</code></td>
+                  <td><code class="small">{{ c.claimant_user_id }}</code></td>
+                  <td>{{ formatDate(c.created_at) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </app-card>
+    }
+  </div>
+</div>

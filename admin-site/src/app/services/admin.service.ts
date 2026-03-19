@@ -24,6 +24,34 @@ export interface DashboardStats {
   activePosts: number;
   resolvedClaims: number;
   pendingAdmin: number;
+  approvedLostCount?: number;
+  matchRate?: number;
+}
+
+export interface GrowthStats {
+  labels: string[];
+  users: number[];
+  posts: number[];
+}
+
+export interface CategoryStat {
+  category: string;
+  count: number;
+}
+
+export interface MonthlyReport {
+  year: number;
+  month: number;
+  summary: {
+    newUsersCount: number;
+    newPostsCount: number;
+    newClaimsCount: number;
+    successfulClaimsCount: number;
+    approvedPostsCount: number;
+  };
+  newUsers: { _id: string; name: string; email: string; created_at: string }[];
+  newPosts: { _id: string; title: string; category: string; post_type: string; status: string; createdAt: string }[];
+  claims: { _id: string; status: string; target_post_id: string; claimant_user_id: string; created_at: string }[];
 }
 
 export interface AdminUser {
@@ -45,6 +73,22 @@ export class AdminService {
 
   getDashboardStats(): Observable<DashboardStats> {
     return this.http.get<DashboardStats>(`${this.baseUrl}/admin/dashboard-stats`);
+  }
+
+  getGrowthStats(months = 12): Observable<GrowthStats> {
+    return this.http.get<GrowthStats>(`${this.baseUrl}/admin/stats/growth`, {
+      params: { months: String(months) }
+    });
+  }
+
+  getStatsByCategory(): Observable<CategoryStat[]> {
+    return this.http.get<CategoryStat[]>(`${this.baseUrl}/admin/stats/by-category`);
+  }
+
+  getMonthlyReport(year: number, month: number): Observable<MonthlyReport> {
+    return this.http.get<MonthlyReport>(`${this.baseUrl}/admin/reports/monthly`, {
+      params: { year: String(year), month: String(month) }
+    });
   }
 
   getUsers(skip = 0, limit = 50): Observable<AdminUser[]> {

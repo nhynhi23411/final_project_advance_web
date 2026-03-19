@@ -52,6 +52,13 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         url: '/audit-logs',
         icon: 'feather icon-file-text'
+      },
+      {
+        id: 'reports',
+        title: 'Báo cáo hàng tháng',
+        type: 'item',
+        url: '/reports',
+        icon: 'feather icon-bar-chart-2'
       }
     ]
   },

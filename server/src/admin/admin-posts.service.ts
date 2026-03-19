@@ -10,6 +10,18 @@ import { UsersService } from "../users/users.service";
 import { UpdatePostStatusDto } from "./dto/update-post-status.dto";
 import { AdminUpdatePostDto } from "./dto/admin-update-post.dto";
 
+/** Danh sách category chuẩn (đồng bộ với client) – dùng để chuẩn hóa pie chart. */
+const STANDARD_CATEGORIES = [
+  "Thiết bị điện tử",
+  "Ví tiền",
+  "Giấy tờ",
+  "Chìa khóa",
+  "Túi xách & Hành lý",
+  "Trang sức & Phụ kiện",
+  "Thể thao & Ngoài trời",
+  "Khác",
+];
+
 @Injectable()
 export class AdminPostsService {
   constructor(
@@ -92,15 +104,218 @@ export class AdminPostsService {
     activePosts: number;
     resolvedClaims: number;
     pendingAdmin: number;
+    approvedLostCount: number;
+    matchRate: number;
   }> {
-    const [totalUsers, activePosts, resolvedClaims, pendingAdmin] =
+    const [
+      totalUsers,
+      activePosts,
+      resolvedClaims,
+      pendingAdmin,
+      approvedLostCount,
+    ] = await Promise.all([
+      this.usersService.countAll(),
+      this.postModel.countDocuments({ status: "APPROVED" }).exec(),
+      this.claimModel.countDocuments({ status: "SUCCESSFUL" }).exec(),
+      this.postModel.countDocuments({ status: "PENDING_ADMIN" }).exec(),
+      this.postModel
+        .countDocuments({
+          post_type: "LOST",
+          status: "APPROVED",
+        })
+        .exec(),
+    ]);
+    const matchRate =
+      approvedLostCount > 0 ? resolvedClaims / approvedLostCount : 0;
+    return {
+      totalUsers,
+      activePosts,
+      resolvedClaims,
+      pendingAdmin,
+      approvedLostCount,
+      matchRate,
+    };
+  }
+
+  /** Tăng trưởng User và Post theo tháng (cho line chart). limitMonths mặc định 12. */
+  async getGrowthStats(limitMonths = 12): Promise<{
+    labels: string[];
+    users: number[];
+    posts: number[];
+  }> {
+    const [userBuckets, postBuckets] = await Promise.all([
+      this.usersService.getCountGroupedByMonth(limitMonths),
+      this.getPostCountGroupedByMonth(limitMonths),
+    ]);
+    const labels = userBuckets.map((u) => u.month);
+    const users = userBuckets.map((u) => u.count);
+    const posts = labels.map(
+      (label) => postBuckets.find((p) => p.month === label)?.count ?? 0,
+    );
+    return { labels, users, posts };
+  }
+
+  private async getPostCountGroupedByMonth(
+    limitMonths: number,
+  ): Promise<{ month: string; count: number }[]> {
+    const now = new Date();
+    const start = new Date(
+      now.getFullYear(),
+      now.getMonth() - limitMonths + 1,
+      1,
+    );
+    const result = await this.postModel
+      .aggregate<{ _id: { year: number; month: number }; count: number }>([
+        { $match: { createdAt: { $gte: start } } },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" },
+            },
+            count: { $sum: 1 },
+          },
+        },
+        { $sort: { "_id.year": 1, "_id.month": 1 } },
+      ])
+      .exec();
+    const map = new Map<string, number>();
+    for (let i = 0; i < limitMonths; i++) {
+      const d = new Date(
+        now.getFullYear(),
+        now.getMonth() - limitMonths + 1 + i,
+        1,
+      );
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      map.set(key, 0);
+    }
+    for (const r of result) {
+      const key = `${r._id.year}-${String(r._id.month).padStart(2, "0")}`;
+      map.set(key, r.count);
+    }
+    return Array.from(map.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([month, count]) => ({ month, count }));
+  }
+
+  /** Số bài đăng đã duyệt theo category (cho pie chart). Chuẩn hóa theo danh sách client: giá trị không nằm trong danh sách gom vào "Khác". */
+  async getStatsByCategory(): Promise<{ category: string; count: number }[]> {
+    const result = await this.postModel
+      .aggregate<{ _id: string; count: number }>([
+        { $match: { status: "APPROVED" } },
+        { $group: { _id: "$category", count: { $sum: 1 } } },
+      ])
+      .exec();
+    const map = new Map<string, number>();
+    for (const cat of STANDARD_CATEGORIES) {
+      map.set(cat, 0);
+    }
+    for (const r of result) {
+      const raw = (r._id || "").trim();
+      const standard =
+        STANDARD_CATEGORIES.includes(raw) ? raw : "Khác";
+      map.set(standard, (map.get(standard) ?? 0) + r.count);
+    }
+    return STANDARD_CATEGORIES.map((category) => ({
+      category,
+      count: map.get(category) ?? 0,
+    })).filter((row) => row.count > 0);
+  }
+
+  /** Báo cáo hàng tháng: tổng hợp + bảng chi tiết (user mới, bài đăng mới, claims). year, month 1-based. */
+  async getMonthlyReport(
+    year: number,
+    month: number,
+  ): Promise<{
+    year: number;
+    month: number;
+    summary: {
+      newUsersCount: number;
+      newPostsCount: number;
+      newClaimsCount: number;
+      successfulClaimsCount: number;
+      approvedPostsCount: number;
+    };
+    newUsers: { _id: string; name: string; email: string; created_at: Date }[];
+    newPosts: {
+      _id: string;
+      title: string;
+      category: string;
+      post_type: string;
+      status: string;
+      createdAt: Date;
+    }[];
+    claims: {
+      _id: string;
+      status: string;
+      target_post_id: string;
+      claimant_user_id: string;
+      created_at: Date;
+    }[];
+  }> {
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+
+    const [newUsers, newPosts, newClaims, successfulInMonth, approvedInMonth] =
       await Promise.all([
-        this.usersService.countAll(),
-        this.postModel.countDocuments({ status: "APPROVED" }).exec(),
-        this.claimModel.countDocuments({ status: "SUCCESSFUL" }).exec(),
-        this.postModel.countDocuments({ status: "PENDING_ADMIN" }).exec(),
+        this.usersService.getCreatedInMonth(year, month),
+        this.postModel
+          .find({ createdAt: { $gte: start, $lte: end } })
+          .select("_id title category post_type status createdAt")
+          .sort({ createdAt: 1 })
+          .lean()
+          .exec(),
+        this.claimModel
+          .find({ created_at: { $gte: start, $lte: end } })
+          .select("_id status target_post_id claimant_user_id created_at")
+          .sort({ created_at: 1 })
+          .lean()
+          .exec(),
+        this.claimModel
+          .countDocuments({
+            status: "SUCCESSFUL",
+            updated_at: { $gte: start, $lte: end },
+          })
+          .exec(),
+        this.postModel
+          .countDocuments({
+            status: "APPROVED",
+            approved_at: { $gte: start, $lte: end },
+          })
+          .exec(),
       ]);
-    return { totalUsers, activePosts, resolvedClaims, pendingAdmin };
+
+    const claimsList = newClaims.map((c: any) => ({
+      _id: String(c._id),
+      status: c.status ?? "",
+      target_post_id: String(c.target_post_id ?? ""),
+      claimant_user_id: String(c.claimant_user_id ?? ""),
+      created_at: c.created_at,
+    }));
+
+    const postsList = newPosts.map((p: any) => ({
+      _id: String(p._id),
+      title: p.title ?? "",
+      category: p.category ?? "",
+      post_type: p.post_type ?? "",
+      status: p.status ?? "",
+      createdAt: p.createdAt,
+    }));
+
+    return {
+      year,
+      month,
+      summary: {
+        newUsersCount: newUsers.length,
+        newPostsCount: newPosts.length,
+        newClaimsCount: newClaims.length,
+        successfulClaimsCount: successfulInMonth,
+        approvedPostsCount: approvedInMonth,
+      },
+      newUsers,
+      newPosts: postsList,
+      claims: claimsList,
+    };
   }
 
   async updatePostStatus(

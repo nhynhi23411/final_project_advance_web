@@ -36,6 +36,30 @@ export class AdminController {
     return this.adminPostsService.getDashboardStats();
   }
 
+  @Get("stats/growth")
+  getGrowthStats(@Query("months") months?: string) {
+    const limitMonths = Math.min(
+      24,
+      Math.max(6, parseInt(months || "12", 10) || 12),
+    );
+    return this.adminPostsService.getGrowthStats(limitMonths);
+  }
+
+  @Get("stats/by-category")
+  getStatsByCategory() {
+    return this.adminPostsService.getStatsByCategory();
+  }
+
+  @Get("reports/monthly")
+  getMonthlyReport(
+    @Query("year") year?: string,
+    @Query("month") month?: string,
+  ) {
+    const y = parseInt(year || String(new Date().getFullYear()), 10);
+    const m = Math.min(12, Math.max(1, parseInt(month || String(new Date().getMonth() + 1), 10) || 1));
+    return this.adminPostsService.getMonthlyReport(y, m);
+  }
+
   @Get("users")
   getUsers(
     @Query("skip") skip?: string,

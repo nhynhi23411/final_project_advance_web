@@ -27,6 +27,7 @@ export class DashAnalyticsComponent implements OnInit {
   chartOptions_3!: Partial<ApexOptions>;
 
   statsLoading = true;
+  chartsLoading = true;
   cards: Array<{ background: string; title: string; icon: string; text: string; number: string; no?: string; url?: string }> = [];
   images: Array<{ src: string; title: string; size: string }> = [];
 
@@ -37,6 +38,7 @@ export class DashAnalyticsComponent implements OnInit {
 
   ngOnInit(): void {
     this.statsLoading = true;
+    this.chartsLoading = true;
     this.adminService.getDashboardStats().pipe(
       finalize(() => {
         this.statsLoading = false;
@@ -44,44 +46,133 @@ export class DashAnalyticsComponent implements OnInit {
       })
     ).subscribe({
       next: (stats: DashboardStats) => {
-        this.cards = [
-          {
-            background: 'bg-c-blue',
-            title: 'Tổng người dùng',
-            icon: 'feather icon-users',
-            text: 'User',
-            number: String(stats.totalUsers),
-            url: '/users'
-          },
-          {
-            background: 'bg-c-green',
-            title: 'Bài đăng đã duyệt',
-            icon: 'feather icon-check-circle',
-            text: 'Approved',
-            number: String(stats.activePosts),
-            url: '/moderation'
-          },
-          {
-            background: 'bg-c-yellow',
-            title: 'Bài chờ duyệt',
-            icon: 'feather icon-clock',
-            text: 'Pending',
-            number: String(stats.pendingAdmin),
-            url: '/moderation'
-          },
-          {
-            background: 'bg-c-red',
-            title: 'Yêu cầu đã giải quyết',
-            icon: 'feather icon-award',
-            text: 'Claims',
-            number: String(stats.resolvedClaims),
-            url: '/moderation'
-          }
-        ];
+        this.buildCards(stats);
       },
       error: () => {
         this.cards = [];
       }
     });
+    this.adminService.getGrowthStats(12).pipe(
+      finalize(() => this.cdr.markForCheck())
+    ).subscribe({
+      next: (data) => {
+        this.chartOptions = this.buildLineChartOptions(data);
+        this.chartsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.chartsLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+    this.adminService.getStatsByCategory().pipe(
+      finalize(() => this.cdr.markForCheck())
+    ).subscribe({
+      next: (data) => {
+        this.chartOptions_1 = this.buildPieChartOptions(data);
+        if (!this.chartOptions) this.chartsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        if (!this.chartOptions) this.chartsLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  private buildCards(stats: DashboardStats): void {
+    type CardItem = { background: string; title: string; icon: string; text: string; number: string; no?: string; url?: string };
+    const base: CardItem[] = [
+      {
+        background: 'bg-c-blue',
+        title: 'Tổng người dùng',
+        icon: 'feather icon-users',
+        text: 'User',
+        number: String(stats.totalUsers),
+        url: '/users'
+      },
+      {
+        background: 'bg-c-green',
+        title: 'Bài đăng đã duyệt',
+        icon: 'feather icon-check-circle',
+        text: 'Approved',
+        number: String(stats.activePosts),
+        url: '/moderation'
+      },
+      {
+        background: 'bg-c-yellow',
+        title: 'Bài chờ duyệt',
+        icon: 'feather icon-clock',
+        text: 'Pending',
+        number: String(stats.pendingAdmin),
+        url: '/moderation'
+      },
+      {
+        background: 'bg-c-red',
+        title: 'Yêu cầu đã giải quyết',
+        icon: 'feather icon-award',
+        text: 'Claims',
+        number: String(stats.resolvedClaims),
+        url: '/moderation'
+      }
+    ];
+    if (stats.matchRate !== undefined) {
+      const pct = (stats.matchRate * 100).toFixed(1);
+      base.push({
+        background: 'bg-c-purple',
+        title: 'Tỷ lệ khớp (Match rate)',
+        icon: 'feather icon-percent',
+        text: 'Successful Claims / Approved Lost',
+        number: pct + '%',
+        no: 'Thấp ⇒ cải thiện thuật toán Matching'
+      });
+    }
+    this.cards = base;
+  }
+
+  private buildLineChartOptions(data: { labels: string[]; users: number[]; posts: number[] }): Partial<ApexOptions> {
+    const labels = data.labels.map((m) => {
+      const [y, mo] = m.split('-');
+      return `${mo}/${y}`;
+    });
+    return {
+      chart: { height: 300, type: 'line', zoom: { enabled: false } },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: [2, 2] },
+      colors: ['#4099ff', '#0e9e4a'],
+      series: [
+        { name: 'User mới', data: data.users },
+        { name: 'Bài đăng mới', data: data.posts }
+      ],
+      title: { text: 'Tăng trưởng User / Post theo tháng', align: 'left' },
+      xaxis: { categories: labels },
+      legend: { position: 'top' },
+      grid: { borderColor: '#f1f1f1' },
+      fill: { opacity: 0.1 },
+      markers: { size: 0 },
+      yaxis: {}
+    };
+  }
+
+  private buildPieChartOptions(data: { category: string; count: number }[]): Partial<ApexOptions> {
+    if (!data?.length) {
+      return { chart: { type: 'donut', height: 320 }, series: [], labels: [] };
+    }
+    const colors = ['#4099ff', '#0e9e4a', '#00acc1', '#FFB64D', '#FF5370', '#7c4dff', '#18ffff', '#ffab91'];
+    return {
+      chart: { height: 320, type: 'donut' },
+      labels: data.map((d) => d.category),
+      series: data.map((d) => d.count),
+      colors: data.map((_, i) => colors[i % colors.length]),
+      legend: { show: true, position: 'bottom' },
+      dataLabels: { enabled: true },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: { show: true, name: { show: true }, value: { show: true } }
+          }
+        }
+      }
+    };
   }
 }
