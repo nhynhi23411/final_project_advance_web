@@ -97,12 +97,13 @@ export class PostsService extends BaseCrudService<
     const payload = {
       ...rest,
       post_type: postType,
-      location: locationData,
+      location: locationData || { type: "Point", coordinates: [0, 0], address: "" },
       metadata,
       created_by_user_id: new Types.ObjectId(userId),
       images: dto.images ?? [],
       image_public_ids: dto.image_public_ids ?? [],
       status: manualStatus || "PENDING_SYSTEM",
+      active_claim_count: 0,
     };
 
     const created = new this.model(payload);

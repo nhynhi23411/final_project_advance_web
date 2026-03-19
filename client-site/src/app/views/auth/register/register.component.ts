@@ -40,7 +40,11 @@ export class RegisterComponent implements OnInit {
       },
       error: (err) => {
         console.error("Register error", err);
-        this.toastService.error(err?.error?.message || "Lỗi khi đăng ký");
+        let errMsg = "Lỗi khi đăng ký";
+        if (err?.error?.message) {
+          errMsg = Array.isArray(err.error.message) ? err.error.message.join(', ') : err.error.message;
+        }
+        this.toastService.error(errMsg);
       },
     });
   }

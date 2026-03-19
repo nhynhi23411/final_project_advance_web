@@ -8,20 +8,35 @@ export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 @Schema({ timestamps: true })
 export class AuditLog {
+  @Prop({ enum: ["SYSTEM", "USER", "ADMIN"], required: true })
+  actor_type!: "SYSTEM" | "USER" | "ADMIN";
+
+  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  actor_user_id?: Types.ObjectId;
+
   @Prop({ required: true, enum: AUDIT_ACTIONS })
   action!: AuditAction;
 
-  @Prop({ type: Types.ObjectId, ref: "Post", required: true })
-  post_id!: Types.ObjectId;
+  @Prop({ enum: ["POST", "CLAIM", "USER", "MATCH"], required: true })
+  entity_type!: "POST" | "CLAIM" | "USER" | "MATCH";
 
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
-  user_id!: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, required: true })
+  entity_id!: Types.ObjectId;
+
+  @Prop({ default: null })
+  from_status?: string;
+
+  @Prop({ default: null })
+  to_status?: string;
 
   @Prop({ default: null })
   reason?: string;
 
-  @Prop({ type: Types.ObjectId, ref: "User", default: null })
-  performed_by_user_id?: Types.ObjectId;
+  @Prop({ enum: ["API", "ADMIN_DASHBOARD", "CRON", "AUTO_MODERATION"], required: true })
+  source!: "API" | "ADMIN_DASHBOARD" | "CRON" | "AUTO_MODERATION";
+
+  @Prop({ type: Object, default: null })
+  payload?: any;
 }
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);

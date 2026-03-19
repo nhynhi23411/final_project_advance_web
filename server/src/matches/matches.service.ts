@@ -13,7 +13,7 @@ import { Post, PostDocument } from "../posts/schemas/post.schema";
 import { User, UserDocument } from "../users/schemas/user.schema";
 import { CreateManualMatchDto } from "./dto/create-manual-match.dto";
 
-const MIN_SUGGESTION_SCORE = 0.6;
+const MIN_SUGGESTION_SCORE = 60;
 
 @Injectable()
 export class MatchesService {
@@ -164,9 +164,9 @@ export class MatchesService {
               created_at: new Date(),
             },
             $set: {
-              score: input.score,
+              score: Math.round(input.score * 100),
               distance_km: input.distanceKm ?? null,
-              text_score: input.textScore ?? null,
+              text_score: input.textScore != null ? Math.round(input.textScore * 100) : null,
               source: input.source ?? "auto",
               updated_at: new Date(),
             },

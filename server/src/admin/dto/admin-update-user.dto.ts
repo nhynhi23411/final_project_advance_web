@@ -14,6 +14,6 @@ export class AdminUpdateUserDto {
   phone?: string;
 
   @IsOptional()
-  @IsEnum(["FINDER", "ADMIN", "USER"])
-  role?: "FINDER" | "ADMIN" | "USER";
+  @IsEnum(["ADMIN", "USER"])
+  role?: "ADMIN" | "USER";
 }

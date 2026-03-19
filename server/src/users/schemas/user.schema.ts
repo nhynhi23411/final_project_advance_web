@@ -3,7 +3,7 @@ import { Document } from "mongoose";
 
 export type UserDocument = User & Document;
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
 export class User {
   @Prop({ required: true, trim: true })
   name!: string;
@@ -20,11 +20,11 @@ export class User {
   @Prop({ required: true, trim: true })
   phone!: string;
 
-  @Prop({ enum: ["FINDER", "ADMIN", "USER"], default: "FINDER" })
-  role!: "FINDER" | "ADMIN" | "USER";
+  @Prop({ enum: ["ADMIN", "USER"], default: "USER" })
+  role!: "ADMIN" | "USER";
 
-  @Prop({ enum: ["ACTIVE", "INACTIVE", "BANNED"], default: "ACTIVE" })
-  status!: "ACTIVE" | "INACTIVE" | "BANNED";
+  @Prop({ enum: ["ACTIVE", "BANNED"], default: "ACTIVE" })
+  status!: "ACTIVE" | "BANNED";
 
   @Prop({ default: 0 })
   warning_count!: number;
