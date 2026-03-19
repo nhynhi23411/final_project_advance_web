@@ -39,6 +39,11 @@ export class SidebarComponent {
       label: 'Quản lý Nội dung',
       icon: 'edit-2',
       route: '/moderation'
+    },
+    {
+      label: 'Nhật ký Hoạt động',
+      icon: 'file-text',
+      route: '/audit-logs'
     }
   ];
 

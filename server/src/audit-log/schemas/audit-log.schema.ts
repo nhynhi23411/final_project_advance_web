@@ -3,7 +3,7 @@ import { Document, Types } from "mongoose";
 
 export type AuditLogDocument = AuditLog & Document;
 
-export const AUDIT_ACTIONS = ["REJECT_POST"] as const;
+export const AUDIT_ACTIONS = ["REJECT_POST", "BAN_USER", "UNBAN_USER", "UPDATE_POST", "DELETE_POST"] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 @Schema({ timestamps: true })
@@ -11,11 +11,11 @@ export class AuditLog {
   @Prop({ required: true, enum: AUDIT_ACTIONS })
   action!: AuditAction;
 
-  @Prop({ type: Types.ObjectId, ref: "Post", required: true })
-  post_id!: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "Post", default: null })
+  post_id?: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: "User", required: true })
-  user_id!: Types.ObjectId;
+  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  user_id?: Types.ObjectId;
 
   @Prop({ default: null })
   reason?: string;

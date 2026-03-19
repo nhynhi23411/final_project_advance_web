@@ -58,11 +58,6 @@
               <p *ngIf="editErrors.name" class="prof-edit-error">{{ editErrors.name }}</p>
             </div>
             <div class="prof-edit-field">
-              <label class="prof-edit-label" for="prof-edit-email">Email</label>
-              <input id="prof-edit-email" type="email" class="prof-edit-input" [(ngModel)]="editForm.email" placeholder="Email" />
-              <p *ngIf="editErrors.email" class="prof-edit-error">{{ editErrors.email }}</p>
-            </div>
-            <div class="prof-edit-field">
               <label class="prof-edit-label" for="prof-edit-phone">Số điện thoại</label>
               <input id="prof-edit-phone" type="tel" class="prof-edit-input" [(ngModel)]="editForm.phone" placeholder="Số điện thoại" />
               <p *ngIf="editErrors.phone" class="prof-edit-error">{{ editErrors.phone }}</p>
