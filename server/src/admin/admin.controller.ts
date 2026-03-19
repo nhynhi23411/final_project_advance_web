@@ -8,6 +8,7 @@ import {
   Param,
   Query,
   UseGuards,
+  Req,
   BadRequestException,
   NotFoundException,
 } from "@nestjs/common";
@@ -16,6 +17,7 @@ import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "../auth/roles.decorator";
 import { AdminPostsService } from "./admin-posts.service";
 import { UsersService } from "../users/users.service";
+import { AuditLogService } from "../audit-log/audit-log.service";
 import { AdminCreateUserDto } from "./dto/admin-create-user.dto";
 import { AdminUpdateUserDto } from "./dto/admin-update-user.dto";
 
@@ -29,6 +31,7 @@ export class AdminController {
   constructor(
     private readonly adminPostsService: AdminPostsService,
     private readonly usersService: UsersService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get("dashboard-stats")
@@ -117,13 +120,26 @@ export class AdminController {
   async updateUserStatus(
     @Param("id") id: string,
     @Body("status") status: "ACTIVE" | "INACTIVE" | "BANNED",
+    @Req() req: any,
   ) {
     const existing = await this.usersService.findById(id);
     if (!existing) throw new NotFoundException("Không tìm thấy user");
     if (!["ACTIVE", "INACTIVE", "BANNED"].includes(status)) {
       throw new BadRequestException("Trạng thái không hợp lệ");
     }
+
+    const previousStatus = (existing as any).status;
+    // Admin id: lấy từ user token (guard đã gán req.user)
+    const performedByUserId = req?.user?.id;
+
     await this.usersService.updateStatus(id, status);
+
+    if (status === "BANNED" && previousStatus !== "BANNED") {
+      await this.auditLogService.createBanLog(id, "admin_ban", performedByUserId);
+    }
+    if (status !== "BANNED" && previousStatus === "BANNED") {
+      await this.auditLogService.createUnbanLog(id, performedByUserId);
+    }
     return { message: "Cập nhật trạng thái thành công", status };
   }
 

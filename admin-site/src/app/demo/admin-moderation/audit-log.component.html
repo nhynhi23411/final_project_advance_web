@@ -68,28 +68,26 @@
     <table class="audit-log-table">
       <thead>
         <tr>
-          <th>Thời gian</th>
           <th>Hành động</th>
-          <th>Người thực hiện</th>
-          <th>Đối tượng tác động</th>
+          <th>User vi phạm</th>
+          <th>Post liên quan</th>
           <th>Lý do</th>
+          <th>Admin thực hiện</th>
+          <th>Thời gian</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let log of logs" class="audit-log-row">
-          <td class="col-timestamp">
-            <span class="timestamp">{{ formatDate(log.createdAt) }}</span>
-          </td>
           <td class="col-action">
             <span class="action-badge" [ngClass]="getActionClass(log.action)">
               {{ getActionLabel(log.action) }}
             </span>
           </td>
-          <td class="col-performer">
-            <span class="performer-name">{{ getPerformedByUser(log) }}</span>
+          <td class="col-user">
+            <span class="target-info">{{ getViolatedUser(log) }}</span>
           </td>
-          <td class="col-target">
-            <span class="target-info">{{ getTargetInfo(log) }}</span>
+          <td class="col-post">
+            <span class="target-info">{{ getRelatedPost(log) }}</span>
           </td>
           <td class="col-reason">
             <span class="reason-text" *ngIf="log.reason; else noReason">
@@ -98,6 +96,12 @@
             <ng-template #noReason>
               <span class="reason-empty">--</span>
             </ng-template>
+          </td>
+          <td class="col-performer">
+            <span class="performer-name">{{ getPerformedByUser(log) }}</span>
+          </td>
+          <td class="col-timestamp">
+            <span class="timestamp">{{ formatDate(log.createdAt) }}</span>
           </td>
         </tr>
       </tbody>

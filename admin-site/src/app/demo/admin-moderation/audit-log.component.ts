@@ -83,7 +83,7 @@ export class AuditLogComponent implements OnInit {
     };
 
     if (this.filterAction) params.action = this.filterAction;
-    if (this.filterUserId) params.user_id = this.filterUserId;
+    if (this.filterUserId) params.userId = this.filterUserId;
     if (this.filterPerformedBy) params.performed_by_user_id = this.filterPerformedBy;
 
     const queryString = new URLSearchParams(params).toString();
@@ -119,7 +119,7 @@ export class AuditLogComponent implements OnInit {
   getActionLabel(action: string): string {
     const labels: Record<string, string> = {
       REJECT_POST: 'Từ chối bài đăng',
-      BAN_USER: 'Cấm người dùng',
+      BAN_USER: 'Auto-ban',
       UNBAN_USER: 'Bỏ cấm người dùng',
       UPDATE_POST: 'Cập nhật bài đăng',
       DELETE_POST: 'Xóa bài đăng',
@@ -150,13 +150,15 @@ export class AuditLogComponent implements OnInit {
     return 'Hệ thống';
   }
 
-  getTargetInfo(log: AuditLogEntry): string {
-    if (log.post_id) {
-      return `Bài: ${log.post_id.title}`;
-    }
+  getViolatedUser(log: AuditLogEntry): string {
     if (log.user_id) {
-      return `Người dùng: ${log.user_id.name || log.user_id.username}`;
+      return log.user_id.name || log.user_id.username;
     }
+    return '--';
+  }
+
+  getRelatedPost(log: AuditLogEntry): string {
+    if (log.post_id) return log.post_id.title;
     return '--';
   }
 }
