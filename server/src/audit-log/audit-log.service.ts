@@ -32,13 +32,16 @@ export class AuditLogService {
     performedByUserId?: string,
   ): Promise<AuditLogDocument> {
     const doc = new this.model({
-      action: "REJECT_POST",
-      post_id: new Types.ObjectId(postId),
-      user_id: new Types.ObjectId(userId),
-      reason: reason || null,
-      performed_by_user_id: performedByUserId
+      actor_type: performedByUserId ? "ADMIN" : "SYSTEM",
+      actor_user_id: performedByUserId
         ? new Types.ObjectId(performedByUserId)
         : null,
+      action: "REJECT_POST",
+      entity_type: "POST",
+      entity_id: new Types.ObjectId(postId),
+      reason: reason || null,
+      source: "AUTO_MODERATION",
+      payload: { user_id: userId }
     });
     return doc.save();
   }
@@ -47,7 +50,7 @@ export class AuditLogService {
     const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
     return this.model
       .countDocuments({
-        user_id: new Types.ObjectId(userId),
+        "payload.user_id": userId,
         action: "REJECT_POST",
         createdAt: { $gte: since },
       })
