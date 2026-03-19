@@ -3,7 +3,7 @@ import { Document, Types } from "mongoose";
 
 export type AuditLogDocument = AuditLog & Document;
 
-export const AUDIT_ACTIONS = ["REJECT_POST"] as const;
+export const AUDIT_ACTIONS = ["REJECT_POST", "BAN_USER", "UNBAN_USER", "UPDATE_POST", "DELETE_POST"] as const;
 export type AuditAction = (typeof AUDIT_ACTIONS)[number];
 
 @Schema({ timestamps: true })

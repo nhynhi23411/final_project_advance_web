@@ -5,6 +5,7 @@ import { environment } from "../../../environments/environment";
 import { ItemService, Item } from "../../services/item.service";
 import { ToastService } from "../../services/toast.service";
 import { NotificationService } from "../../services/notification.service";
+import { AuthService } from "../../services/auth.service";
 
 export interface MeUser {
   userId?: string;
@@ -43,7 +44,8 @@ export class ProfileComponent implements OnInit {
     private itemService: ItemService,
     private router: Router,
     private toastService: ToastService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -207,7 +209,7 @@ export class ProfileComponent implements OnInit {
     if (!this.user) return;
     this.editForm = {
       name: this.user.name ?? "",
-      email: this.user.email ?? "",
+      email: "",
       phone: this.user.phone ?? "",
     };
     this.editErrors = {};
@@ -251,7 +253,6 @@ export class ProfileComponent implements OnInit {
     this.saving = true;
     const body = {
       name: this.editForm.name.trim() || undefined,
-      email: this.editForm.email.trim() || undefined,
       phone: this.editForm.phone.trim() || undefined,
     };
     this.http
@@ -259,7 +260,10 @@ export class ProfileComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.saving = false;
-          if (res.user) this.user = res.user;
+          if (res.user) {
+            this.user = res.user;
+            this.authService.setAuth(localStorage.getItem('access_token') || '', res.user as any);
+          }
           this.isEditing = false;
           this.editErrors = {};
           this.toastService.success("Cập nhật hồ sơ thành công.");
