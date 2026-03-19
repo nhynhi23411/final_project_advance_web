@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-badge.component';
 
@@ -65,9 +66,33 @@ export interface AdminUser {
   created_at?: string;
 }
 
+export interface AuditLogUser {
+  _id: string;
+  username: string;
+  email?: string;
+  name?: string;
+}
+
+export interface AuditLogPost {
+  _id: string;
+  title: string;
+}
+
+export interface AuditLogEntry {
+  _id: string;
+  action: string;
+  reason?: string;
+  createdAt: string;
+  user_id?: AuditLogUser | null;
+  post_id?: AuditLogPost | null;
+  performed_by_user_id?: AuditLogUser | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private baseUrl = environment.apiUrl;
+  private readonly auditLogCache = new Map<string, { expiresAt: number; data: AuditLogEntry[] }>();
+  private readonly auditLogCacheTtlMs = 15000;
 
   constructor(private http: HttpClient) { }
 
@@ -111,6 +136,40 @@ export class AdminService {
 
   deleteUser(id: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.baseUrl}/admin/users/${id}`);
+  }
+
+  getAuditLogs(
+    userId = '',
+    skip = 0,
+    action = '',
+    options?: { forceRefresh?: boolean },
+  ): Observable<AuditLogEntry[]> {
+    const params: Record<string, string> = {
+      skip: String(Math.max(0, skip)),
+    };
+
+    if (userId.trim()) params['userId'] = userId.trim();
+    if (action.trim()) params['action'] = action.trim();
+
+    const cacheKey = JSON.stringify(params);
+    const now = Date.now();
+    const cached = this.auditLogCache.get(cacheKey);
+    if (!options?.forceRefresh && cached && cached.expiresAt > now) {
+      return of(cached.data);
+    }
+
+    return this.http
+      .get<AuditLogEntry[]>(`${this.baseUrl}/admin/audit-logs`, {
+        params,
+      })
+      .pipe(
+        tap((data) => {
+          this.auditLogCache.set(cacheKey, {
+            data: data || [],
+            expiresAt: now + this.auditLogCacheTtlMs,
+          });
+        }),
+      );
   }
 
   getPendingItems(): Observable<Item[]> {

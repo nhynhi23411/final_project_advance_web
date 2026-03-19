@@ -16,6 +16,7 @@ import { RolesGuard } from "../auth/roles.guard";
 import { Roles } from "../auth/roles.decorator";
 import { AdminPostsService } from "./admin-posts.service";
 import { UsersService } from "../users/users.service";
+import { AuditLogService } from "../audit-log/audit-log.service";
 import { AdminCreateUserDto } from "./dto/admin-create-user.dto";
 import { AdminUpdateUserDto } from "./dto/admin-update-user.dto";
 
@@ -29,6 +30,7 @@ export class AdminController {
   constructor(
     private readonly adminPostsService: AdminPostsService,
     private readonly usersService: UsersService,
+    private readonly auditLogService: AuditLogService,
   ) {}
 
   @Get("dashboard-stats")
@@ -68,6 +70,15 @@ export class AdminController {
     const skipNum = Math.max(0, parseInt(skip || "0", 10) || 0);
     const limitNum = Math.min(100, Math.max(1, parseInt(limit || "50", 10) || 50));
     return this.usersService.findAll(skipNum, limitNum);
+  }
+
+  @Get("audit-logs")
+  getAuditLogs(
+    @Query("userId") userId?: string,
+    @Query("skip") skip?: string,
+    @Query("action") action?: string,
+  ) {
+    return this.auditLogService.findAll(userId, skip, action as any);
   }
 
   @Post("users")

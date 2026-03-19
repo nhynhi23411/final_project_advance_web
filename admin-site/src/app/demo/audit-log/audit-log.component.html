@@ -1,0 +1,72 @@
+<section class="audit-log-page">
+  <div class="filters">
+    <label>
+      User ID vi phạm
+      <input
+        type="text"
+        [(ngModel)]="filterUserId"
+        (ngModelChange)="onUserIdInputChange()"
+        autocomplete="off"
+        placeholder="Nhập ObjectId người dùng"
+      />
+    </label>
+
+    <label>
+      Hành động
+      <select [(ngModel)]="filterAction" (ngModelChange)="onActionChange()">
+        <option *ngFor="let option of actionOptions" [value]="option.value">
+          {{ option.label }}
+        </option>
+      </select>
+    </label>
+
+    <button type="button" (click)="applyFilters()">Lọc</button>
+    <button type="button" class="btn-ghost" (click)="clearFilters()">Xóa bộ lọc</button>
+  </div>
+
+  <div class="quick-actions">
+    <span *ngIf="!isLoading">Thời gian phản hồi: {{ responseTimeMs }} ms</span>
+  </div>
+
+  <div *ngIf="isLoading" class="state loading">Đang tải dữ liệu nhật ký...</div>
+  <div *ngIf="!isLoading && error" class="state error">{{ error }}</div>
+
+  <div *ngIf="!isLoading && !error" class="table-wrap" [attr.aria-busy]="isLoading">
+    <table>
+      <thead>
+        <tr>
+          <th>Action</th>
+          <th>Người dùng vi phạm</th>
+          <th>Bài đăng liên quan</th>
+          <th>Lý do</th>
+          <th>Admin thực hiện</th>
+          <th>Thời gian</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs; trackBy: trackByLogId">
+          <td>
+            <span class="action-badge" [ngClass]="getActionClass(log.action)">
+              {{ getActionLabel(log.action) }}
+            </span>
+          </td>
+          <td>{{ getViolatedUser(log) }}</td>
+          <td>{{ getRelatedPost(log) }}</td>
+          <td>{{ log.reason || '--' }}</td>
+          <td>{{ getAdminUser(log) }}</td>
+          <td>{{ formatDate(log.createdAt) }}</td>
+        </tr>
+
+        <tr *ngIf="logs.length === 0">
+          <td colspan="6" class="empty">Không có dữ liệu audit log phù hợp bộ lọc.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="!isLoading && !error" class="pager">
+    <button type="button" (click)="previousPage()" [disabled]="skip === 0">Trang trước</button>
+    <span>Đang hiển thị từ bản ghi thứ {{ skip + 1 }}</span>
+    <button type="button" (click)="nextPage()" [disabled]="!hasMore">Trang sau</button>
+  </div>
+</section>

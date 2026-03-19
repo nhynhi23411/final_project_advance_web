@@ -369,6 +369,13 @@ export class AdminPostsService {
 
       if (count >= maxRejects) {
         await this.usersService.updateStatus(userId, "BANNED");
+        await this.auditLogService.createLog(
+          "BAN_USER",
+          undefined,
+          userId,
+          "Auto-ban do vuot nguong bai bi tu choi trong 24h",
+          adminUserId,
+        );
         this.eventEmitter.emit("user.banned", { userId, reason: "reject_limit" });
       }
     }

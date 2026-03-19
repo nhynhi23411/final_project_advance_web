@@ -5,9 +5,9 @@ import { Roles } from "../auth/roles.decorator";
 import { AuditLogService } from "./audit-log.service";
 import { AuditAction } from "./schemas/audit-log.schema";
 
-@Controller("admin/audit-logs")
+@Controller("admin/audit-logs/paginated")
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles("admin")
+@Roles("ADMIN")
 export class AuditLogController {
   constructor(private readonly auditLogService: AuditLogService) {}
 
@@ -19,7 +19,7 @@ export class AuditLogController {
     @Query("user_id") user_id?: string,
     @Query("performed_by_user_id") performed_by_user_id?: string,
   ) {
-    const result = await this.auditLogService.findAll({
+    const result = await this.auditLogService.findAllPaginated({
       page: page ? parseInt(page, 10) : 1,
       limit: limit ? parseInt(limit, 10) : 20,
       action,
