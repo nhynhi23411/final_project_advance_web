@@ -1,12 +1,16 @@
 <div class="main-wrapper">
   <!-- Header Component -->
-  <app-header
-    (toggleSidebar)="toggleSidebar()"
-    (toggleMobileSidebar)="toggleMobileSidebar()"
-  ></app-header>
+  <app-header></app-header>
 
   <!-- Main Content Area -->
-  <div class="content-area d-flex">
+  <div class="content-area">
+    <app-sidebar
+      class="admin-sidebar"
+      [isCollapsed]="isNavCollapsed"
+      [isMobileOpen]="isMobileNavOpen"
+      (closeMenu)="closeMobileMenu()"
+    ></app-sidebar>
+
     <!-- Page Content -->
     <div class="pcoded-main-container w-100">
       <div class="pcoded-wrapper">

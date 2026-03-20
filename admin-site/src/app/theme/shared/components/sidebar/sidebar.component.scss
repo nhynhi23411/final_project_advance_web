@@ -1,14 +1,23 @@
 .pcoded-navbar {
   margin-top: 0;
-  height: 100vh;
+  height: calc(100vh - var(--admin-layout-header-height, 70px));
+  min-height: calc(100vh - var(--admin-layout-header-height, 70px));
   width: 240px;
+  flex: 0 0 240px;
+  position: fixed;
+  top: var(--admin-layout-header-height, 70px);
+  left: 0;
+  align-self: flex-start;
   transition: width 0.25s ease, box-shadow 0.25s ease;
   border-right: 1px solid #e6edf5;
   background: #ffffff;
   box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
+  overflow: hidden;
+  z-index: 1100;
 
   &.navbar-collapsed {
     width: 72px;
+    flex-basis: 72px;
 
     .pcoded-mtext {
       display: none;
@@ -44,8 +53,8 @@
 
   .scroll-div {
     height: 100%;
-    overflow-y: auto;
-    padding: calc(var(--admin-layout-header-height, 70px) + 12px) 8px 16px;
+    overflow: hidden;
+    padding: 12px 8px 16px;
   }
 
   .pcoded-navbar-nav {
@@ -150,37 +159,64 @@
   }
 
   @media (max-width: 768px) {
-    position: fixed;
-    left: -100%;
-    top: var(--admin-layout-header-height, 70px);
-    margin-top: 0;
-    width: 260px;
-    height: calc(100vh - var(--admin-layout-header-height, 70px));
-    z-index: 1040;
-    background: #ffffff;
-    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.22);
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    flex: 1 1 auto;
+    border-right: 0;
+    border-bottom: 1px solid #e6edf5;
+    box-shadow: none;
+    overflow: visible;
+    z-index: auto;
 
     .scroll-div {
-      padding-top: 12px;
+      height: auto;
+      overflow: visible;
+      padding: 10px 8px;
     }
 
-    &.mob-open {
+    &.mob-open,
+    &.navbar-collapsed {
       left: 0;
+      width: 100%;
+      flex-basis: 100%;
+
+      .pcoded-mtext {
+        display: block;
+      }
+
+      .pcoded-arrow {
+        display: flex;
+      }
+
+      .pcoded-navbar-nav {
+        padding-left: 0;
+        padding-right: 0;
+
+        .nav-item {
+          .nav-link {
+            justify-content: flex-start;
+            padding: 10px 12px;
+          }
+
+          &.active > .nav-link {
+            border-left-width: 3px;
+            padding-left: 10px;
+          }
+        }
+
+        .pcoded-micon {
+          margin-right: 0;
+          width: 18px;
+        }
+      }
     }
   }
 }
 
 .pc-menu-overlay {
   display: none;
-
-  @media (max-width: 768px) {
-    display: block;
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(15, 23, 42, 0.32);
-    z-index: 1035;
-  }
 }

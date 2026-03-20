@@ -9,11 +9,12 @@ footer {
   background-color: #f8f9fa;
   border-top: 1px solid #e3e3e3;
   padding: 20px;
+  margin-left: 240px;
   margin-top: auto;
   transition: margin-left 0.3s ease;
 
   &.navbar-collapsed {
-    margin-left: 60px;
+    margin-left: 72px;
   }
 
   .footer-content {
@@ -51,6 +52,12 @@ footer {
         }
       }
     }
+  }
+}
+
+@media (max-width: 768px) {
+  footer {
+    margin-left: 0;
   }
 }
 

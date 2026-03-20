@@ -42,7 +42,7 @@ export class SidebarComponent {
     },
     {
       label: 'Quản lý Ghép cặp',
-      icon: 'git-merge',
+      icon: 'shuffle',
       route: '/matches'
     },
     {

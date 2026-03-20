@@ -2,7 +2,7 @@
   @if (!hidHeader()) {
     <div class="card-header" [ngClass]="headerClass()">
       @if (!customHeader()) {
-        <h5>{{ cardTitle() || 'Card Title' }}</h5>
+        <h5>{{ cardTitle() || 'Danh sách' }}</h5>
       }
       @if (customHeader()) {
         <ng-content select=".app-card-header"></ng-content>

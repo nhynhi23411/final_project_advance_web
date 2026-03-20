@@ -51,7 +51,7 @@ export const NavigationItems: NavigationItem[] = [
         title: 'Quản lý Ghép cặp',
         type: 'item',
         url: '/matches',
-        icon: 'feather icon-git-merge'
+        icon: 'feather icon-shuffle'
       },
       {
         id: 'audit-logs',

@@ -1,11 +1,9 @@
-:root {
-  --admin-header-height: 70px;
+:host {
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
   --space-4: 16px;
   --space-5: 24px;
-  --space-6: 32px;
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -13,7 +11,6 @@
   --admin-surface-soft: #f8fafc;
   --admin-border-subtle: #e6edf5;
   --admin-text-primary: #0f172a;
-  --admin-text-secondary: #475569;
 }
 
 .navbar {
@@ -28,28 +25,19 @@
   box-shadow: 2px 5px 12px rgba(15, 23, 42, 0.05);
   backdrop-filter: blur(8px);
   z-index: 1200;
-  overflow: visible;
-  display: flex;
-  align-items: center;
 
   .container-fluid {
     height: 100%;
-    min-height: unset;
     padding: 0;
-    gap: var(--space-4);
-    overflow: visible;
     display: flex;
     align-items: center;
+    gap: var(--space-3);
   }
 
   .app-brand {
     display: inline-flex;
     align-items: center;
-    gap: 0;
     text-decoration: none;
-    color: var(--admin-text-primary);
-    font-weight: 700;
-    margin-right: var(--space-4);
     flex-shrink: 0;
 
     .brand-image {
@@ -60,94 +48,25 @@
     }
   }
 
-  .header-nav {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: var(--space-2);
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-
-    &::-webkit-scrollbar {
-      display: none;
-    }
-  }
-
-  .header-nav-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 12px;
-    border-radius: 10px;
-    border: 2px solid transparent;
-    color: #475569;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.2;
-    white-space: nowrap;
-    text-decoration: none;
-    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-
-    i {
-      font-size: 14px;
-      color: #64748b;
-      transition: color 0.2s ease;
-    }
-
-    &:hover {
-      color: #0f172a;
-      background: #f8fbff;
-      border-color: #e6edf6;
-
-      i {
-        color: #0f172a;
-      }
-    }
-
-    &.active {
-      color: #1d4ed8;
-      background: #e9f1ff;
-      border-color: #cfe0ff;
-      font-weight: 600;
-
-      i {
-        color: #1d4ed8;
-      }
-    }
-  }
-
   .header-actions {
-    overflow: visible;
-    margin-left: var(--space-4);
+    margin-left: auto;
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    overflow: visible;
   }
 
   .nav-item.dropdown {
     position: relative;
-    flex: 0 0 auto;
-
-    &.user-dropdown {
-      width: fit-content;
-    }
   }
 
   .user-trigger {
     display: inline-flex;
     align-items: center;
     gap: var(--space-2);
-    margin: 0;
-    width: auto;
-    min-width: 0;
     line-height: 1.2;
     padding: var(--space-2) var(--space-3);
     border-radius: var(--radius-lg);
-    border: 3px solid var(--admin-border-subtle);
+    border: 2px solid var(--admin-border-subtle);
     background: var(--admin-surface);
     color: var(--admin-text-primary);
     transition: all 0.2s ease;
@@ -184,13 +103,11 @@
     margin-left: 0 !important;
     font-size: 14px;
     font-weight: 600;
-    white-space: nowrap;
     color: var(--admin-text-primary);
   }
 
   .dropdown-menu {
     min-width: 220px;
-    white-space: nowrap;
     border: 1px solid var(--admin-border-subtle);
     border-radius: var(--radius-md);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
@@ -206,7 +123,6 @@
       color: #64748b;
       text-transform: uppercase;
       letter-spacing: 0.4px;
-      white-space: nowrap;
     }
 
     button.dropdown-item {
@@ -216,11 +132,8 @@
       border-radius: var(--radius-sm);
       background: none;
       width: 100%;
-      min-width: 100%;
       text-align: left;
       padding: var(--space-2) var(--space-3);
-      white-space: nowrap;
-      overflow: visible;
       font-size: 13px;
       color: #334155;
 
@@ -231,84 +144,21 @@
     }
   }
 
-  @media (max-width: 991.98px) {
-    height: 88px;
-    padding: 0 var(--space-4);
-
-    .app-brand .brand-image {
-      height: 36px;
-    }
-
-    .header-nav {
-      justify-content: flex-start;
-      gap: 6px;
-    }
-
-    .header-nav-item {
-      padding: 7px 10px;
-      font-size: 12px;
-
-      i {
-        font-size: 13px;
-      }
-    }
-
-    .user-trigger {
-      padding: 6px 10px;
-    }
-  }
-
   @media (max-width: 575.98px) {
-    height: 76px;
     padding: 0 var(--space-3);
 
     .app-brand .brand-image {
-      height: 30px;
-    }
-
-    .header-nav {
-      gap: 4px;
-      margin-left: 2px;
-    }
-
-    .header-nav-item {
-      padding: 6px 8px;
-      font-size: 11px;
-
-      i {
-        display: none;
-      }
+      height: 34px;
     }
 
     .user-trigger {
       padding: 6px;
       border-color: transparent;
       background: transparent;
-
-      &::after {
-        display: none;
-      }
     }
 
     .user-name {
       display: none !important;
     }
-
-    .user-avatar {
-      width: 30px;
-      height: 30px;
-    }
-  }
-}
-
-@media (max-width: 991.98px) {
-  :root {
-    --admin-header-height: 88px;
-  }
-}
-
-@media (max-width: 575.98px) {
-  :root {
-    --admin-header-height: 76px;
   }
 }
