@@ -86,6 +86,44 @@ export interface UpdateWeightsResponse {
   weights: AlgorithmWeights;
 }
 
+export type AdminMatchReviewStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
+
+export interface AdminMatchPostSummary {
+  _id: string;
+  title?: string;
+  description?: string;
+  category?: string;
+  post_type?: string;
+  status?: string;
+  location?: Record<string, unknown>;
+  metadata?: Record<string, unknown>;
+  images?: string[];
+  createdAt?: string;
+}
+
+export interface AdminMatchRow {
+  _id: string;
+  lost_post_id: AdminMatchPostSummary | string;
+  found_post_id: AdminMatchPostSummary | string;
+  score?: number;
+  score_percent?: number;
+  confidence_score: number;
+  text_score?: number | null;
+  distance_km?: number | null;
+  source?: string;
+  status?: string;
+  review_status?: AdminMatchReviewStatus;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AdminMatchesPage {
+  items: AdminMatchRow[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private baseUrl = environment.apiUrl;
@@ -225,6 +263,31 @@ export class AdminService {
 
   updateAlgorithmWeights(weights: AlgorithmWeights): Observable<UpdateWeightsResponse> {
     return this.http.patch<UpdateWeightsResponse>(`${this.baseUrl}/admin/system-config/weights`, weights);
+  }
+
+  // ─── Match management ───────────────────────────────────────────────────────
+
+  getMatches(params?: {
+    page?: number;
+    limit?: number;
+    status?: AdminMatchReviewStatus | '';
+    minConfidence?: number;
+    maxConfidence?: number;
+  }): Observable<AdminMatchesPage> {
+    const p: Record<string, string> = {};
+    if (params?.page != null) p['page'] = String(params.page);
+    if (params?.limit != null) p['limit'] = String(params.limit);
+    if (params?.status) p['status'] = params.status;
+    if (params?.minConfidence != null) p['minConfidence'] = String(params.minConfidence);
+    if (params?.maxConfidence != null) p['maxConfidence'] = String(params.maxConfidence);
+    return this.http.get<AdminMatchesPage>(`${this.baseUrl}/admin/matches`, { params: p });
+  }
+
+  updateMatchReviewStatus(
+    id: string,
+    status: 'CONFIRMED' | 'REJECTED'
+  ): Observable<AdminMatchRow> {
+    return this.http.patch<AdminMatchRow>(`${this.baseUrl}/admin/matches/${id}/status`, { status });
   }
 }
 

@@ -20,6 +20,7 @@ import { UsersService } from "../users/users.service";
 import { AuditLogService } from "../audit-log/audit-log.service";
 import { AdminCreateUserDto } from "./dto/admin-create-user.dto";
 import { AdminUpdateUserDto } from "./dto/admin-update-user.dto";
+import { AdminMatchesService } from "./admin-matches.service";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const bcrypt = require("bcryptjs");
@@ -32,6 +33,7 @@ export class AdminController {
     private readonly adminPostsService: AdminPostsService,
     private readonly usersService: UsersService,
     private readonly auditLogService: AuditLogService,
+    private readonly adminMatchesService: AdminMatchesService,
   ) {}
 
   @Get("dashboard-stats")
@@ -149,5 +151,30 @@ export class AdminController {
     if (!existing) throw new NotFoundException("Không tìm thấy user");
     await this.usersService.delete(id);
     return { message: "Xóa user thành công" };
+  }
+
+  @Get("matches")
+  getMatches(
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+    @Query("status") status?: string,
+    @Query("minConfidence") minConfidence?: string,
+    @Query("maxConfidence") maxConfidence?: string,
+  ) {
+    return this.adminMatchesService.findAllMatches({
+      page,
+      limit,
+      status,
+      minConfidence,
+      maxConfidence,
+    });
+  }
+
+  @Patch("matches/:id/status")
+  updateMatchStatus(
+    @Param("id") id: string,
+    @Body("status") status: "CONFIRMED" | "REJECTED",
+  ) {
+    return this.adminMatchesService.updateMatchStatus(id, status);
   }
 }

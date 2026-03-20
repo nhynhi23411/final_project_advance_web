@@ -29,6 +29,14 @@ export class Match {
 
   @Prop({ required: true, default: "ACTIVE" })
   status!: string;
+
+  /** Quyết định admin (Quản lý Ghép cặp) */
+  @Prop({
+    type: String,
+    enum: ["PENDING", "CONFIRMED", "REJECTED"],
+    default: "PENDING",
+  })
+  review_status!: string;
 }
 
 export const MatchSchema = SchemaFactory.createForClass(Match);

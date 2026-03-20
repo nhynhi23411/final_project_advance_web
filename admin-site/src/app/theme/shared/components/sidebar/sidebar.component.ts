@@ -41,6 +41,11 @@ export class SidebarComponent {
       route: '/moderation'
     },
     {
+      label: 'Quản lý Ghép cặp',
+      icon: 'git-merge',
+      route: '/matches'
+    },
+    {
       label: 'Nhật ký Hoạt động',
       icon: 'file-text',
       route: '/audit-logs'
