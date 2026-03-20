@@ -82,6 +82,13 @@ async function ensureIndexes(db) {
 await db.collection("blacklisted_keywords").createIndex({ keyword: 1 }, { unique: true });
 await db.collection("blacklisted_keywords").createIndex({ is_active: 1, updated_at: -1 });
 
+  // ALGORITHM_WEIGHTS
+  await db.collection("algorithm_weights").createIndex(
+    { key: 1 },
+    { unique: true },
+  );
+  await db.collection("algorithm_weights").createIndex({ updated_at: -1 });
+
   // POST_REVIEWS
   await db.collection("post_reviews").createIndex({ post_id: 1, created_at: -1 });
   await db.collection("post_reviews").createIndex({ admin_user_id: 1, created_at: -1 });
@@ -364,6 +371,35 @@ await ensureCollection(db, "blacklisted_keywords", {
     }
   }
 });
+
+  // ===== ALGORITHM_WEIGHTS =====
+  await ensureCollection(db, "algorithm_weights", {
+    $jsonSchema: {
+      bsonType: "object",
+      required: [
+        "key",
+        "category",
+        "text",
+        "location",
+        "time",
+        "attributes",
+        "created_at",
+        "updated_at",
+      ],
+      additionalProperties: true,
+      properties: {
+        _id: { bsonType: "objectId" },
+        key: { bsonType: "string", minLength: 1, maxLength: 50 },
+        category: { bsonType: ["double", "int"], minimum: 0, maximum: 1 },
+        text: { bsonType: ["double", "int"], minimum: 0, maximum: 1 },
+        location: { bsonType: ["double", "int"], minimum: 0, maximum: 1 },
+        time: { bsonType: ["double", "int"], minimum: 0, maximum: 1 },
+        attributes: { bsonType: ["double", "int"], minimum: 0, maximum: 1 },
+        created_at: { bsonType: "date" },
+        updated_at: { bsonType: "date" },
+      },
+    },
+  });
 
   // ===== MATCHES =====
   await ensureCollection(db, "matches", {

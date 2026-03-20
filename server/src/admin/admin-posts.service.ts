@@ -369,6 +369,11 @@ export class AdminPostsService {
 
       if (count >= maxRejects) {
         await this.usersService.updateStatus(userId, "BANNED");
+        await this.auditLogService.createBanLog(
+          userId,
+          "reject_limit",
+          adminUserId,
+        );
         this.eventEmitter.emit("user.banned", { userId, reason: "reject_limit" });
       }
     }

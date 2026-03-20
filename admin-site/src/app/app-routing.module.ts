@@ -42,6 +42,10 @@ const routes: Routes = [
       {
         path: 'reports',
         loadComponent: () => import('./demo/reports/monthly-report.component').then((c) => c.MonthlyReportComponent)
+      },
+      {
+        path: 'system-config',
+        loadComponent: () => import('./demo/system-config/system-config.component').then((c) => c.SystemConfigComponent)
       }
     ]
   },

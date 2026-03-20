@@ -1,0 +1,349 @@
+<div class="sc-page">
+  <!-- ═══ PAGE HEADER ═══════════════════════════════════════════════════════ -->
+  <div class="sc-header">
+    <div class="sc-header-left">
+      <div class="sc-header-icon">
+        <i class="fas fa-sliders-h"></i>
+      </div>
+      <div>
+        <h1 class="sc-title">Cấu hình Hệ thống</h1>
+        <p class="sc-subtitle">Quản lý blacklist từ khóa và hiệu chỉnh trọng số thuật toán ghép đôi</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN CONTENT GRID ═════════════════════════════════════════════════ -->
+  <div class="sc-grid">
+
+    <!-- ╔══ LEFT PANEL: BLACKLIST ═══════════════════════════════════════════╗ -->
+    <div class="sc-panel panel-blacklist">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-icon panel-icon--red">
+            <i class="fas fa-ban"></i>
+          </div>
+          <div>
+            <h2 class="panel-title">Quản lý Blacklist</h2>
+            <p class="panel-desc">Từ khóa bị chặn trong hệ thống tìm kiếm</p>
+          </div>
+        </div>
+        <div class="panel-stats">
+          <span class="stat-badge stat-badge--active">
+            <i class="fas fa-check-circle"></i> {{ activeCount }} hoạt động
+          </span>
+          <span class="stat-badge stat-badge--inactive">
+            <i class="fas fa-times-circle"></i> {{ inactiveCount }} tắt
+          </span>
+        </div>
+      </div>
+
+      <!-- Success/Error alerts -->
+      <div *ngIf="keywordSuccess" class="alert alert--success">
+        <i class="fas fa-check-circle"></i> {{ keywordSuccess }}
+      </div>
+      <div *ngIf="keywordError" class="alert alert--error">
+        <i class="fas fa-exclamation-circle"></i> {{ keywordError }}
+        <button class="alert-close" (click)="keywordError = null">×</button>
+      </div>
+
+      <!-- Add keyword form -->
+      <div class="add-keyword-form">
+        <div class="add-input-wrapper">
+          <i class="fas fa-plus-circle add-icon"></i>
+          <input
+            type="text"
+            class="add-input"
+            [(ngModel)]="newKeyword"
+            placeholder="Nhập từ khóa cần chặn..."
+            (keyup.enter)="addKeyword()"
+            [disabled]="isAddingKeyword"
+          />
+        </div>
+        <button
+          class="btn btn--primary btn--sm"
+          (click)="addKeyword()"
+          [disabled]="!newKeyword.trim() || isAddingKeyword"
+        >
+          <i class="fas fa-spinner fa-spin" *ngIf="isAddingKeyword"></i>
+          <i class="fas fa-plus" *ngIf="!isAddingKeyword"></i>
+          {{ isAddingKeyword ? 'Đang thêm...' : 'Thêm' }}
+        </button>
+      </div>
+
+      <!-- Search bar -->
+      <div class="search-bar">
+        <i class="fas fa-search search-icon"></i>
+        <input
+          type="text"
+          class="search-input"
+          [(ngModel)]="searchQuery"
+          placeholder="Tìm kiếm từ khóa..."
+        />
+        <button *ngIf="searchQuery" class="search-clear" (click)="searchQuery = ''">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingKeywords" class="state-center">
+        <div class="spinner-ring"></div>
+        <p>Đang tải danh sách...</p>
+      </div>
+
+      <!-- Keyword list -->
+      <div *ngIf="!isLoadingKeywords" class="keyword-list">
+        <div *ngIf="filteredKeywords.length === 0" class="state-empty">
+          <i class="fas fa-folder-open"></i>
+          <p>{{ searchQuery ? 'Không tìm thấy từ khóa phù hợp' : 'Chưa có từ khóa nào' }}</p>
+        </div>
+
+        <div
+          *ngFor="let kw of filteredKeywords"
+          class="keyword-item"
+          [class.keyword-item--inactive]="!kw.is_active"
+        >
+          <div class="keyword-item-left">
+            <div class="keyword-status-dot" [class.dot--active]="kw.is_active" [class.dot--inactive]="!kw.is_active"></div>
+            <span class="keyword-text" [class.keyword-text--faded]="!kw.is_active">{{ kw.keyword }}</span>
+            <span class="keyword-badge" [class.badge--active]="kw.is_active" [class.badge--inactive]="!kw.is_active">
+              {{ kw.is_active ? 'Hoạt động' : 'Tắt' }}
+            </span>
+          </div>
+          <div class="keyword-actions">
+            <button
+              class="action-btn action-btn--toggle"
+              [class.active]="kw.is_active"
+              (click)="toggleKeyword(kw)"
+              [title]="kw.is_active ? 'Vô hiệu hóa' : 'Kích hoạt'"
+            >
+              <i class="fas" [class.fa-toggle-on]="kw.is_active" [class.fa-toggle-off]="!kw.is_active"></i>
+            </button>
+            <button class="action-btn action-btn--edit" (click)="openEditModal(kw)" title="Chỉnh sửa">
+              <i class="fas fa-pen"></i>
+            </button>
+            <button class="action-btn action-btn--delete" (click)="openDeleteModal(kw)" title="Xóa">
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ╔══ RIGHT PANEL: WEIGHTS ════════════════════════════════════════════╗ -->
+    <div class="sc-panel panel-weights">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <div class="panel-icon panel-icon--blue">
+            <i class="fas fa-balance-scale"></i>
+          </div>
+          <div>
+            <h2 class="panel-title">Trọng số Thuật toán</h2>
+            <p class="panel-desc">Điều chỉnh mức độ ưu tiên cho từng tiêu chí ghép đôi</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weights alerts -->
+      <div *ngIf="weightsSuccess" class="alert alert--success">
+        <i class="fas fa-check-circle"></i> {{ weightsSuccess }}
+      </div>
+      <div *ngIf="weightsError" class="alert alert--error">
+        <i class="fas fa-exclamation-circle"></i> {{ weightsError }}
+        <button class="alert-close" (click)="weightsError = null">×</button>
+      </div>
+
+      <!-- Loading weights -->
+      <div *ngIf="isLoadingWeights" class="state-center">
+        <div class="spinner-ring"></div>
+        <p>Đang tải cấu hình...</p>
+      </div>
+
+      <!-- Sliders -->
+      <div *ngIf="!isLoadingWeights" class="weights-body">
+
+        <!-- Total indicator -->
+        <div class="total-indicator" [class.total-warning]="rawTotal !== 100" [class.total-ok]="rawTotal === 100">
+          <div class="total-bar-wrap">
+            <div class="total-bar-label">
+              <span class="total-label-text">
+                <i class="fas fa-percent"></i> Tổng hiện tại
+              </span>
+              <span class="total-value" [class.val--ok]="rawTotal === 100" [class.val--warn]="rawTotal !== 100">
+                {{ rawTotal }}%
+              </span>
+            </div>
+            <div class="total-progress">
+              <div
+                class="total-progress-fill"
+                [style.width]="(rawTotal > 100 ? 100 : rawTotal) + '%'"
+                [class.fill--ok]="rawTotal === 100"
+                [class.fill--warn]="rawTotal > 100"
+                [class.fill--low]="rawTotal < 100"
+              ></div>
+            </div>
+            <p class="total-hint" *ngIf="rawTotal !== 100">
+              <i class="fas fa-info-circle"></i>
+              Hệ thống sẽ tự chuẩn hoá về 100% khi lưu. Trọng số thực tế được hiển thị bên dưới.
+            </p>
+            <p class="total-hint total-hint--ok" *ngIf="rawTotal === 100">
+              <i class="fas fa-check-circle"></i>
+              Tổng đúng bằng 100% — không cần chuẩn hoá.
+            </p>
+          </div>
+        </div>
+
+        <!-- Slider items -->
+        <div class="sliders-list">
+          <div *ngFor="let s of weightSliders" class="slider-item">
+            <div class="slider-header">
+              <div class="slider-label-group">
+                <div class="slider-icon-wrap" [style.background]="s.color + '1a'" [style.color]="s.color">
+                  <i [class]="s.icon"></i>
+                </div>
+                <div class="slider-label-text">
+                  <span class="slider-label">{{ s.label }}</span>
+                  <span class="slider-desc">{{ s.description }}</span>
+                </div>
+              </div>
+              <div class="slider-values">
+                <span class="slider-raw" [style.color]="s.color">{{ weights[s.key] }}%</span>
+                <span class="slider-normalized">≈ {{ getNormalized(s.key) }}%</span>
+              </div>
+            </div>
+            <div class="slider-track-wrap">
+              <input
+                type="range"
+                class="slider-range"
+                min="0"
+                max="100"
+                step="1"
+                [(ngModel)]="weights[s.key]"
+                [style.background]="getSliderBackground(s.key, s.color)"
+                [disabled]="isSavingWeights"
+              />
+              <div class="slider-ticks">
+                <span>0</span>
+                <span>25</span>
+                <span>50</span>
+                <span>75</span>
+                <span>100</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Normalized preview -->
+        <div class="normalized-preview">
+          <div class="normalized-title">
+            <i class="fas fa-chart-pie"></i>
+            <span>Trọng số sau chuẩn hoá</span>
+          </div>
+          <div class="normalized-bars">
+            <div *ngFor="let s of weightSliders" class="norm-bar-item">
+              <div class="norm-bar-label">{{ s.label }}</div>
+              <div class="norm-bar-track">
+                <div
+                  class="norm-bar-fill"
+                  [style.width]="getNormalized(s.key) + '%'"
+                  [style.background]="s.color"
+                ></div>
+              </div>
+              <div class="norm-bar-value" [style.color]="s.color">{{ getNormalized(s.key) }}%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="weights-actions">
+          <button
+            class="btn btn--ghost btn--md"
+            (click)="resetWeights()"
+            [disabled]="isSavingWeights || !hasChanges"
+          >
+            <i class="fas fa-undo"></i> Hoàn tác thay đổi
+          </button>
+          <button
+            class="btn btn--success btn--md"
+            (click)="saveWeights()"
+            [disabled]="isSavingWeights || !hasChanges || !isTotalValid"
+          >
+            <ng-container *ngIf="isSavingWeights">
+              <i class="fas fa-spinner fa-spin"></i> Đang lưu &amp; Re-score...
+            </ng-container>
+            <ng-container *ngIf="!isSavingWeights">
+              <i class="fas fa-save"></i> Lưu &amp; Áp dụng
+            </ng-container>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDIT MODAL ══════════════════════════════════════════════════════════ -->
+<div *ngIf="showEditModal" class="modal-overlay" (click)="closeModals()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-icon modal-icon--edit">
+        <i class="fas fa-pen"></i>
+      </div>
+      <h3 class="modal-title">Chỉnh sửa từ khóa</h3>
+      <button class="modal-close" (click)="closeModals()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <label class="form-label">Từ khóa</label>
+      <input
+        type="text"
+        class="form-input"
+        [(ngModel)]="editKeywordValue"
+        placeholder="Nhập từ khóa mới..."
+        (keyup.enter)="saveEdit()"
+        autofocus
+      />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn--ghost btn--md" (click)="closeModals()" [disabled]="isSavingEdit">Hủy</button>
+      <button
+        class="btn btn--primary btn--md"
+        (click)="saveEdit()"
+        [disabled]="!editKeywordValue.trim() || isSavingEdit"
+      >
+        <i class="fas fa-spinner fa-spin" *ngIf="isSavingEdit"></i>
+        <i class="fas fa-check" *ngIf="!isSavingEdit"></i>
+        {{ isSavingEdit ? 'Đang lưu...' : 'Lưu thay đổi' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DELETE MODAL ════════════════════════════════════════════════════════ -->
+<div *ngIf="showDeleteModal" class="modal-overlay" (click)="closeModals()">
+  <div class="modal modal--danger" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-header-icon modal-icon--danger">
+        <i class="fas fa-trash-alt"></i>
+      </div>
+      <h3 class="modal-title">Xác nhận xóa</h3>
+      <button class="modal-close" (click)="closeModals()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <p class="delete-confirm-text">
+        Bạn có chắc chắn muốn xóa từ khóa
+        <strong class="delete-keyword-highlight">"{{ deleteTarget?.keyword }}"</strong>?
+      </p>
+      <p class="delete-warn">Hành động này không thể hoàn tác.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn--ghost btn--md" (click)="closeModals()" [disabled]="isDeletingKeyword">Hủy</button>
+      <button
+        class="btn btn--danger btn--md"
+        (click)="confirmDelete()"
+        [disabled]="isDeletingKeyword"
+      >
+        <i class="fas fa-spinner fa-spin" *ngIf="isDeletingKeyword"></i>
+        <i class="fas fa-trash-alt" *ngIf="!isDeletingKeyword"></i>
+        {{ isDeletingKeyword ? 'Đang xóa...' : 'Xóa' }}
+      </button>
+    </div>
+  </div>
+</div>

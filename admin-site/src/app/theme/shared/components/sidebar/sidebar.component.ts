@@ -49,6 +49,11 @@ export class SidebarComponent {
       label: 'Báo cáo hàng tháng',
       icon: 'bar-chart-2',
       route: '/reports'
+    },
+    {
+      label: 'Cấu hình Hệ thống',
+      icon: 'settings',
+      route: '/system-config'
     }
   ];
 

@@ -65,6 +65,27 @@ export interface AdminUser {
   created_at?: string;
 }
 
+export interface BlacklistedKeyword {
+  _id: string;
+  keyword: string;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface AlgorithmWeights {
+  category: number;
+  text: number;
+  location: number;
+  time: number;
+  attributes: number;
+}
+
+export interface UpdateWeightsResponse {
+  message: string;
+  weights: AlgorithmWeights;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private baseUrl = environment.apiUrl;
@@ -172,6 +193,38 @@ export class AdminService {
       body.reject_reason = reason.trim();
     }
     return this.http.patch(`${this.baseUrl}/admin/posts/${id}/status`, body);
+  }
+
+  // ─── System Config: Blacklist ────────────────────────────────────────────────
+
+  getBlacklistedKeywords(): Observable<BlacklistedKeyword[]> {
+    return this.http.get<BlacklistedKeyword[]>(`${this.baseUrl}/admin/system-config/blacklist`);
+  }
+
+  createBlacklistedKeyword(keyword: string): Observable<BlacklistedKeyword> {
+    return this.http.post<BlacklistedKeyword>(`${this.baseUrl}/admin/system-config/blacklist`, { keyword });
+  }
+
+  updateBlacklistedKeyword(id: string, dto: { keyword?: string; is_active?: boolean }): Observable<BlacklistedKeyword> {
+    return this.http.patch<BlacklistedKeyword>(`${this.baseUrl}/admin/system-config/blacklist/${id}`, dto);
+  }
+
+  toggleBlacklistedKeyword(id: string, is_active: boolean): Observable<BlacklistedKeyword> {
+    return this.http.patch<BlacklistedKeyword>(`${this.baseUrl}/admin/system-config/blacklist/${id}/toggle`, { is_active });
+  }
+
+  deleteBlacklistedKeyword(id: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/admin/system-config/blacklist/${id}`);
+  }
+
+  // ─── System Config: Algorithm Weights ───────────────────────────────────────
+
+  getAlgorithmWeights(): Observable<AlgorithmWeights> {
+    return this.http.get<AlgorithmWeights>(`${this.baseUrl}/admin/system-config/weights`);
+  }
+
+  updateAlgorithmWeights(weights: AlgorithmWeights): Observable<UpdateWeightsResponse> {
+    return this.http.patch<UpdateWeightsResponse>(`${this.baseUrl}/admin/system-config/weights`, weights);
   }
 }
 

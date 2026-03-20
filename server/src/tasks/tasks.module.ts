@@ -14,6 +14,7 @@ import { TasksService } from "./tasks.service";
     MatchesModule,
   ],
   providers: [TasksService],
+  exports: [TasksService],
 })
 export class TasksModule {}
 

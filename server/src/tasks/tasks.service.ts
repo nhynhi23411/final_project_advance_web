@@ -7,6 +7,7 @@ import { Post, PostDocument } from "../posts/schemas/post.schema";
 import { Claim, ClaimDocument } from "../claims/schemas/claim.schema";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { MatchesService } from "../matches/matches.service";
+import { AdminKeywordService } from "../keyword/admin-keyword.service";
 
 type PostLean = Pick<Post, "category" | "post_type" | "location" | "status"> & {
   _id: Types.ObjectId;
@@ -20,11 +21,17 @@ type PostLean = Pick<Post, "category" | "post_type" | "location" | "status"> & {
 export class TasksService {
   private readonly logger = new Logger(TasksService.name);
 
+  /**
+   * Prevent concurrent re-scoring runs (cron vs admin "immediate" update).
+   */
+  private suggestMatchesRun: Promise<void> | null = null;
+
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     @InjectModel(Claim.name) private readonly claimModel: Model<ClaimDocument>,
     private readonly cloudinary: CloudinaryService,
     private readonly matchesService: MatchesService,
+    private readonly adminKeywordService: AdminKeywordService,
   ) {}
 
   @Cron("0 0 * * *")
@@ -119,6 +126,17 @@ export class TasksService {
 
   @Cron("*/5 * * * *")
   async suggestMatches() {
+    await this.suggestMatchesNow();
+  }
+
+  /**
+   * Re-score match_suggestions immediately.
+   * Used by admin config changes; protected against concurrent runs.
+   */
+  async suggestMatchesNow(): Promise<void> {
+    if (this.suggestMatchesRun) return this.suggestMatchesRun;
+
+    this.suggestMatchesRun = (async () => {
     const since = new Date(Date.now() - 90 * 24 * 60 * 60 * 1000); // 90-day window
 
     // Post-integrity check: exclude locked/returned posts
@@ -138,6 +156,12 @@ export class TasksService {
     ]);
 
     if (lost.length === 0 || found.length === 0) return;
+
+    // Dismiss stale auto suggestions so weights update is reflected immediately.
+    await this.matchesService.dismissAutoMatchesForCandidates(
+      lost.map((p) => p._id),
+      found.map((p) => p._id),
+    );
 
     let createdCount = 0;
     const batchUpserts: Parameters<MatchesService["upsertMatch"]>[0][] = [];
@@ -166,6 +190,13 @@ export class TasksService {
     if (createdCount > 0) {
       this.logger.log(`SuggestMatches created ${createdCount} matches`);
     }
+    })();
+
+    try {
+      await this.suggestMatchesRun;
+    } finally {
+      this.suggestMatchesRun = null;
+    }
   }
 
   // ─── Core scoring engine ─────────────────────────────────────────────────────
@@ -174,12 +205,7 @@ export class TasksService {
    * Compute composite match score for a (LOST, FOUND) pair.
    * Returns null when the pair should be skipped (score below threshold).
    *
-   * Weights (sum = 1.0):
-   *   Category   0.20
-   *   Text       0.35
-   *   Location   0.25
-   *   Time       0.10
-   *   Attributes 0.10
+   * Composite uses dynamic Algorithm Weights loaded from DB.
    */
   private computeScore(
     l: PostLean,
@@ -235,8 +261,13 @@ export class TasksService {
     const attrScore = this.attributeScore(l.metadata, f.metadata);
 
     // --- Composite ---
+    const w = this.adminKeywordService.getAlgorithmWeights();
     const composite = Number(
-      (0.20 * catScore + 0.35 * textScore + 0.25 * distScore + 0.10 * timeScore + 0.10 * attrScore).toFixed(4),
+      (w.category * catScore +
+        w.text * textScore +
+        w.location * distScore +
+        w.time * timeScore +
+        w.attributes * attrScore).toFixed(4),
     );
 
     if (composite < MIN_SCORE) return null;

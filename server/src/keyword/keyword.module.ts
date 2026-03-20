@@ -7,16 +7,23 @@ import {
 import { BlacklistedKeywordRepository } from "./blacklisted-keyword.repository";
 import { KeywordService } from "./keyword.service";
 import { AdminKeywordService } from "./admin-keyword.service";
+import {
+  AlgorithmWeights,
+  AlgorithmWeightsSchema,
+} from "./schemas/algorithm-weights.schema";
+import { AlgorithmWeightsRepository } from "./algorithm-weights.repository";
 
 @Global()
 @Module({
   imports: [
     MongooseModule.forFeature([
       { name: BlacklistedKeyword.name, schema: BlacklistedKeywordSchema },
+      { name: AlgorithmWeights.name, schema: AlgorithmWeightsSchema },
     ]),
   ],
   providers: [
     BlacklistedKeywordRepository,
+    AlgorithmWeightsRepository,
     KeywordService,
     AdminKeywordService,
   ],

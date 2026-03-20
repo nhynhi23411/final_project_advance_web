@@ -14,6 +14,19 @@ export class AuditLog {
   @Prop({ type: Types.ObjectId, ref: "User", default: null })
   actor_user_id?: Types.ObjectId;
 
+  // --- Fields phục vụ trang admin audit logs (theo ticket) ---
+  // Người dùng bị vi phạm / bị tác động.
+  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  user_id?: Types.ObjectId;
+
+  // Bài đăng liên quan.
+  @Prop({ type: Types.ObjectId, ref: "Post", default: null })
+  post_id?: Types.ObjectId;
+
+  // Admin thực hiện (ai thao tác).
+  @Prop({ type: Types.ObjectId, ref: "User", default: null })
+  performed_by_user_id?: Types.ObjectId;
+
   @Prop({ required: true, enum: AUDIT_ACTIONS })
   action!: AuditAction;
 
@@ -41,3 +54,4 @@ export class AuditLog {
 
 export const AuditLogSchema = SchemaFactory.createForClass(AuditLog);
 AuditLogSchema.index({ user_id: 1, action: 1, createdAt: -1 });
+AuditLogSchema.index({ performed_by_user_id: 1, action: 1, createdAt: -1 });
