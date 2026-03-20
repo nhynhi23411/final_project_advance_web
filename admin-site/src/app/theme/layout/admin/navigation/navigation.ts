@@ -59,6 +59,13 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         url: '/reports',
         icon: 'feather icon-bar-chart-2'
+      },
+      {
+        id: 'system-config',
+        title: 'Cấu hình Hệ thống',
+        type: 'item',
+        url: '/system-config',
+        icon: 'feather icon-settings'
       }
     ]
   },

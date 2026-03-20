@@ -164,6 +164,7 @@ export class MatchesService {
               created_at: new Date(),
             },
             $set: {
+              status: "ACTIVE",
               score: Math.round(input.score * 100),
               distance_km: input.distanceKm ?? null,
               text_score: input.textScore != null ? Math.round(input.textScore * 100) : null,
@@ -231,6 +232,37 @@ export class MatchesService {
 
       throw e;
     }
+  }
+
+  /**
+   * When admin updates Algorithm Weights, we need suggestions computed from "auto"
+   * to reflect the new thresholds. To avoid stale suggestions, we dismiss existing
+   * auto matches in the candidate sets before re-computing.
+   *
+   * Manual matches are NOT dismissed.
+   */
+  async dismissAutoMatchesForCandidates(
+    lostIds: Types.ObjectId[],
+    foundIds: Types.ObjectId[],
+  ): Promise<void> {
+    if (lostIds.length === 0 || foundIds.length === 0) return;
+
+    await this.matchModel
+      .updateMany(
+        {
+          status: "ACTIVE",
+          source: "auto",
+          lost_post_id: { $in: lostIds },
+          found_post_id: { $in: foundIds },
+        },
+        {
+          $set: {
+            status: "DISMISSED",
+            updated_at: new Date(),
+          },
+        },
+      )
+      .exec();
   }
 
   /** Return raw { lost_post_id, found_post_id } pairs for a given set of post IDs.
