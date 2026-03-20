@@ -3,12 +3,13 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { finalize } from 'rxjs';
 
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { AdminService, AdminUser } from 'src/app/services/admin.service';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, PageTitleComponent],
   templateUrl: './users.component.html',
   styleUrls: ['./users.component.scss']
 })

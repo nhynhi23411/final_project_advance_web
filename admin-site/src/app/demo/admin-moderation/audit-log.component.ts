@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 
 interface AuditLogEntry {
   _id: string;
@@ -42,7 +43,7 @@ interface AuditLogResponse {
   templateUrl: './audit-log.component.html',
   styleUrls: ['./audit-log.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PageTitleComponent],
 })
 export class AuditLogComponent implements OnInit {
   logs: AuditLogEntry[] = [];

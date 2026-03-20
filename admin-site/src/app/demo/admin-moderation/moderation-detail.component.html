@@ -1,8 +1,19 @@
 <div class="row">
   <div class="col-xl-12">
-    <div class="detail-header mb-3">
-      <button class="btn btn-link btn-sm ps-0" type="button" (click)="goBackToPending()">&larr; Quay lại danh sách chờ duyệt</button>
-      <h4 class="mb-1">{{ pageTitle }}</h4>
+    <app-page-title
+      [title]="pageTitle"
+      [subtitle]="'Đánh giá nội dung và quyết định trạng thái bài đăng đang chờ duyệt.'"
+      [breadcrumbs]="[
+        { label: 'Kiểm duyệt nội dung', link: '/moderation' },
+        { label: 'Chi tiết chờ duyệt' }
+      ]"
+    >
+      <button pageTitleActions class="btn btn-outline-primary btn-sm" type="button" (click)="goBackToPending()">
+        <i class="feather icon-arrow-left me-1"></i>Quay lại danh sách chờ duyệt
+      </button>
+    </app-page-title>
+
+    <div class="detail-toolbar mb-3">
       <div class="d-flex flex-wrap align-items-center gap-2">
         <span class="text-muted">ID: {{ itemIdLabel }}</span>
         <app-status-badge [status]="currentStatus"></app-status-badge>

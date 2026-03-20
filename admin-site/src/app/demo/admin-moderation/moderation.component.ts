@@ -3,12 +3,13 @@ import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { AdminService, Item } from 'src/app/services/admin.service';
 
 @Component({
   selector: 'app-moderation',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, PageTitleComponent],
   templateUrl: './moderation.component.html',
   styleUrls: ['./moderation.component.scss']
 })

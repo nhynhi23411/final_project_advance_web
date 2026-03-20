@@ -7,11 +7,10 @@ import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/components/header/header.component';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { FooterComponent } from '../../shared/components/footer/footer.component';
-import { BreadcrumbComponent } from '../../shared/components/breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'app-admin',
-  imports: [RouterModule, CommonModule, HeaderComponent, SidebarComponent, FooterComponent, BreadcrumbComponent],
+  imports: [RouterModule, CommonModule, HeaderComponent, SidebarComponent, FooterComponent],
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.scss']
 })

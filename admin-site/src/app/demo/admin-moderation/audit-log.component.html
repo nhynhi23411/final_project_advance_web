@@ -1,9 +1,9 @@
 <div class="audit-log-container">
-  <!-- Header -->
-  <div class="audit-log-header">
-    <h1 class="audit-log-title">Nhật ký hoạt động</h1>
-    <p class="audit-log-desc">Xem lịch sử toàn bộ hoạt động quản lý trên hệ thống</p>
-  </div>
+  <app-page-title
+    [title]="'Nhật ký hoạt động'"
+    [subtitle]="'Theo dõi lịch sử thao tác quản trị để kiểm soát rủi ro và truy vết sự cố.'"
+    [breadcrumbs]="[{ label: 'Nhật ký hoạt động' }]"
+  ></app-page-title>
 
   <!-- Filter Bar -->
   <div class="audit-log-filters">
