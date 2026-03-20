@@ -152,6 +152,16 @@ export class MatchesService {
     const lostId = new Types.ObjectId(input.lostPostId);
     const foundId = new Types.ObjectId(input.foundPostId);
 
+    const existing = await this.matchModel
+      .findOne({ lost_post_id: lostId, found_post_id: foundId })
+      .select("review_status")
+      .lean()
+      .exec();
+    const rs = (existing as any)?.review_status as string | undefined;
+    if (rs === "CONFIRMED" || rs === "REJECTED") {
+      return false;
+    }
+
     try {
       const res = await this.matchModel
         .updateOne(
@@ -161,6 +171,7 @@ export class MatchesService {
               lost_post_id: lostId,
               found_post_id: foundId,
               status: "ACTIVE",
+              review_status: "PENDING",
               created_at: new Date(),
             },
             $set: {
@@ -254,6 +265,11 @@ export class MatchesService {
           source: "auto",
           lost_post_id: { $in: lostIds },
           found_post_id: { $in: foundIds },
+          $or: [
+            { review_status: { $exists: false } },
+            { review_status: null },
+            { review_status: "PENDING" },
+          ],
         },
         {
           $set: {

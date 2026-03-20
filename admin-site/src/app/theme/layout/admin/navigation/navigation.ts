@@ -47,6 +47,13 @@ export const NavigationItems: NavigationItem[] = [
         icon: 'feather icon-edit-2'
       },
       {
+        id: 'matches',
+        title: 'Quản lý Ghép cặp',
+        type: 'item',
+        url: '/matches',
+        icon: 'feather icon-git-merge'
+      },
+      {
         id: 'audit-logs',
         title: 'Nhật ký Hoạt động',
         type: 'item',

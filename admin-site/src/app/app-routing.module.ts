@@ -36,6 +36,10 @@ const routes: Routes = [
         loadComponent: () => import('./demo/admin-moderation/content-management.component').then((c) => c.ContentManagementComponent)
       },
       {
+        path: 'matches',
+        loadComponent: () => import('./demo/match-management/match-management.component').then((c) => c.MatchManagementComponent)
+      },
+      {
         path: 'audit-logs',
         loadComponent: () => import('./demo/admin-moderation/audit-log.component').then((c) => c.AuditLogComponent)
       },

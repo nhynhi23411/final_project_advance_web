@@ -1,0 +1,182 @@
+<div class="row">
+  <div class="col-12">
+    <app-card [cardTitle]="'Quản lý Ghép cặp'" [blockClass]="'mb-4'">
+      <p class="text-muted small mb-3">
+        So sánh bài <strong>Mất</strong> và <strong>Nhặt được</strong>, xem điểm tin cậy và xác nhận hoặc từ chối gợi ý.
+        Trọng số thuật toán (danh mục, văn bản, vị trí, thời gian, thuộc tính) chỉnh tại
+        <a routerLink="/system-config">Cấu hình Hệ thống</a>.
+      </p>
+
+      <ul class="nav nav-tabs mb-3 flex-wrap" role="tablist">
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'PENDING'"
+            href="javascript:void(0)"
+            (click)="onTabChange('PENDING')"
+            >Chờ duyệt</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'CONFIRMED'"
+            href="javascript:void(0)"
+            (click)="onTabChange('CONFIRMED')"
+            >Đã xác nhận</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'REJECTED'"
+            href="javascript:void(0)"
+            (click)="onTabChange('REJECTED')"
+            >Đã từ chối</a
+          >
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            [class.active]="activeTab === 'all'"
+            href="javascript:void(0)"
+            (click)="onTabChange('all')"
+            >Tất cả</a
+          >
+        </li>
+      </ul>
+
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-sm-6 col-md-4">
+          <label class="form-label small mb-1">Điểm tối thiểu (%)</label>
+          <input
+            type="number"
+            class="form-control form-control-sm"
+            min="0"
+            max="100"
+            placeholder="Không lọc"
+            [(ngModel)]="minConfidencePercent"
+            (keyup.enter)="applyFilters()"
+          />
+        </div>
+        <div class="col-sm-auto">
+          <button type="button" class="btn btn-sm btn-primary" (click)="applyFilters()">
+            Lọc
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="error" class="alert alert-danger py-2">{{ error }}</div>
+
+      <div *ngIf="loading" class="text-center py-5 text-muted">Đang tải…</div>
+
+      <ng-container *ngIf="!loading">
+        <div *ngIf="items.length === 0" class="text-muted py-4 text-center">
+          Không có cặp ghép nào.
+        </div>
+
+        <div *ngFor="let m of items" class="match-card card border shadow-sm mb-4">
+          <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
+              <div>
+                <span class="badge bg-secondary me-1">{{ m.source || 'auto' }}</span>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-warning text-dark': (m.review_status || 'PENDING') === 'PENDING',
+                    'bg-success': m.review_status === 'CONFIRMED',
+                    'bg-danger': m.review_status === 'REJECTED'
+                  }"
+                >
+                  {{
+                    m.review_status === 'CONFIRMED'
+                      ? 'Đã xác nhận'
+                      : m.review_status === 'REJECTED'
+                        ? 'Đã từ chối'
+                        : 'Chờ duyệt'
+                  }}
+                </span>
+              </div>
+              <div class="text-end">
+                <div class="fw-semibold text-primary fs-5">Độ tin cậy: {{ confidenceLabel(m) }}</div>
+                <div class="small text-muted">
+                  Văn bản: {{ textSimilarityLabel(m) }}
+                  <span *ngIf="m.distance_km != null"> · Cách: {{ m.distance_km }} km</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="row g-3 compare-row">
+              <div class="col-md-6">
+                <div class="post-panel lost h-100 p-3 rounded border border-danger border-opacity-25 bg-danger bg-opacity-5">
+                  <h6 class="text-danger mb-2"><i class="feather icon-search me-1"></i> Bài Mất</h6>
+                  <ng-container *ngIf="asPost(m.lost_post_id) as lost">
+                    <p class="fw-semibold mb-1">{{ lost.title || '—' }}</p>
+                    <p class="small text-muted mb-2">{{ lost.category || '—' }}</p>
+                    <p class="small mb-2 text-break">{{ lost.description || '—' }}</p>
+                    <p class="small mb-0"><strong>Vị trí:</strong> {{ locationLabel(lost) }}</p>
+                    <p class="small mb-0"><strong>Ngày:</strong> {{ metaDate(lost) }}</p>
+                    <div *ngIf="lost.images?.[0] as lostImg" class="mt-2">
+                      <img [src]="lostImg" alt="" class="thumb-img rounded" />
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="post-panel found h-100 p-3 rounded border border-success border-opacity-25 bg-success bg-opacity-5">
+                  <h6 class="text-success mb-2"><i class="feather icon-package me-1"></i> Bài Nhặt được</h6>
+                  <ng-container *ngIf="asPost(m.found_post_id) as found">
+                    <p class="fw-semibold mb-1">{{ found.title || '—' }}</p>
+                    <p class="small text-muted mb-2">{{ found.category || '—' }}</p>
+                    <p class="small mb-2">{{ found.description || '—' }}</p>
+                    <p class="small mb-0"><strong>Vị trí:</strong> {{ locationLabel(found) }}</p>
+                    <p class="small mb-0"><strong>Ngày:</strong> {{ metaDate(found) }}</p>
+                    <div *ngIf="found.images?.[0] as foundImg" class="mt-2">
+                      <img [src]="foundImg" alt="" class="thumb-img rounded" />
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="isPending(m)" class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+              <button
+                type="button"
+                class="btn btn-success btn-sm"
+                [disabled]="updatingId === m._id"
+                (click)="confirmMatch(m)"
+              >
+                Xác nhận
+              </button>
+              <button
+                type="button"
+                class="btn btn-outline-danger btn-sm"
+                [disabled]="updatingId === m._id"
+                (click)="rejectMatch(m)"
+              >
+                Từ chối
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="items.length > 0" class="d-flex justify-content-between align-items-center mt-2">
+          <span class="small text-muted">Tổng {{ total }} · Trang {{ page }} / {{ totalPages }}</span>
+          <div class="btn-group btn-group-sm">
+            <button type="button" class="btn btn-outline-secondary" [disabled]="page <= 1" (click)="prevPage()">
+              Trước
+            </button>
+            <button
+              type="button"
+              class="btn btn-outline-secondary"
+              [disabled]="page >= totalPages"
+              (click)="nextPage()"
+            >
+              Sau
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </app-card>
+  </div>
+</div>
