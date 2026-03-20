@@ -1,0 +1,52 @@
+.matches-sync-banner {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  background: rgba(13, 110, 253, 0.06);
+}
+
+.matches-table-loading {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.match-posts {
+  display: flex;
+  align-items: stretch;
+  gap: 0.75rem;
+}
+
+.match-col {
+  flex: 1;
+  min-width: 220px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+  background: #f9fafb;
+}
+
+.match-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+}
+
+.match-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.match-meta {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.match-separator {
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  color: #6b7280;
+}
+

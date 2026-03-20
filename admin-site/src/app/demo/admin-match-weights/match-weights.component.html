@@ -1,0 +1,96 @@
+<div class="row">
+  <div class="col-xl-12">
+    <h5 class="mb-3">Cấu hình trọng số ghép cặp</h5>
+
+    <app-card>
+      <div *ngIf="loading" class="weights-sync-banner mb-3">
+        <span class="spinner-border spinner-border-sm text-primary me-2" role="status"></span>
+        <span class="text-muted">Đang đồng bộ trọng số từ server…</span>
+      </div>
+
+      <div class="weights-form">
+        <div class="weight-row">
+          <label>Category</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            class="form-control"
+            [(ngModel)]="form.category_weight"
+            [disabled]="loading || saving || recomputing"
+          />
+        </div>
+        <div class="weight-row">
+          <label>Text</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            class="form-control"
+            [(ngModel)]="form.text_weight"
+            [disabled]="loading || saving || recomputing"
+          />
+        </div>
+        <div class="weight-row">
+          <label>Location</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            class="form-control"
+            [(ngModel)]="form.location_weight"
+            [disabled]="loading || saving || recomputing"
+          />
+        </div>
+        <div class="weight-row">
+          <label>Time</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            class="form-control"
+            [(ngModel)]="form.time_weight"
+            [disabled]="loading || saving || recomputing"
+          />
+        </div>
+        <div class="weight-row">
+          <label>Attributes</label>
+          <input
+            type="number"
+            min="0"
+            max="100"
+            class="form-control"
+            [(ngModel)]="form.attributes_weight"
+            [disabled]="loading || saving || recomputing"
+          />
+        </div>
+
+        <div class="mt-3">
+          <strong>Tổng trọng số: </strong>
+          <span [class.text-success]="totalWeight === 100" [class.text-danger]="totalWeight !== 100">
+            {{ totalWeight }}
+          </span>
+        </div>
+
+        <div class="mt-3 d-flex gap-2">
+          <button
+            class="btn btn-primary"
+            (click)="saveWeights()"
+            [disabled]="loading || saving || recomputing || !isValid"
+          >
+            <span *ngIf="saving" class="spinner-border spinner-border-sm me-1"></span>
+            Lưu cấu hình
+          </button>
+          <button class="btn btn-warning" (click)="recompute()" [disabled]="loading || saving || recomputing">
+            <span *ngIf="recomputing" class="spinner-border spinner-border-sm me-1"></span>
+            Chạy lại ghép cặp
+          </button>
+        </div>
+
+        <div *ngIf="message" class="alert alert-success mt-3 mb-0">{{ message }}</div>
+        <div *ngIf="error" class="alert alert-danger mt-3 mb-0">{{ error }}</div>
+      </div>
+    </app-card>
+  </div>
+</div>
+

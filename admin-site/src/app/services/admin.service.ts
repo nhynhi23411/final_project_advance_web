@@ -31,6 +31,41 @@ export interface AdminUser {
   created_at?: string;
 }
 
+export type MatchStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
+
+export interface AdminMatchPostLite {
+  _id: string;
+  title?: string;
+  category?: string;
+  images?: string[];
+  location?: { address?: string };
+  metadata?: Record<string, any>;
+}
+
+export interface AdminMatch {
+  _id: string;
+  confidence_score: number;
+  status: MatchStatus;
+  lost_post_id?: AdminMatchPostLite | string;
+  found_post_id?: AdminMatchPostLite | string;
+  created_at?: string;
+}
+
+export interface AdminMatchListResponse {
+  items: AdminMatch[];
+  page: number;
+  limit: number;
+  total: number;
+}
+
+export interface MatchWeightConfig {
+  category_weight: number;
+  text_weight: number;
+  location_weight: number;
+  time_weight: number;
+  attributes_weight: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private baseUrl = environment.apiUrl;
@@ -85,6 +120,44 @@ export class AdminService {
       body.reject_reason = reason.trim();
     }
     return this.http.patch(`${this.baseUrl}/admin/posts/${id}/status`, body);
+  }
+
+  getMatches(params?: {
+    page?: number;
+    limit?: number;
+    status?: MatchStatus;
+    minConfidence?: number;
+    maxConfidence?: number;
+  }): Observable<AdminMatchListResponse> {
+    const query: Record<string, string> = {};
+    if (params?.page != null) query['page'] = String(params.page);
+    if (params?.limit != null) query['limit'] = String(params.limit);
+    if (params?.status) query['status'] = params.status;
+    if (params?.minConfidence != null) query['minConfidence'] = String(params.minConfidence);
+    if (params?.maxConfidence != null) query['maxConfidence'] = String(params.maxConfidence);
+    return this.http.get<AdminMatchListResponse>(`${this.baseUrl}/admin/matches`, { params: query });
+  }
+
+  updateMatchStatus(
+    id: string,
+    status: Extract<MatchStatus, 'CONFIRMED' | 'REJECTED'>
+  ): Observable<AdminMatch> {
+    return this.http.patch<AdminMatch>(`${this.baseUrl}/admin/matches/${id}/status`, { status });
+  }
+
+  getMatchWeights(): Observable<MatchWeightConfig> {
+    return this.http.get<MatchWeightConfig>(`${this.baseUrl}/admin/matches/weights`);
+  }
+
+  updateMatchWeights(payload: MatchWeightConfig): Observable<MatchWeightConfig> {
+    return this.http.patch<MatchWeightConfig>(`${this.baseUrl}/admin/matches/weights`, payload);
+  }
+
+  recomputeMatches(): Observable<{ processed_pairs: number; lost_posts: number; found_posts: number }> {
+    return this.http.post<{ processed_pairs: number; lost_posts: number; found_posts: number }>(
+      `${this.baseUrl}/admin/matches/recompute`,
+      {}
+    );
   }
 }
 

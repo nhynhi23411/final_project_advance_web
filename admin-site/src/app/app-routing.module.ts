@@ -30,6 +30,14 @@ const routes: Routes = [
       {
         path: 'moderation',
         loadComponent: () => import('./demo/admin-moderation/moderation.component').then((c) => c.ModerationComponent)
+      },
+      {
+        path: 'matches',
+        loadComponent: () => import('./demo/admin-matches/matches.component').then((c) => c.MatchesComponent)
+      },
+      {
+        path: 'matches/weights',
+        loadComponent: () => import('./demo/admin-match-weights/match-weights.component').then((c) => c.MatchWeightsComponent)
       }
     ]
   },

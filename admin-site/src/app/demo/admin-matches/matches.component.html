@@ -1,0 +1,108 @@
+<div class="row">
+  <div class="col-xl-12">
+    <div *ngIf="recomputeFlash" class="alert alert-success alert-dismissible fade show" role="alert">
+      {{ recomputeFlash }}
+      <button type="button" class="btn-close" aria-label="Close" (click)="dismissRecomputeFlash()"></button>
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">Quản lý Ghép cặp</h5>
+      <div class="d-flex gap-2 align-items-center">
+        <button class="btn btn-outline-secondary btn-sm" (click)="goToWeightConfig()">
+          Cấu hình trọng số
+        </button>
+        <button class="btn btn-warning btn-sm" (click)="recomputeNow()">Recompute</button>
+        <select class="form-select form-select-sm" [(ngModel)]="statusFilter" (change)="loadMatches()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="PENDING">PENDING</option>
+          <option value="CONFIRMED">CONFIRMED</option>
+          <option value="REJECTED">REJECTED</option>
+        </select>
+        <input
+          type="number"
+          class="form-control form-control-sm"
+          style="width: 120px"
+          min="0"
+          max="100"
+          [(ngModel)]="minConfidence"
+          (change)="loadMatches()"
+          placeholder="Min score"
+        />
+      </div>
+    </div>
+
+    <app-card>
+      <div *ngIf="loading" class="matches-sync-banner mb-3">
+        <span class="spinner-border spinner-border-sm text-primary me-2" role="status"></span>
+        <span class="text-muted">Đang tải danh sách ghép cặp…</span>
+      </div>
+
+      <div *ngIf="!loading && matches.length === 0" class="text-center p-4 text-muted">
+        Không có cặp ghép nào phù hợp bộ lọc hiện tại.
+      </div>
+
+      <div *ngIf="matches.length > 0" class="table-responsive" [class.matches-table-loading]="loading">
+        <table class="table table-hover align-middle">
+          <thead>
+            <tr>
+              <th>Cặp Lost / Found</th>
+              <th>Điểm tin cậy</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let m of matches">
+              <td>
+                <div class="match-posts">
+                  <div class="match-col">
+                    <div class="match-label">LOST</div>
+                    <div class="match-title">{{ asPost(m.lost_post_id)?.title || '—' }}</div>
+                    <div class="match-meta">{{ asPost(m.lost_post_id)?.category || '—' }}</div>
+                  </div>
+                  <div class="match-separator">↔</div>
+                  <div class="match-col">
+                    <div class="match-label">FOUND</div>
+                    <div class="match-title">{{ asPost(m.found_post_id)?.title || '—' }}</div>
+                    <div class="match-meta">{{ asPost(m.found_post_id)?.category || '—' }}</div>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-info">{{ m.confidence_score | number: '1.0-2' }}%</span>
+              </td>
+              <td>
+                <span
+                  class="badge"
+                  [ngClass]="{
+                    'bg-warning': m.status === 'PENDING',
+                    'bg-success': m.status === 'CONFIRMED',
+                    'bg-danger': m.status === 'REJECTED'
+                  }"
+                >
+                  {{ m.status }}
+                </span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-success btn-sm me-2"
+                  [disabled]="m.status !== 'PENDING'"
+                  (click)="updateStatus(m, 'CONFIRMED')"
+                >
+                  Xác nhận
+                </button>
+                <button
+                  class="btn btn-danger btn-sm"
+                  [disabled]="m.status !== 'PENDING'"
+                  (click)="updateStatus(m, 'REJECTED')"
+                >
+                  Hủy
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </app-card>
+  </div>
+</div>
+

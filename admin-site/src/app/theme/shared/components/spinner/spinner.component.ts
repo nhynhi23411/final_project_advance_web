@@ -16,8 +16,8 @@ export class SpinnerComponent implements OnDestroy {
   private router = inject(Router);
   private document = inject<Document>(DOCUMENT);
 
-  // public props
-  isSpinnerVisible = true;
+  // Mặc định tắt — chỉ bật khi NavigationStart; tránh overlay che app khi chưa có sự kiện router
+  isSpinnerVisible = false;
   Spinkit = Spinkit;
   backgroundColor = input('#2689E2');
   spinner = input(Spinkit.skLine);

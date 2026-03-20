@@ -39,6 +39,16 @@ export class SidebarComponent {
       label: 'Quản lý Bài Đăng',
       icon: 'file-text',
       route: '/moderation'
+    },
+    {
+      label: 'Quản lý Ghép cặp',
+      icon: 'link',
+      route: '/matches'
+    },
+    {
+      label: 'Cấu hình Trọng số Match',
+      icon: 'sliders',
+      route: '/matches/weights'
     }
   ];
 

@@ -13,6 +13,7 @@ import { MeController } from "./me/me.controller";
 import { KeywordModule } from "./keyword/keyword.module";
 import { AuditLogModule } from "./audit-log/audit-log.module";
 import { AdminModule } from "./admin/admin.module";
+import { MatchesModule } from "./matches/matches.module";
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { AdminModule } from "./admin/admin.module";
     AuthModule,
     PostsModule,
     ClaimsModule,
+    MatchesModule,
     AuditLogModule,
     AdminModule,
   ],

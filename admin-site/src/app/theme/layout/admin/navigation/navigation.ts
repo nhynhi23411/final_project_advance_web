@@ -45,6 +45,20 @@ export const NavigationItems: NavigationItem[] = [
         type: 'item',
         url: '/moderation',
         icon: 'feather icon-file-text'
+      },
+      {
+        id: 'matches',
+        title: 'Quản lý Ghép cặp',
+        type: 'item',
+        url: '/matches',
+        icon: 'feather icon-link'
+      },
+      {
+        id: 'match-weights',
+        title: 'Cấu hình Trọng số Match',
+        type: 'item',
+        url: '/matches/weights',
+        icon: 'feather icon-sliders'
       }
     ]
   },
