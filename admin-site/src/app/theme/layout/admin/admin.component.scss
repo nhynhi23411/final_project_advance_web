@@ -16,17 +16,25 @@
   background-color: #f5f7fb;
 
   .content-area {
-    display: block;
+    display: flex;
     flex: 1;
+    align-items: stretch;
     overflow: visible;
+    padding-top: var(--admin-layout-header-height);
     min-height: calc(100vh - var(--admin-layout-header-height));
+
+    .admin-sidebar {
+      flex: 0 0 240px;
+      width: 240px;
+      min-width: 0;
+    }
 
     .pcoded-main-container {
       flex: 1;
-      width: 100%;
+      width: auto;
       margin-left: 0 !important;
-      overflow-y: auto;
-      margin-top: var(--admin-layout-header-height);
+      overflow: visible;
+      margin-top: 0;
       min-height: calc(100vh - var(--admin-layout-header-height));
       padding: var(--space-4) var(--space-5) var(--space-5);
 
@@ -42,6 +50,11 @@
   .main-wrapper {
     .content-area {
       display: block;
+      overflow: visible;
+
+      .admin-sidebar {
+        width: 100%;
+      }
     }
   }
 }
