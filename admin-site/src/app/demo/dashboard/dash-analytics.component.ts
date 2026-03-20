@@ -5,7 +5,7 @@ import { finalize } from 'rxjs';
 
 // project import
 import { SharedModule } from 'src/app/theme/shared/shared.module';
-import { ProductSaleComponent } from './product-sale/product-sale.component';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { AdminService, DashboardStats } from 'src/app/services/admin.service';
 
 // 3rd party import
@@ -13,7 +13,7 @@ import { ApexOptions, ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
 
 @Component({
   selector: 'app-dash-analytics',
-  imports: [SharedModule, RouterModule, NgApexchartsModule, ProductSaleComponent],
+  imports: [SharedModule, RouterModule, NgApexchartsModule, PageTitleComponent],
   templateUrl: './dash-analytics.component.html',
   styleUrls: ['./dash-analytics.component.scss']
 })
@@ -87,7 +87,7 @@ export class DashAnalyticsComponent implements OnInit {
         background: 'bg-c-blue',
         title: 'Tổng người dùng',
         icon: 'feather icon-users',
-        text: 'User',
+        text: 'Người dùng',
         number: String(stats.totalUsers),
         url: '/users'
       },
@@ -95,7 +95,7 @@ export class DashAnalyticsComponent implements OnInit {
         background: 'bg-c-green',
         title: 'Bài đăng đã duyệt',
         icon: 'feather icon-check-circle',
-        text: 'Approved',
+        text: 'Đã duyệt',
         number: String(stats.activePosts),
         url: '/moderation'
       },
@@ -103,7 +103,7 @@ export class DashAnalyticsComponent implements OnInit {
         background: 'bg-c-yellow',
         title: 'Bài chờ duyệt',
         icon: 'feather icon-clock',
-        text: 'Pending',
+        text: 'Chờ duyệt',
         number: String(stats.pendingAdmin),
         url: '/moderation'
       },
@@ -111,7 +111,7 @@ export class DashAnalyticsComponent implements OnInit {
         background: 'bg-c-red',
         title: 'Yêu cầu đã giải quyết',
         icon: 'feather icon-award',
-        text: 'Claims',
+        text: 'Đã giải quyết',
         number: String(stats.resolvedClaims),
         url: '/moderation'
       }
@@ -120,11 +120,11 @@ export class DashAnalyticsComponent implements OnInit {
       const pct = (stats.matchRate * 100).toFixed(1);
       base.push({
         background: 'bg-c-purple',
-        title: 'Tỷ lệ khớp (Match rate)',
+        title: 'Tỷ lệ khớp',
         icon: 'feather icon-percent',
-        text: 'Successful Claims / Approved Lost',
+        text: 'Claim thành công / Bài thất lạc đã duyệt',
         number: pct + '%',
-        no: 'Thấp ⇒ cải thiện thuật toán Matching'
+        no: 'Thấp => cần cải thiện thuật toán ghép cặp'
       });
     }
     this.cards = base;
@@ -141,10 +141,10 @@ export class DashAnalyticsComponent implements OnInit {
       stroke: { curve: 'smooth', width: [2, 2] },
       colors: ['#4099ff', '#0e9e4a'],
       series: [
-        { name: 'User mới', data: data.users },
+        { name: 'Người dùng mới', data: data.users },
         { name: 'Bài đăng mới', data: data.posts }
       ],
-      title: { text: 'Tăng trưởng User / Post theo tháng', align: 'left' },
+      title: { text: 'Tăng trưởng người dùng và bài đăng theo tháng', align: 'left' },
       xaxis: { categories: labels },
       legend: { position: 'top' },
       grid: { borderColor: '#f1f1f1' },

@@ -1,3 +1,9 @@
+<app-page-title
+  [title]="'Kiểm duyệt nội dung'"
+  [subtitle]="'Quản lý các bài đăng chờ duyệt, đã duyệt và bị từ chối.'"
+  [breadcrumbs]="[{ label: 'Kiểm duyệt nội dung' }]"
+></app-page-title>
+
 <div class="row">
   <div class="col-xl-12">
     <ul class="nav nav-tabs mb-3" role="tablist">
@@ -36,8 +42,7 @@
       </li>
     </ul>
 
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <h5 class="mb-0">{{ getListTitle() }}</h5>
+    <div class="d-flex justify-content-end align-items-center mb-3">
       <div class="d-flex align-items-center">
         <input
           type="text"

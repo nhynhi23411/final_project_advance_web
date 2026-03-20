@@ -1,12 +1,13 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { AdminService, MonthlyReport } from 'src/app/services/admin.service';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-monthly-report',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, PageTitleComponent],
   templateUrl: './monthly-report.component.html',
   styleUrls: ['./monthly-report.component.scss']
 })

@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&display=swap');
+
+:host {
+  display: block;
+  margin-bottom: 16px;
+}
+
+.page-title-shell {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border: 1px solid #e6edf5;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.page-title-main {
+  min-width: 0;
+}
+
+.page-title {
+  margin: 0;
+  font-size: 29px;
+  line-height: 1.2;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.page-subtitle {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #64748b;
+}
+
+.page-breadcrumb {
+  margin-top: 8px;
+
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #64748b;
+    font-size: 13px;
+
+    &:not(:last-child)::after {
+      content: '/';
+      color: #cbd5e1;
+      margin-left: 2px;
+    }
+  }
+
+  a,
+  span {
+    text-decoration: none;
+    color: inherit;
+    font-weight: 500;
+  }
+
+  li:last-child span {
+    color: #334155;
+    font-weight: 600;
+  }
+
+  .breadcrumb-home a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+
+    i {
+      font-size: 14px;
+    }
+  }
+}
+
+.page-title-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  :host {
+    margin-bottom: 12px;
+  }
+
+  .page-title-shell {
+    padding: 12px 14px;
+    border-radius: 12px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .page-subtitle {
+    font-size: 12px;
+  }
+
+  .page-breadcrumb li {
+    font-size: 12px;
+  }
+
+  .page-title-actions {
+    width: 100%;
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}

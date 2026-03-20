@@ -3,6 +3,7 @@ import { RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import {
   AdminService,
   AdminMatchRow,
@@ -15,7 +16,7 @@ type ReviewTab = 'all' | AdminMatchReviewStatus;
 @Component({
   selector: 'app-match-management',
   standalone: true,
-  imports: [SharedModule, RouterModule],
+  imports: [SharedModule, RouterModule, PageTitleComponent],
   templateUrl: './match-management.component.html',
   styleUrls: ['./match-management.component.scss'],
 })

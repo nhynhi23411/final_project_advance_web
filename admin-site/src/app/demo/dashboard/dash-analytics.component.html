@@ -1,86 +1,104 @@
-<div class="row">
-  <!-- stats cards from API -->
-  @if (statsLoading) {
-    <div class="col-12 text-center py-4">
-      <span class="spinner-border text-primary" role="status"></span>
-      <p class="mt-2 mb-0">Đang tải thống kê...</p>
+<div class="dashboard-shell">
+  <app-page-title
+    [title]="'Bảng điều khiển quản trị'"
+    [subtitle]="'Theo dõi nhanh tình trạng hệ thống Lost & Found từ dữ liệu thực tế.'"
+    [breadcrumbs]="[{ label: 'Bảng điều khiển' }]"
+  >
+    <span pageTitleActions class="live-badge"><span class="dot"></span>Dữ liệu trực tiếp</span>
+  </app-page-title>
+
+  <section class="dashboard-block">
+    <div class="block-heading">
+      <h3>Tổng quan</h3>
+      <p>Chỉ số trọng tâm để theo dõi và ra quyết định nhanh.</p>
     </div>
-  } @else {
-    @for (card of cards; track card.title) {
-      <div class="col-md-6 col-xl-3">
-        @if (card.url) {
-          <a [routerLink]="card.url" class="text-decoration-none d-block">
-            <app-card [hidHeader]="true" cardClass="{{ card.background }} order-card card-clickable">
-              <h6 class="text-white">{{ card.title }}</h6>
-              <h2 class="text-end text-white">
-                <i class="feather {{ card.icon }} float-start"></i>
-                <span>{{ card.number }}</span>
-              </h2>
-              <p class="m-b-0">
-                {{ card.text }}
-                @if (card.no) {
-                  <span class="float-end">{{ card.no }}</span>
-                }
-              </p>
-            </app-card>
-          </a>
-        } @else {
-          <app-card [hidHeader]="true" cardClass="{{ card.background }} order-card">
-            <h6 class="text-white">{{ card.title }}</h6>
-            <h2 class="text-end text-white">
-              <i class="feather {{ card.icon }} float-start"></i>
-              <span>{{ card.number }}</span>
-            </h2>
-            <p class="m-b-0">
-              {{ card.text }}
-              @if (card.no) {
-                <span class="float-end">{{ card.no }}</span>
-              }
-            </p>
-          </app-card>
+
+    @if (statsLoading) {
+      <div class="dashboard-empty">
+        <span class="spinner-border text-primary" role="status"></span>
+        <p class="mt-2 mb-0">Đang tải thống kê...</p>
+      </div>
+    } @else if (!cards.length) {
+      <div class="dashboard-empty">
+        <i class="feather icon-inbox"></i>
+        <p class="mb-0">Chưa có dữ liệu thống kê.</p>
+      </div>
+    } @else {
+      <div class="row g-4 metrics-grid">
+        @for (card of cards; track card.title) {
+          <div class="col-12 col-md-6 col-xl-3">
+            @if (card.url) {
+              <a [routerLink]="card.url" class="metric-link">
+                <app-card [hidHeader]="true" cardClass="metric-card {{ card.background }} card-clickable">
+                  <div class="metric-top">
+                    <span class="metric-title">{{ card.title }}</span>
+                    <span class="metric-icon"><i class="feather {{ card.icon }}"></i></span>
+                  </div>
+                  <div class="metric-value">{{ card.number }}</div>
+                  <div class="metric-footer">
+                    <span class="metric-label">{{ card.text }}</span>
+                    @if (card.no) {
+                      <span class="metric-note">{{ card.no }}</span>
+                    }
+                  </div>
+                </app-card>
+              </a>
+            } @else {
+              <app-card [hidHeader]="true" cardClass="metric-card {{ card.background }}">
+                <div class="metric-top">
+                  <span class="metric-title">{{ card.title }}</span>
+                  <span class="metric-icon"><i class="feather {{ card.icon }}"></i></span>
+                </div>
+                <div class="metric-value">{{ card.number }}</div>
+                <div class="metric-footer">
+                  <span class="metric-label">{{ card.text }}</span>
+                  @if (card.no) {
+                    <span class="metric-note">{{ card.no }}</span>
+                  }
+                </div>
+              </app-card>
+            }
+          </div>
         }
       </div>
     }
-  }
-  <!-- order-card end -->
+  </section>
 
-  <!-- account-section start -->
-  <div class="col-xl-6 col-md-12">
-    <app-card cardTitle="Tăng trưởng User / Post">
-      @if (chartOptions?.chart) {
-        <apx-chart
-          [chart]="chartOptions.chart!"
-          [dataLabels]="chartOptions.dataLabels!"
-          [stroke]="chartOptions.stroke!"
-          [series]="chartOptions.series!"
-          [xaxis]="chartOptions.xaxis!"
-          [colors]="chartOptions.colors!"
-          [fill]="chartOptions.fill!"
-          [markers]="chartOptions.markers!"
-          [yaxis]="chartOptions.yaxis!"
-        ></apx-chart>
-      } @else {
-        <p class="text-muted text-center py-5">Đang tải dữ liệu...</p>
-      }
-    </app-card>
-  </div>
-  <div class="col-xl-6 col-md-12">
-    <div class="row">
-      <div class="col-md-6">
-        <app-card [hidHeader]="true">
-          <div class="row">
-            <div class="col-auto">
-              <span>Tỷ lệ đồ vật theo Category</span>
+  <section class="dashboard-block">
+    <div class="block-heading">
+      <h3>Phân tích</h3>
+      <p>Biểu đồ chỉ hiển thị khi có dữ liệu thật từ hệ thống.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12 col-xxl-8">
+        <app-card cardTitle="Tăng trưởng người dùng và bài đăng theo tháng">
+          @if (chartOptions && chartOptions.chart) {
+            <apx-chart
+              [chart]="chartOptions.chart!"
+              [dataLabels]="chartOptions.dataLabels!"
+              [stroke]="chartOptions.stroke!"
+              [series]="chartOptions.series!"
+              [xaxis]="chartOptions.xaxis!"
+              [colors]="chartOptions.colors!"
+              [fill]="chartOptions.fill!"
+              [markers]="chartOptions.markers!"
+              [yaxis]="chartOptions.yaxis!"
+              [legend]="chartOptions.legend!"
+              [grid]="chartOptions.grid!"
+            ></apx-chart>
+          } @else {
+            <div class="chart-empty">
+              <i class="feather icon-bar-chart-2"></i>
+              <p>Chưa có dữ liệu tăng trưởng.</p>
             </div>
-            <div class="col text-end">
-              <h2 class="mb-0">-</h2>
-              <span class="text-c-green">
-                -
-                <i class="feather icon-trending-up ms-1"></i>
-              </span>
-            </div>
-          </div>
-          @if (chartOptions_1?.chart) {
+          }
+        </app-card>
+      </div>
+
+      <div class="col-12 col-xxl-4">
+        <app-card cardTitle="Phân bổ bài đăng theo danh mục">
+          @if (chartOptions_1 && chartOptions_1.chart) {
             <apx-chart
               [series]="chartOptions_1.series!"
               [chart]="chartOptions_1.chart!"
@@ -90,253 +108,86 @@
               [legend]="chartOptions_1.legend!"
               [colors]="chartOptions_1.colors!"
               [fill]="chartOptions_1.fill!"
-              [grid]="chartOptions_1.grid!"
               [plotOptions]="chartOptions_1.plotOptions!"
-              [tooltip]="chartOptions_1.tooltip!"
             ></apx-chart>
           } @else {
-            <p class="text-muted text-center py-4">Đang tải dữ liệu...</p>
+            <div class="chart-empty chart-empty-small">
+              <i class="feather icon-pie-chart"></i>
+              <p>Chưa có dữ liệu danh mục.</p>
+            </div>
           }
-          <div class="row mt-3 text-center">
-            <div class="col">
-              <h3 class="m-0">
-                <i class="fas fa-circle f-10 m-r-5 text-success"></i>
-                -
-              </h3>
-              <span class="ms-3">New</span>
-            </div>
-            <div class="col">
-              <h3 class="m-0">
-                <i class="fas fa-circle text-primary f-10 m-r-5"></i>
-                -
-              </h3>
-              <span class="ms-3">Return</span>
-            </div>
-          </div>
-        </app-card>
-      </div>
-      <div class="col-md-6">
-        <app-card [hidHeader]="true" cardClass="bg-primary text-white">
-          <div class="row">
-            <div class="col-auto">
-              <span>Customers</span>
-            </div>
-            <div class="col text-end">
-              <h2 class="mb-0 text-white">-</h2>
-              <span class="text-white">
-                -
-                <i class="feather icon-trending-up ms-1"></i>
-              </span>
-            </div>
-          </div>
-          <div id="customerChart">
-            @if (chartOptions_2?.chart) {
-              <apx-chart
-                [series]="chartOptions_2.series!"
-                [chart]="chartOptions_2.chart!"
-                [stroke]="chartOptions_2.stroke!"
-                [dataLabels]="chartOptions_2.dataLabels!"
-                [labels]="chartOptions_2.labels!"
-                [legend]="chartOptions_2.legend!"
-                [colors]="chartOptions_2.colors!"
-                [fill]="chartOptions_2.fill!"
-                [grid]="chartOptions_2.grid!"
-                [plotOptions]="chartOptions_2.plotOptions!"
-                [tooltip]="chartOptions_2.tooltip!"
-              ></apx-chart>
-            } @else {
-              <p class="text-muted text-center py-4">Đang tải dữ liệu...</p>
-            }
-          </div>
-          <div class="row mt-3 text-center">
-            <div class="col">
-              <h3 class="m-0 text-white">
-                <i class="fas fa-circle f-10 m-r-5 text-white"></i>
-                -
-              </h3>
-              <span class="ms-3">New</span>
-            </div>
-            <div class="col">
-              <h3 class="m-0 text-white">
-                <i class="fas fa-circle text-white f-10 m-r-5"></i>
-                -
-              </h3>
-              <span class="ms-3">Return</span>
-            </div>
-          </div>
         </app-card>
       </div>
     </div>
-  </div>
+  </section>
 
-  <div class="col-md-12 col-lg-4">
-    <app-card
-      [hidHeader]="true"
-      cardClass="seo-card"
-      blockClass="seo-statustic"
-      footerClass="seo-chart border border-top-0 p-0 overflow-hidden"
-      [isCardFooter]="true"
-    >
-      <i class="feather icon-save f-20 text-c-red"></i>
-      <h5 class="mb-1">-</h5>
-      <p>Memory</p>
-      <div class="app-card-footer">
-        @if (chartOptions_3?.chart) {
-          <apx-chart
-            [series]="chartOptions_3.series!"
-            [chart]="chartOptions_3.chart!"
-            [stroke]="chartOptions_3.stroke!"
-            [dataLabels]="chartOptions_3.dataLabels!"
-            [colors]="chartOptions_3.colors!"
-            [fill]="chartOptions_3.fill!"
-            [tooltip]="chartOptions_3.tooltip!"
-            [yaxis]="chartOptions_3.yaxis!"
-          ></apx-chart>
-        }
+  <section class="dashboard-block">
+    <div class="block-heading">
+      <h3>Hoạt động gần đây</h3>
+      <p>Các mục cần xử lý ngay để giảm tồn đọng cho kiểm duyệt viên.</p>
+    </div>
+
+    @if (!cards.length) {
+      <div class="dashboard-empty compact">
+        <i class="feather icon-activity"></i>
+        <p class="mb-0">Chưa có dữ liệu hoạt động.</p>
       </div>
-    </app-card>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <app-card [hidHeader]="true" blockClass="text-center">
-      <i class="fa fa-envelope-open text-c-blue d-block f-40"></i>
-      <h4 class="m-t-20">
-        <span class="text-c-blue">-</span>
-        Subscribers
-      </h4>
-      <p class="m-b-20">Danh sách của bạn đang phát triển</p>
-      <button class="btn btn-primery btn-sm btn-round">Manage List</button>
-    </app-card>
-  </div>
-  <div class="col-md-6 col-lg-4">
-    <app-card [hidHeader]="true" blockClass="text-center">
-      <i class="fab fa-twitter text-c-green d-block f-40"></i>
-      <h4 class="m-t-20">
-        <span class="text-c-green">-</span>
-        Followers
-      </h4>
-      <p class="m-b-20">Danh sách của bạn đang phát triển</p>
-      <button class="btn btn-success btn-sm btn-round">Check Theme Out</button>
-    </app-card>
-  </div>
-  <!-- account-section end -->
-
-  <!-- conversion-section start -->
-  <div class="col-lg-4 col-md-12">
-    <app-card [hidHeader]="true" footerClass="border border-top-0 p-0 overflow-hidden" [isCardFooter]="true">
-      <h6>Conversions</h6>
-      <h4 class="m-0">
-        -
-        <span class="text-c-blue ms-2">
-          <i class="feather icon-arrow-up"></i>
-          -
-        </span>
-      </h4>
-      <span>Purchased</span>
-      <div class="app-card-footer"></div>
-    </app-card>
-    <app-card [hidHeader]="true" footerClass="border border-top-0 p-0 overflow-hidden" [isCardFooter]="true">
-      <h6>Conversions</h6>
-      <h4 class="m-0">
-        -
-        <span class="text-c-red ms-2">
-          <i class="feather icon-arrow-up"></i>
-          -
-        </span>
-      </h4>
-      <span>Purchased</span>
-      <div class="app-card-footer"></div>
-    </app-card>
-    <app-card [hidHeader]="true" footerClass="border border-top-0 p-0 overflow-hidden" [isCardFooter]="true">
-      <h6>Conversions</h6>
-      <h4 class="m-0">
-        -
-        <span class="text-c-green ms-2">
-          <i class="feather icon-arrow-up"></i>
-          -
-        </span>
-      </h4>
-      <span>Purchased</span>
-      <div class="app-card-footer"></div>
-    </app-card>
-  </div>
-  <div class="col-lg-8 col-md-12">
-    <app-card cardTitle="Activity Feed" blockClass="m-t-10">
-      @if (images && images.length > 0) {
-        <ul class="feed-blog ps-0">
-          <li class="active-feed">
-            <div class="feed-user-img">
-              <img src="assets/images/user/avatar-4.jpg" class="img-radius" alt="User-Profile-Image" />
-            </div>
-            <h6>
-              <span class="badge bg-danger">File</span>
-              Đã upload tệp:
-              <small class="text-muted ms-1">Gần đây</small>
-            </h6>
-            <p class="m-b-15 m-t-15">
-              Các tệp được upload gần đây
-            </p>
-            <div class="row">
-              @for (image of images; track image.src) {
-                <div class="col-auto text-center">
-                  <img src="{{ image.src }}" alt="img" class="img-fluid wid-100" />
-                  <h6 class="m-t-15 m-b-0">{{ image.title }}</h6>
-                  <p class="text-muted m-b-0">
-                    <small>{{ image.size }}</small>
-                  </p>
+    } @else {
+      <div class="row g-4">
+        <div class="col-12 col-xl-8">
+          <app-card [hidHeader]="true" cardClass="activity-card">
+            <ul class="activity-list">
+              <li>
+                <span class="activity-indicator pending"><i class="feather icon-clock"></i></span>
+                <div class="activity-body">
+                  <h6>Bài chờ duyệt</h6>
+                  <p>Nội dung đang chờ quản trị viên kiểm duyệt trước khi hiển thị.</p>
                 </div>
-              }
-            </div>
-          </li>
-        </ul>
-      } @else {
-        <p class="text-muted text-center py-5">Đang tải Activity Feed...</p>
-      }
-    </app-card>
-  </div>
-  <!-- conversion-section end -->
-  <div class="col-md-12">
-    <app-card cardTitle="Campaign Monitor" cardClass="tab-card tab-content" blockClass="nav-fill">
-      <ul ngbNav #nav="ngbNav" aria-busy="true" class="nav-pills">
-        <li [ngbNavItem]="1" class="flex">
-          <a ngbNavLink>
-            <i class="fa fa-home m-r-10"></i>
-            Home
-          </a>
-          <ng-template ngbNavContent>
-            <div class="table-responsive">
-              <app-product-sale></app-product-sale>
-            </div>
-          </ng-template>
-        </li>
-        <li [ngbNavItem]="2" class="flex">
-          <a ngbNavLink>
-            <i class="fa fa-key m-r-10"></i>
-            Security
-          </a>
-          <ng-template ngbNavContent>
-            <app-product-sale></app-product-sale>
-          </ng-template>
-        </li>
-        <li [ngbNavItem]="3" class="flex">
-          <a ngbNavLink>
-            <i class="fa fa-play-circle m-r-10"></i>
-            Entertainment
-          </a>
-          <ng-template ngbNavContent>
-            <app-product-sale></app-product-sale>
-          </ng-template>
-        </li>
-        <li [ngbNavItem]="4" class="flex">
-          <a ngbNavLink>
-            <i class="fa fa-database m-r-10"></i>
-            Big Data
-          </a>
-          <ng-template ngbNavContent>
-            <app-product-sale></app-product-sale>
-          </ng-template>
-        </li>
-      </ul>
-      <div [ngbNavOutlet]="nav" class="mt-2"></div>
-    </app-card>
-  </div>
+                <a [routerLink]="['/moderation']" class="activity-value">{{ cards[2]?.number || '0' }}</a>
+              </li>
+
+              <li>
+                <span class="activity-indicator success"><i class="feather icon-check-circle"></i></span>
+                <div class="activity-body">
+                  <h6>Bài đăng đã duyệt</h6>
+                  <p>Tổng số bài đã được phê duyệt và hiển thị cho cộng đồng.</p>
+                </div>
+                <a [routerLink]="['/moderation']" class="activity-value">{{ cards[1]?.number || '0' }}</a>
+              </li>
+
+              <li>
+                <span class="activity-indicator info"><i class="feather icon-award"></i></span>
+                <div class="activity-body">
+                  <h6>Yêu cầu đã giải quyết</h6>
+                  <p>Số claim đã xử lý thành công và đóng hồ sơ.</p>
+                </div>
+                <a [routerLink]="['/moderation']" class="activity-value">{{ cards[3]?.number || '0' }}</a>
+              </li>
+            </ul>
+          </app-card>
+        </div>
+
+        <div class="col-12 col-xl-4">
+          <app-card [hidHeader]="true" cardClass="quick-card">
+            <h5 class="quick-title">Hành động nhanh</h5>
+
+            <a [routerLink]="['/moderation']" class="quick-action">
+              <span class="quick-label">Kiểm duyệt bài chờ duyệt</span>
+              <span class="quick-meta">{{ cards[2]?.number || '0' }}</span>
+            </a>
+
+            <a [routerLink]="['/users']" class="quick-action">
+              <span class="quick-label">Xem tổng quan người dùng</span>
+              <span class="quick-meta">{{ cards[0]?.number || '0' }}</span>
+            </a>
+
+            <a [routerLink]="['/matches']" class="quick-action">
+              <span class="quick-label">Theo dõi kết quả ghép cặp</span>
+              <span class="quick-meta">{{ cards[4]?.number || 'Chưa có' }}</span>
+            </a>
+          </app-card>
+        </div>
+      </div>
+    }
+  </section>
 </div>

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 
 import { SharedModule } from 'src/app/theme/shared/shared.module';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { AdminService, Item } from 'src/app/services/admin.service';
 
 export type ContentTab =
@@ -17,7 +18,7 @@ export type ContentTab =
 @Component({
   selector: 'app-content-management',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, PageTitleComponent],
   templateUrl: './content-management.component.html',
   styleUrls: ['./content-management.component.scss']
 })

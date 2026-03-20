@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, BlacklistedKeyword, AlgorithmWeights } from '../../services/admin.service';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 
 type WeightKey = keyof AlgorithmWeights;
 
@@ -18,7 +19,7 @@ interface WeightSlider {
   templateUrl: './system-config.component.html',
   styleUrls: ['./system-config.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PageTitleComponent],
 })
 export class SystemConfigComponent implements OnInit {
   // ─── Blacklist State ──────────────────────────────────────────────────────

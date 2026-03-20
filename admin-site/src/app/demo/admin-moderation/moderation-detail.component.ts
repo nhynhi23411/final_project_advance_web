@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, forkJoin, of } from 'rxjs';
 
 import { AdminService, Item } from 'src/app/services/admin.service';
+import { PageTitleComponent } from 'src/app/theme/shared/components/page-title/page-title.component';
 import { SharedModule } from 'src/app/theme/shared/shared.module';
 import { PostStatus } from 'src/app/theme/shared/components/status-badge/status-badge.component';
 
@@ -18,7 +19,7 @@ interface AuditEntry {
 @Component({
   selector: 'app-moderation-detail',
   standalone: true,
-  imports: [SharedModule],
+  imports: [SharedModule, PageTitleComponent],
   templateUrl: './moderation-detail.component.html',
   styleUrls: ['./moderation-detail.component.scss']
 })

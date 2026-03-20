@@ -1,0 +1,28 @@
+<section class="page-title-shell">
+  <div class="page-title-main">
+    <h1 class="page-title">{{ title }}</h1>
+
+    <p class="page-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+
+    <nav class="page-breadcrumb" *ngIf="showBreadcrumb && breadcrumbs.length" aria-label="Breadcrumb">
+      <ol>
+        <li class="breadcrumb-home">
+          <a [routerLink]="['/analytics']" title="Trang chủ">
+            <i class="feather icon-home"></i>
+          </a>
+        </li>
+
+        <li *ngFor="let item of breadcrumbs; let last = last">
+          <a *ngIf="item.link && !last; else currentItem" [routerLink]="[item.link]">{{ item.label }}</a>
+          <ng-template #currentItem>
+            <span>{{ item.label }}</span>
+          </ng-template>
+        </li>
+      </ol>
+    </nav>
+  </div>
+
+  <div class="page-title-actions">
+    <ng-content select="[pageTitleActions]"></ng-content>
+  </div>
+</section>
