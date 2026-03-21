@@ -25,6 +25,40 @@ export class UsersService {
     return this.userModel.findById(id).exec();
   }
 
+  async setPasswordResetToken(
+    userId: string,
+    tokenHash: string,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.userModel
+      .findByIdAndUpdate(userId, {
+        password_reset_token_hash: tokenHash,
+        password_reset_expires_at: expiresAt,
+        updated_at: new Date(),
+      })
+      .exec();
+  }
+
+  async findByPasswordResetTokenHash(tokenHash: string): Promise<User | null> {
+    return this.userModel
+      .findOne({
+        password_reset_token_hash: tokenHash,
+        password_reset_expires_at: { $gte: new Date() },
+      })
+      .exec();
+  }
+
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    await this.userModel
+      .findByIdAndUpdate(userId, {
+        password: passwordHash,
+        password_reset_token_hash: null,
+        password_reset_expires_at: null,
+        updated_at: new Date(),
+      })
+      .exec();
+  }
+
   /** Lấy danh sách user có role ADMIN (để gửi thông báo). */
   async findAdmins(): Promise<{ _id: string }[]> {
     const docs = await this.userModel

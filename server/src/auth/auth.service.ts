@@ -1,9 +1,11 @@
 import {
   Injectable,
+  BadRequestException,
   ConflictException,
   UnauthorizedException,
   ForbiddenException,
 } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { UsersService } from "../users/users.service";
 import { RegisterDto } from "./dto/register.dto";
 import { LoginDto } from "./dto/login.dto";
@@ -13,12 +15,16 @@ import { LoginDto } from "./dto/login.dto";
 const bcrypt = require("bcryptjs");
 import { JwtService } from "@nestjs/jwt";
 import { User } from "../users/schemas/user.schema";
+import { MailService } from "../mail/mail.service";
+import { createHash, randomBytes } from "crypto";
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
+    private readonly config: ConfigService,
   ) { }
 
   private buildUserResponse(user: User, accessToken: string) {
@@ -102,5 +108,60 @@ export class AuthService {
     const token = await this.jwtService.signAsync(payload);
 
     return this.buildUserResponse(user, token);
+  }
+
+  async forgotPassword(email: string) {
+    const normalizedEmail = String(email || "").trim().toLowerCase();
+    const user = await this.usersService.findByEmail(normalizedEmail);
+    const genericMessage =
+      "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi hướng dẫn đặt lại mật khẩu.";
+
+    if (!user) return { message: genericMessage };
+
+    const rawToken = randomBytes(32).toString("hex");
+    const tokenHash = createHash("sha256").update(rawToken).digest("hex");
+    const expiresMinutes = Number(
+      this.config.get<string>("RESET_PASSWORD_EXPIRES_MINUTES") || 20,
+    );
+    const expiresAt = new Date(Date.now() + expiresMinutes * 60 * 1000);
+
+    await this.usersService.setPasswordResetToken(
+      (user as any)._id.toString(),
+      tokenHash,
+      expiresAt,
+    );
+
+    const baseUrl =
+      user.role === "ADMIN"
+        ? this.config.get<string>("ADMIN_RESET_PASSWORD_URL") ||
+          "http://localhost:4200/reset-password"
+        : this.config.get<string>("CLIENT_RESET_PASSWORD_URL") ||
+          "http://localhost:4201/auth/reset-password";
+    const separator = baseUrl.includes("?") ? "&" : "?";
+    const resetUrl = `${baseUrl}${separator}token=${encodeURIComponent(rawToken)}`;
+
+    await this.mailService.sendPasswordResetEmail({
+      to: user.email,
+      receiverName: user.name,
+      resetUrl,
+      expiresMinutes,
+    });
+
+    return { message: genericMessage };
+  }
+
+  async resetPassword(token: string, newPassword: string) {
+    const raw = String(token || "").trim();
+    if (!raw) throw new BadRequestException("Token đặt lại mật khẩu không hợp lệ");
+
+    const tokenHash = createHash("sha256").update(raw).digest("hex");
+    const user = await this.usersService.findByPasswordResetTokenHash(tokenHash);
+    if (!user) {
+      throw new BadRequestException("Token đã hết hạn hoặc không hợp lệ");
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await this.usersService.updatePassword((user as any)._id.toString(), hashedPassword);
+    return { message: "Đặt lại mật khẩu thành công" };
   }
 }

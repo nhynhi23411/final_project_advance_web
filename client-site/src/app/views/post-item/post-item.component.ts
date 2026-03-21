@@ -57,6 +57,8 @@ export class PostItemComponent implements OnInit {
     submitError = '';
     submitSuccess = false;
     submitSuccessMessage = 'Bài đăng của bạn đang chờ kiểm duyệt.';
+    formWarning = '';
+    imageRequiredError = '';
     private linkLostId: string | null = null;
 
     private uploadedUrls: string[] = [];
@@ -125,6 +127,13 @@ export class PostItemComponent implements OnInit {
         });
     }
 
+    onImagesChanged(): void {
+        this.syncUploadedImages();
+        if (this.uploadedUrls.length > 0) {
+            this.imageRequiredError = '';
+        }
+    }
+
     private syncUploadedImages(): void {
         const done = this.imageUploader.images.filter(img => img.done);
         this.uploadedUrls = done.map(img => img.url);
@@ -135,7 +144,19 @@ export class PostItemComponent implements OnInit {
         Object.keys(this.form.controls).forEach(key => {
             this.form.get(key)!.markAsTouched();
         });
-        if (this.form.invalid) return;
+        this.formWarning = '';
+        this.imageRequiredError = '';
+        this.syncUploadedImages();
+
+        if (this.form.invalid) {
+            this.formWarning = 'Vui lòng điền đầy đủ các trường bắt buộc trước khi đăng tin.';
+            return;
+        }
+        if (this.uploadedUrls.length === 0) {
+            this.imageRequiredError = 'Vui lòng tải lên ít nhất 1 ảnh.';
+            this.formWarning = 'Bài đăng bắt buộc phải có hình ảnh.';
+            return;
+        }
 
         this.submitting = true;
         this.submitError = '';
@@ -205,6 +226,8 @@ export class PostItemComponent implements OnInit {
         this.dynamicFields = [];
         this.uploadedUrls = [];
         this.uploadedPublicIds = [];
+        this.formWarning = '';
+        this.imageRequiredError = '';
         this.submitError = '';
         this.submitSuccess = false;
         this.submitSuccessMessage = 'Bài đăng của bạn đang chờ kiểm duyệt.';
@@ -220,8 +243,12 @@ export class PostItemComponent implements OnInit {
         const ctrl = this.form.get(name);
         if (!ctrl || !ctrl.errors) return '';
         if (ctrl.errors.required) {
+            if (name === 'type') return 'Vui lòng chọn loại bài đăng';
+            if (name === 'title') return 'Vui lòng nhập tiêu đề';
+            if (name === 'category') return 'Vui lòng chọn danh mục sản phẩm';
             if (name === 'ward') return 'Vui lòng chọn phường';
             if (name === 'address_detail') return 'Vui lòng nhập chi tiết địa chỉ';
+            if (name === 'lost_found_date') return 'Vui lòng chọn thời điểm';
             return 'Trường này không được để trống';
         }
         if (ctrl.errors.maxlength) return `Tối đa ${ctrl.errors.maxlength.requiredLength} ký tự`;
