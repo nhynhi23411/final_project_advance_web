@@ -7,6 +7,8 @@ import { AuthComponent } from "./layouts/auth/auth.component";
 // auth views
 import { LoginComponent } from "./views/auth/login/login.component";
 import { RegisterComponent } from "./views/auth/register/register.component";
+import { ForgotPasswordComponent } from "./views/auth/forgot-password/forgot-password.component";
+import { ResetPasswordComponent } from "./views/auth/reset-password/reset-password.component";
 
 // no layouts views
 import { LandingComponent } from "./views/landing/landing.component";
@@ -33,6 +35,8 @@ const routes: Routes = [
     children: [
       { path: "login", component: LoginComponent },
       { path: "register", component: RegisterComponent },
+      { path: "forgot-password", component: ForgotPasswordComponent },
+      { path: "reset-password", component: ResetPasswordComponent },
       { path: "", redirectTo: "login", pathMatch: "full" },
     ],
   },

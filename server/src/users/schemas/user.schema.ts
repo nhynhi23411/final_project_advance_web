@@ -29,6 +29,12 @@ export class User {
   @Prop({ default: 0 })
   warning_count!: number;
 
+  @Prop({ type: String, default: null })
+  password_reset_token_hash?: string | null;
+
+  @Prop({ type: Date, default: null })
+  password_reset_expires_at?: Date | null;
+
   @Prop()
   created_at?: Date;
 

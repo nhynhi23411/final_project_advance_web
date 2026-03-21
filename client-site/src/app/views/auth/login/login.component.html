@@ -40,7 +40,7 @@
       </div>
       <div class="login-links flex flex-wrap mt-6 relative">
         <div class="w-1/2">
-          <a href="#" class="login-link login-link-muted" (click)="$event.preventDefault()"><small>Quên mật khẩu?</small></a>
+          <a [routerLink]="['/auth/forgot-password']" class="login-link login-link-muted"><small>Quên mật khẩu?</small></a>
         </div>
         <div class="w-1/2 text-right">
           <a [routerLink]="['/auth/register']" class="login-link login-link-register"><small>Tạo tài khoản mới</small></a>

@@ -134,6 +134,10 @@ export interface UpdateWeightsResponse {
   weights: AlgorithmWeights;
 }
 
+export interface ApiMessageResponse {
+  message: string;
+}
+
 export type AdminMatchReviewStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED';
 
 export interface AdminMatchPostSummary {
@@ -347,6 +351,14 @@ export class AdminService {
 
   updateAlgorithmWeights(weights: AlgorithmWeights): Observable<UpdateWeightsResponse> {
     return this.http.patch<UpdateWeightsResponse>(`${this.baseUrl}/admin/system-config/weights`, weights);
+  }
+
+  forgotPassword(email: string): Observable<ApiMessageResponse> {
+    return this.http.post<ApiMessageResponse>(`${this.baseUrl}/auth/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<ApiMessageResponse> {
+    return this.http.post<ApiMessageResponse>(`${this.baseUrl}/auth/reset-password`, { token, newPassword });
   }
 
   // ─── Match management ───────────────────────────────────────────────────────

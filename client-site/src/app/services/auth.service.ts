@@ -98,4 +98,18 @@ export class AuthService {
   register(data: { name: string; username: string; email: string; phone: string; password: string }): Observable<any> {
     return this.http.post(`${environment.apiUrl}/auth/register`, data);
   }
+
+  forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/forgot-password`,
+      { email }
+    );
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/reset-password`,
+      { token, newPassword }
+    );
+  }
 }

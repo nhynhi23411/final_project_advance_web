@@ -61,6 +61,20 @@ const routes: Routes = [
       {
         path: 'login',
         loadComponent: () => import('./demo/pages/authentication/sign-in/sign-in.component').then((c) => c.SignInComponent)
+      },
+      {
+        path: 'forgot-password',
+        loadComponent: () =>
+          import('./demo/pages/authentication/forgot-password/forgot-password.component').then(
+            (c) => c.ForgotPasswordComponent
+          )
+      },
+      {
+        path: 'reset-password',
+        loadComponent: () =>
+          import('./demo/pages/authentication/reset-password/reset-password.component').then(
+            (c) => c.ResetPasswordComponent
+          )
       }
     ]
   }

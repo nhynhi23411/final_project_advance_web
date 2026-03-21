@@ -15,6 +15,8 @@ import { AuthComponent } from "./layouts/auth/auth.component";
 // auth views
 import { LoginComponent } from "./views/auth/login/login.component";
 import { RegisterComponent } from "./views/auth/register/register.component";
+import { ForgotPasswordComponent } from "./views/auth/forgot-password/forgot-password.component";
+import { ResetPasswordComponent } from "./views/auth/reset-password/reset-password.component";
 
 // no layouts views
 import { LandingComponent } from "./views/landing/landing.component";
@@ -66,6 +68,8 @@ import { GlobalErrorHandler } from "./global-error.handler";
     IndexNavbarComponent,
     LoginComponent,
     RegisterComponent,
+    ForgotPasswordComponent,
+    ResetPasswordComponent,
     LandingComponent,
     ProfileComponent,
     PostItemComponent,

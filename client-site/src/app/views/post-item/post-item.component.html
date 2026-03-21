@@ -34,6 +34,11 @@
         </p>
       </header>
 
+      <div *ngIf="formWarning" class="post-item-error-banner">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ formWarning }}
+      </div>
+
       <form [formGroup]="form" (ngSubmit)="onSubmit()" class="post-item-form">
         <!-- Section A: Thông tin cơ bản -->
         <section class="post-item-section">
@@ -184,12 +189,17 @@
           </div>
 
           <div class="post-item-field">
-            <span class="post-item-label">Hình ảnh</span>
+            <span class="post-item-label">Hình ảnh <span class="post-item-required">*</span></span>
             <p class="post-item-helper post-item-helper-upload">Tối đa 5 ảnh, mỗi ảnh ≤ 5MB. Ảnh giúp người khác nhận diện đồ vật dễ hơn.</p>
             <div class="post-item-upload-box">
               <i class="fas fa-cloud-upload-alt post-item-upload-icon" aria-hidden="true"></i>
-              <app-image-uploader #imageUploader (filesSelected)="onFilesSelected($event)"></app-image-uploader>
+              <app-image-uploader
+                #imageUploader
+                (filesSelected)="onFilesSelected($event)"
+                (imagesChanged)="onImagesChanged()"
+              ></app-image-uploader>
             </div>
+            <p *ngIf="imageRequiredError" class="post-item-error-text">{{ imageRequiredError }}</p>
           </div>
         </section>
 

@@ -23,6 +23,11 @@ export class ImageUploaderComponent {
     dragOver = false;
 
     @Output() filesSelected = new EventEmitter<File[]>();
+    @Output() imagesChanged = new EventEmitter<ImagePreview[]>();
+
+    private emitImagesChanged(): void {
+        this.imagesChanged.emit([...this.images]);
+    }
 
     onDragOver(event: DragEvent): void {
         event.preventDefault();
@@ -86,6 +91,7 @@ export class ImageUploaderComponent {
             validFiles.push(file);
         });
 
+        this.emitImagesChanged();
         if (validFiles.length) {
             this.filesSelected.emit(validFiles);
         }
@@ -94,14 +100,17 @@ export class ImageUploaderComponent {
     updateImageStatus(index: number, data: { uploading?: boolean; done?: boolean; url?: string; publicId?: string; error?: string }): void {
         if (this.images[index]) {
             Object.assign(this.images[index], data);
+            this.emitImagesChanged();
         }
     }
 
     removeImage(index: number): void {
         this.images.splice(index, 1);
+        this.emitImagesChanged();
     }
 
     reset(): void {
         this.images = [];
+        this.emitImagesChanged();
     }
 }
