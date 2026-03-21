@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AdminService, BlacklistedKeyword, AlgorithmWeights } from '../../services/admin.service';
@@ -57,7 +57,10 @@ export class SystemConfigComponent implements OnInit {
     { key: 'attributes', label: 'Thuộc tính',  icon: 'fas fa-list-ul',      description: 'Mức độ ưu tiên theo đặc điểm chi tiết',  color: '#ec4899' },
   ];
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadKeywords();
@@ -73,11 +76,13 @@ export class SystemConfigComponent implements OnInit {
       next: (data) => {
         this.keywords = data;
         this.isLoadingKeywords = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.keywordError = 'Không thể tải danh sách từ khóa. Vui lòng thử lại.';
         this.isLoadingKeywords = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -102,11 +107,13 @@ export class SystemConfigComponent implements OnInit {
         this.newKeyword = '';
         this.isAddingKeyword = false;
         this.showKeywordSuccess('Thêm từ khóa thành công!');
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.keywordError = err.error?.message || 'Thêm từ khóa thất bại.';
         this.isAddingKeyword = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -118,10 +125,12 @@ export class SystemConfigComponent implements OnInit {
         const idx = this.keywords.findIndex(k => k._id === kw._id);
         if (idx !== -1) this.keywords[idx] = updated;
         this.showKeywordSuccess(`${newState ? 'Kích hoạt' : 'Vô hiệu hóa'} từ khóa thành công!`);
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.keywordError = 'Cập nhật trạng thái thất bại.';
+        this.cdr.markForCheck();
       },
     });
   }
@@ -143,11 +152,13 @@ export class SystemConfigComponent implements OnInit {
         this.editTarget = null;
         this.isSavingEdit = false;
         this.showKeywordSuccess('Cập nhật từ khóa thành công!');
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.keywordError = 'Cập nhật thất bại.';
         this.isSavingEdit = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -167,11 +178,13 @@ export class SystemConfigComponent implements OnInit {
         this.deleteTarget = null;
         this.isDeletingKeyword = false;
         this.showKeywordSuccess('Xóa từ khóa thành công!');
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.keywordError = 'Xóa thất bại.';
         this.isDeletingKeyword = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -185,7 +198,11 @@ export class SystemConfigComponent implements OnInit {
 
   private showKeywordSuccess(msg: string): void {
     this.keywordSuccess = msg;
-    setTimeout(() => { this.keywordSuccess = null; }, 3000);
+    this.cdr.markForCheck();
+    setTimeout(() => {
+      this.keywordSuccess = null;
+      this.cdr.markForCheck();
+    }, 3000);
   }
 
   // ─── Weights Methods ──────────────────────────────────────────────────────
@@ -197,11 +214,13 @@ export class SystemConfigComponent implements OnInit {
         this.weights = { ...data };
         this.originalWeights = { ...data };
         this.isLoadingWeights = false;
+        this.cdr.markForCheck();
       },
       error: (err) => {
         console.error(err);
         this.weightsError = 'Không thể tải trọng số. Vui lòng thử lại.';
         this.isLoadingWeights = false;
+        this.cdr.markForCheck();
       },
     });
   }
@@ -233,12 +252,17 @@ export class SystemConfigComponent implements OnInit {
         this.weights = { ...res.weights };
         this.isSavingWeights = false;
         this.weightsSuccess = 'Trọng số đã được lưu và áp dụng thành công! Hệ thống đang re-score các gợi ý ghép đôi.';
-        setTimeout(() => { this.weightsSuccess = null; }, 5000);
+        this.cdr.markForCheck();
+        setTimeout(() => {
+          this.weightsSuccess = null;
+          this.cdr.markForCheck();
+        }, 5000);
       },
       error: (err) => {
         console.error(err);
         this.weightsError = err.error?.message || 'Lưu trọng số thất bại.';
         this.isSavingWeights = false;
+        this.cdr.markForCheck();
       },
     });
   }
