@@ -89,95 +89,158 @@
 
       <!-- Bảng chi tiết: User mới -->
       <app-card cardTitle="User đăng ký mới" cardClass="mb-3">
-        <div class="table-responsive">
-          <table class="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th>Họ tên</th>
-                <th>Email</th>
-                <th>Ngày đăng ký</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (report.newUsers.length === 0) {
+        @if (usersLoading) {
+          <div class="text-center py-4">
+            <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+            <span class="ms-2">Đang tải danh sách...</span>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
                 <tr>
-                  <td colspan="3" class="text-muted text-center py-3">Không có user mới trong tháng.</td>
+                  <th>Họ tên</th>
+                  <th>Email</th>
+                  <th>Ngày đăng ký</th>
                 </tr>
-              }
-              @for (u of report.newUsers; track u._id) {
-                <tr>
-                  <td>{{ u.name }}</td>
-                  <td>{{ u.email }}</td>
-                  <td>{{ formatDate(u.created_at) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @if (users.length === 0) {
+                  <tr>
+                    <td colspan="3" class="text-muted text-center py-3">Không có user mới trong tháng.</td>
+                  </tr>
+                }
+                @for (u of users; track u._id) {
+                  <tr>
+                    <td>{{ u.name }}</td>
+                    <td>{{ u.email }}</td>
+                    <td>{{ formatDate(u.created_at) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (usersTotal > 10) {
+            <div class="d-flex justify-content-end mt-2">
+              <ngb-pagination
+                [collectionSize]="usersTotal"
+                [(page)]="usersPage"
+                [pageSize]="10"
+                [maxSize]="5"
+                [rotate]="true"
+                [boundaryLinks]="true"
+                size="sm"
+                (pageChange)="loadUsers()"
+              ></ngb-pagination>
+            </div>
+          }
+        }
       </app-card>
 
       <!-- Bảng chi tiết: Bài đăng mới -->
       <app-card cardTitle="Bài đăng mới" cardClass="mb-3">
-        <div class="table-responsive">
-          <table class="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th>Tiêu đề</th>
-                <th>Loại</th>
-                <th>Category</th>
-                <th>Trạng thái</th>
-                <th>Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (report.newPosts.length === 0) {
+        @if (postsLoading) {
+          <div class="text-center py-4">
+            <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+            <span class="ms-2">Đang tải danh sách...</span>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
                 <tr>
-                  <td colspan="5" class="text-muted text-center py-3">Không có bài đăng mới trong tháng.</td>
+                  <th>Tiêu đề</th>
+                  <th>Loại</th>
+                  <th>Category</th>
+                  <th>Trạng thái</th>
+                  <th>Ngày tạo</th>
                 </tr>
-              }
-              @for (p of report.newPosts; track p._id) {
-                <tr>
-                  <td>{{ p.title }}</td>
-                  <td>{{ p.post_type }}</td>
-                  <td>{{ p.category }}</td>
-                  <td><span [ngClass]="getPostStatusBadge(p.status)">{{ p.status }}</span></td>
-                  <td>{{ formatDate(p.createdAt) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @if (posts.length === 0) {
+                  <tr>
+                    <td colspan="5" class="text-muted text-center py-3">Không có bài đăng mới trong tháng.</td>
+                  </tr>
+                }
+                @for (p of posts; track p._id) {
+                  <tr>
+                    <td>{{ p.title }}</td>
+                    <td>{{ p.post_type }}</td>
+                    <td>{{ p.category }}</td>
+                    <td><span [ngClass]="getPostStatusBadge(p.status)">{{ p.status }}</span></td>
+                    <td>{{ formatDate(p.createdAt) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (postsTotal > 10) {
+            <div class="d-flex justify-content-end mt-2">
+              <ngb-pagination
+                [collectionSize]="postsTotal"
+                [(page)]="postsPage"
+                [pageSize]="10"
+                [maxSize]="5"
+                [rotate]="true"
+                [boundaryLinks]="true"
+                size="sm"
+                (pageChange)="loadPosts()"
+              ></ngb-pagination>
+            </div>
+          }
+        }
       </app-card>
 
       <!-- Bảng chi tiết: Claims -->
       <app-card cardTitle="Yêu cầu nhận đồ (Claims)">
-        <div class="table-responsive">
-          <table class="table table-sm table-striped">
-            <thead>
-              <tr>
-                <th>Trạng thái</th>
-                <th>Post ID</th>
-                <th>User ID (người claim)</th>
-                <th>Ngày tạo</th>
-              </tr>
-            </thead>
-            <tbody>
-              @if (report.claims.length === 0) {
+        @if (claimsLoading) {
+          <div class="text-center py-4">
+            <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+            <span class="ms-2">Đang tải danh sách...</span>
+          </div>
+        } @else {
+          <div class="table-responsive">
+            <table class="table table-sm table-striped">
+              <thead>
                 <tr>
-                  <td colspan="4" class="text-muted text-center py-3">Không có claim nào trong tháng.</td>
+                  <th>Trạng thái</th>
+                  <th>Post ID</th>
+                  <th>User ID (người claim)</th>
+                  <th>Ngày tạo</th>
                 </tr>
-              }
-              @for (c of report.claims; track c._id) {
-                <tr>
-                  <td><span [ngClass]="getClaimStatusBadge(c.status)">{{ c.status }}</span></td>
-                  <td><code class="small">{{ c.target_post_id }}</code></td>
-                  <td><code class="small">{{ c.claimant_user_id }}</code></td>
-                  <td>{{ formatDate(c.created_at) }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                @if (claims.length === 0) {
+                  <tr>
+                    <td colspan="4" class="text-muted text-center py-3">Không có claim nào trong tháng.</td>
+                  </tr>
+                }
+                @for (c of claims; track c._id) {
+                  <tr>
+                    <td><span [ngClass]="getClaimStatusBadge(c.status)">{{ c.status }}</span></td>
+                    <td><code class="small">{{ c.target_post_id }}</code></td>
+                    <td><code class="small">{{ c.claimant_user_id }}</code></td>
+                    <td>{{ formatDate(c.created_at) }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          @if (claimsTotal > 10) {
+            <div class="d-flex justify-content-end mt-2">
+              <ngb-pagination
+                [collectionSize]="claimsTotal"
+                [(page)]="claimsPage"
+                [pageSize]="10"
+                [maxSize]="5"
+                [rotate]="true"
+                [boundaryLinks]="true"
+                size="sm"
+                (pageChange)="loadClaims()"
+              ></ngb-pagination>
+            </div>
+          }
+        }
       </app-card>
     }
   </div>

@@ -27,6 +27,11 @@ function isValidObjectId(id: string): boolean {
 export class AdminPostsController {
   constructor(private readonly adminPostsService: AdminPostsService) {}
 
+  @Get("counts")
+  getPostCountsByStatus() {
+    return this.adminPostsService.getPostCountsByStatus();
+  }
+
   @Get()
   findPosts(
     @Query("status") status?: string,

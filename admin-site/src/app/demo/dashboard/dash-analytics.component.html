@@ -119,6 +119,56 @@
         </app-card>
       </div>
     </div>
+
+    <div class="row g-4 mt-2">
+      <div class="col-12 col-xxl-8">
+        <app-card cardTitle="Tỷ lệ khớp bài LOST đã duyệt theo tháng">
+          @if (matchRateOptions && matchRateOptions.chart) {
+            <apx-chart
+              [chart]="matchRateOptions.chart!"
+              [dataLabels]="matchRateOptions.dataLabels!"
+              [stroke]="matchRateOptions.stroke!"
+              [series]="matchRateOptions.series!"
+              [xaxis]="matchRateOptions.xaxis!"
+              [colors]="matchRateOptions.colors!"
+              [fill]="matchRateOptions.fill!"
+              [markers]="matchRateOptions.markers!"
+              [yaxis]="matchRateOptions.yaxis!"
+              [legend]="matchRateOptions.legend!"
+              [grid]="matchRateOptions.grid!"
+            ></apx-chart>
+          } @else {
+            <div class="chart-empty">
+              <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+              <p class="ms-2 mb-0">Đang tải biểu đồ...</p>
+            </div>
+          }
+        </app-card>
+      </div>
+
+      <div class="col-12 col-xxl-4">
+        <app-card cardTitle="Khối lượng công việc kiểm duyệt">
+          @if (moderationOptions && moderationOptions.chart) {
+            <apx-chart
+              [series]="moderationOptions.series!"
+              [chart]="moderationOptions.chart!"
+              [stroke]="moderationOptions.stroke!"
+              [dataLabels]="moderationOptions.dataLabels!"
+              [labels]="moderationOptions.labels!"
+              [legend]="moderationOptions.legend!"
+              [colors]="moderationOptions.colors!"
+              [fill]="moderationOptions.fill!"
+              [plotOptions]="moderationOptions.plotOptions!"
+            ></apx-chart>
+          } @else {
+            <div class="chart-empty chart-empty-small">
+              <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+              <p class="ms-2 mb-0">Đang tải biểu đồ...</p>
+            </div>
+          }
+        </app-card>
+      </div>
+    </div>
   </section>
 
   <section class="dashboard-block">
@@ -189,5 +239,65 @@
         </div>
       </div>
     }
+  </section>
+
+  <section class="dashboard-block mt-4">
+    <div class="block-heading">
+      <h3>Sức khỏe Nền tảng</h3>
+      <p>Theo dõi các tài khoản vi phạm hoặc bị khóa để đảm bảo an toàn.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-12">
+        <app-card [hidHeader]="true" cardClass="activity-card">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Tài khoản</th>
+                  <th>Hành động</th>
+                  <th>Lý do</th>
+                  <th>Thời gian</th>
+                </tr>
+              </thead>
+              <tbody>
+                @if (healthLoading) {
+                  <tr>
+                    <td colspan="4" class="text-center py-4">
+                      <span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+                      <span class="ms-2">Đang tải dữ liệu...</span>
+                    </td>
+                  </tr>
+                } @else if (!platformHealthLogs.length) {
+                  <tr>
+                    <td colspan="4" class="text-center py-4 text-muted">
+                      Không có người dùng nào bị khóa gần đây. Hệ thống đang hoạt động tốt!
+                    </td>
+                  </tr>
+                }
+                @for (log of platformHealthLogs; track log._id) {
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <div class="avatar bg-light-danger text-danger rounded-circle me-3" style="width:36px;height:36px;display:flex;align-items:center;justify-content:center">
+                          <i class="feather icon-user-x"></i>
+                        </div>
+                        <div>
+                          <h6 class="mb-0">{{ log.user_id?.name || 'Unknown' }}</h6>
+                          <small class="text-muted">{{ log.user_id?.email || '' }}</small>
+                        </div>
+                      </div>
+                    </td>
+                    <td><span class="badge bg-danger">Khóa tài khoản</span></td>
+                    <td>{{ log.reason || 'Vi phạm chính sách nền tảng' }}</td>
+                    <td>{{ log.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </app-card>
+      </div>
+    </div>
   </section>
 </div>

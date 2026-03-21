@@ -31,6 +31,10 @@ export class ContentManagementComponent implements OnInit {
   filterDateFrom = '';
   filterDateTo = '';
 
+  tabCounts: Record<ContentTab, number> = {
+    all: 0, pending: 0, approved: 0, needs_update: 0, rejected: 0, returned: 0, archived: 0
+  };
+
   showQuickEditModal = false;
   showDeleteModal = false;
   quickEditItem: Item | null = null;
@@ -46,7 +50,17 @@ export class ContentManagementComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.loadCounts();
     this.loadCurrentTab();
+  }
+
+  loadCounts() {
+    this.adminService.getPostCountsByStatus().subscribe({
+      next: (counts) => {
+        this.tabCounts = counts as Record<ContentTab, number>;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   get statusParam(): string {
@@ -181,6 +195,7 @@ export class ContentManagementComponent implements OnInit {
         const idx = this.items.findIndex((i) => this.getItemId(i) === id);
         if (idx !== -1) this.items[idx] = { ...this.items[idx], ...updated };
         this.closeQuickEdit();
+        this.loadCounts();
       },
       error: () => {}
     });
@@ -212,6 +227,7 @@ export class ContentManagementComponent implements OnInit {
       next: () => {
         this.items = this.items.filter((i) => this.getItemId(i) !== id);
         this.closeDeleteModal();
+        this.loadCounts();
       },
       error: () => {}
     });

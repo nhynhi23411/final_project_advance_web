@@ -34,6 +34,26 @@ export interface GrowthStats {
   posts: number[];
 }
 
+export interface MatchRateStats {
+  labels: string[];
+  rates: number[];
+}
+
+export interface ModerationWorkload {
+  approved: number;
+  rejected: number;
+  pending: number;
+  needsUpdate: number;
+}
+
+export interface PlatformHealthLog {
+  _id: string;
+  action: string;
+  user_id?: { _id: string; username: string; email: string; name: string };
+  reason?: string;
+  createdAt: string;
+}
+
 export interface CategoryStat {
   category: string;
   count: number;
@@ -49,9 +69,37 @@ export interface MonthlyReport {
     successfulClaimsCount: number;
     approvedPostsCount: number;
   };
-  newUsers: { _id: string; name: string; email: string; created_at: string }[];
-  newPosts: { _id: string; title: string; category: string; post_type: string; status: string; createdAt: string }[];
-  claims: { _id: string; status: string; target_post_id: string; claimant_user_id: string; created_at: string }[];
+}
+
+export interface MonthlyNewUser {
+  _id: string;
+  name: string;
+  email: string;
+  created_at: string;
+}
+
+export interface MonthlyNewPost {
+  _id: string;
+  title: string;
+  category: string;
+  post_type: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface MonthlyClaim {
+  _id: string;
+  status: string;
+  target_post_id: string;
+  claimant_user_id: string;
+  created_at: string;
+}
+
+export interface PaginatedMonthlyResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
 }
 
 export interface AdminUser {
@@ -140,6 +188,20 @@ export class AdminService {
     });
   }
 
+  getMatchRateStats(months = 12): Observable<MatchRateStats> {
+    return this.http.get<MatchRateStats>(`${this.baseUrl}/admin/stats/match-rate`, {
+      params: { months: String(months) }
+    });
+  }
+
+  getModerationWorkload(): Observable<ModerationWorkload> {
+    return this.http.get<ModerationWorkload>(`${this.baseUrl}/admin/stats/moderation-workload`);
+  }
+
+  getPlatformHealth(): Observable<PlatformHealthLog[]> {
+    return this.http.get<PlatformHealthLog[]>(`${this.baseUrl}/admin/stats/platform-health`);
+  }
+
   getStatsByCategory(): Observable<CategoryStat[]> {
     return this.http.get<CategoryStat[]>(`${this.baseUrl}/admin/stats/by-category`);
   }
@@ -147,6 +209,24 @@ export class AdminService {
   getMonthlyReport(year: number, month: number): Observable<MonthlyReport> {
     return this.http.get<MonthlyReport>(`${this.baseUrl}/admin/reports/monthly`, {
       params: { year: String(year), month: String(month) }
+    });
+  }
+
+  getMonthlyUsers(year: number, month: number, page: number = 1, limit: number = 10): Observable<PaginatedMonthlyResponse<MonthlyNewUser>> {
+    return this.http.get<PaginatedMonthlyResponse<MonthlyNewUser>>(`${this.baseUrl}/admin/reports/monthly/users`, {
+      params: { year: String(year), month: String(month), page: String(page), limit: String(limit) }
+    });
+  }
+
+  getMonthlyPosts(year: number, month: number, page: number = 1, limit: number = 10): Observable<PaginatedMonthlyResponse<MonthlyNewPost>> {
+    return this.http.get<PaginatedMonthlyResponse<MonthlyNewPost>>(`${this.baseUrl}/admin/reports/monthly/posts`, {
+      params: { year: String(year), month: String(month), page: String(page), limit: String(limit) }
+    });
+  }
+
+  getMonthlyClaims(year: number, month: number, page: number = 1, limit: number = 10): Observable<PaginatedMonthlyResponse<MonthlyClaim>> {
+    return this.http.get<PaginatedMonthlyResponse<MonthlyClaim>>(`${this.baseUrl}/admin/reports/monthly/claims`, {
+      params: { year: String(year), month: String(month), page: String(page), limit: String(limit) }
     });
   }
 
@@ -209,6 +289,10 @@ export class AdminService {
     if (params?.dateFrom) p['dateFrom'] = params.dateFrom;
     if (params?.dateTo) p['dateTo'] = params.dateTo;
     return this.http.get<Item[]>(`${this.baseUrl}/admin/posts`, { params: p });
+  }
+
+  getPostCountsByStatus(): Observable<Record<string, number>> {
+    return this.http.get<Record<string, number>>(`${this.baseUrl}/admin/posts/counts`);
   }
 
   /** Admin override: update post content (title, description, category). */
