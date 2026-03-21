@@ -15,7 +15,7 @@
           (click)="onTabChange('all')"
         >
           Tất cả bài đăng
-          <span class="badge bg-secondary ms-1" *ngIf="activeTab === 'all' && items.length">{{ items.length }}</span>
+          <span class="badge bg-secondary ms-1" *ngIf="tabCounts['all'] > 0">{{ tabCounts['all'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -26,7 +26,7 @@
           (click)="onTabChange('pending')"
         >
           Chờ duyệt
-          <span class="badge bg-warning ms-1" *ngIf="activeTab === 'pending' && items.length">{{ items.length }}</span>
+          <span class="badge bg-warning ms-1" *ngIf="tabCounts['pending'] > 0">{{ tabCounts['pending'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -37,7 +37,7 @@
           (click)="onTabChange('approved')"
         >
           Đã duyệt
-          <span class="badge bg-success ms-1" *ngIf="activeTab === 'approved' && items.length">{{ items.length }}</span>
+          <span class="badge bg-success ms-1" *ngIf="tabCounts['approved'] > 0">{{ tabCounts['approved'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -48,7 +48,7 @@
           (click)="onTabChange('needs_update')"
         >
           Cần cập nhật
-          <span class="badge bg-info ms-1" *ngIf="activeTab === 'needs_update' && items.length">{{ items.length }}</span>
+          <span class="badge bg-info ms-1" *ngIf="tabCounts['needs_update'] > 0">{{ tabCounts['needs_update'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -59,7 +59,7 @@
           (click)="onTabChange('rejected')"
         >
           Bị từ chối
-          <span class="badge bg-danger ms-1" *ngIf="activeTab === 'rejected' && items.length">{{ items.length }}</span>
+          <span class="badge bg-danger ms-1" *ngIf="tabCounts['rejected'] > 0">{{ tabCounts['rejected'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -70,7 +70,7 @@
           (click)="onTabChange('returned')"
         >
           Đã trả lại
-          <span class="badge bg-primary ms-1" *ngIf="activeTab === 'returned' && items.length">{{ items.length }}</span>
+          <span class="badge bg-primary ms-1" *ngIf="tabCounts['returned'] > 0">{{ tabCounts['returned'] }}</span>
         </a>
       </li>
       <li class="nav-item">
@@ -81,7 +81,7 @@
           (click)="onTabChange('archived')"
         >
           Đã đóng
-          <span class="badge bg-dark ms-1" *ngIf="activeTab === 'archived' && items.length">{{ items.length }}</span>
+          <span class="badge bg-dark ms-1" *ngIf="tabCounts['archived'] > 0">{{ tabCounts['archived'] }}</span>
         </a>
       </li>
     </ul>
@@ -89,13 +89,21 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
       <h5 class="mb-0">{{ getListTitle() }}</h5>
       <div class="d-flex flex-wrap align-items-center gap-2">
-        <input
-          type="text"
-          class="form-control form-control-sm"
-          style="max-width: 140px;"
-          placeholder="Danh mục"
+        <select
+          class="form-select form-select-sm"
+          style="max-width: 160px;"
           [(ngModel)]="filterCategory"
-        />
+        >
+          <option value="">Tất cả danh mục</option>
+          <option value="Thiết bị điện tử">Thiết bị điện tử</option>
+          <option value="Ví tiền">Ví tiền</option>
+          <option value="Giấy tờ">Giấy tờ</option>
+          <option value="Chìa khóa">Chìa khóa</option>
+          <option value="Túi xách & Hành lý">Túi xách & Hành lý</option>
+          <option value="Trang sức & Phụ kiện">Trang sức & Phụ kiện</option>
+          <option value="Thể thao & Ngoài trời">Thể thao & Ngoài trời</option>
+          <option value="Khác">Khác</option>
+        </select>
         <input
           type="date"
           class="form-control form-control-sm"
@@ -218,7 +226,16 @@
         </div>
         <div class="mb-2">
           <label class="form-label">Danh mục</label>
-          <input type="text" class="form-control" [(ngModel)]="quickEditForm.category" maxlength="100" />
+          <select class="form-select" [(ngModel)]="quickEditForm.category">
+            <option value="Thiết bị điện tử">Thiết bị điện tử</option>
+            <option value="Ví tiền">Ví tiền</option>
+            <option value="Giấy tờ">Giấy tờ</option>
+            <option value="Chìa khóa">Chìa khóa</option>
+            <option value="Túi xách & Hành lý">Túi xách & Hành lý</option>
+            <option value="Trang sức & Phụ kiện">Trang sức & Phụ kiện</option>
+            <option value="Thể thao & Ngoài trời">Thể thao & Ngoài trời</option>
+            <option value="Khác">Khác</option>
+          </select>
         </div>
       </div>
       <div class="modal-footer">

@@ -26,6 +26,12 @@ export class DashAnalyticsComponent implements OnInit {
   chartOptions_2!: Partial<ApexOptions>;
   chartOptions_3!: Partial<ApexOptions>;
 
+  matchRateOptions!: Partial<ApexOptions>;
+  moderationOptions!: Partial<ApexOptions>;
+  
+  platformHealthLogs: any[] = [];
+  healthLoading = true;
+
   statsLoading = true;
   chartsLoading = true;
   cards: Array<{ background: string; title: string; icon: string; text: string; number: string; no?: string; url?: string }> = [];
@@ -75,6 +81,37 @@ export class DashAnalyticsComponent implements OnInit {
       },
       error: () => {
         if (!this.chartOptions) this.chartsLoading = false;
+        this.cdr.markForCheck();
+      }
+    });
+
+    // Match Rate Line Chart
+    this.adminService.getMatchRateStats(12).subscribe({
+      next: (data) => {
+        this.matchRateOptions = this.buildMatchRateChartOptions(data);
+        this.cdr.markForCheck();
+      }
+    });
+
+    // Moderation Workload Donut/Pie Chart
+    this.adminService.getModerationWorkload().subscribe({
+      next: (data) => {
+        this.moderationOptions = this.buildModerationChartOptions(data);
+        this.cdr.markForCheck();
+      }
+    });
+
+    // Platform Health Table Data
+    this.healthLoading = true;
+    this.adminService.getPlatformHealth().subscribe({
+      next: (data) => {
+        this.platformHealthLogs = data;
+        this.healthLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.platformHealthLogs = [];
+        this.healthLoading = false;
         this.cdr.markForCheck();
       }
     });
@@ -164,6 +201,51 @@ export class DashAnalyticsComponent implements OnInit {
       labels: data.map((d) => d.category),
       series: data.map((d) => d.count),
       colors: data.map((_, i) => colors[i % colors.length]),
+      legend: { show: true, position: 'bottom' },
+      dataLabels: { enabled: true },
+      plotOptions: {
+        pie: {
+          donut: {
+            labels: { show: true, name: { show: true }, value: { show: true } }
+          }
+        }
+      }
+    };
+  }
+
+  private buildMatchRateChartOptions(data: { labels: string[]; rates: number[] }): Partial<ApexOptions> {
+    const labels = data.labels.map((m) => {
+      const [y, mo] = m.split('-');
+      return `${mo}/${y}`;
+    });
+    return {
+      chart: { height: 300, type: 'area', zoom: { enabled: false } },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: [3] },
+      colors: ['#7c4dff'],
+      series: [
+        { name: 'Tỷ lệ khớp (%)', data: data.rates.map(r => Number(r.toFixed(1))) }
+      ],
+      title: { text: 'Tỷ lệ khớp bài LOST đã duyệt theo tháng', align: 'left' },
+      xaxis: { categories: labels },
+      yaxis: { min: 0, max: 100, labels: { formatter: (val) => val + '%' } },
+      legend: { position: 'top' },
+      grid: { borderColor: '#f1f1f1' },
+      fill: { type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.7, opacityTo: 0.9, stops: [0, 90, 100] } },
+      markers: { size: 4 }
+    };
+  }
+
+  private buildModerationChartOptions(data: { approved: number; rejected: number; pending: number; needsUpdate: number }): Partial<ApexOptions> {
+    const series = [data.approved, data.rejected, data.pending, data.needsUpdate];
+    const labels = ['Đã duyệt', 'Từ chối (Hủy)', 'Chờ duyệt', 'Y/C Sửa đổi'];
+    const colors = ['#0e9e4a', '#FF5370', '#FFB64D', '#4099ff'];
+    
+    return {
+      chart: { height: 320, type: 'donut' },
+      labels: labels,
+      series: series,
+      colors: colors,
       legend: { show: true, position: 'bottom' },
       dataLabels: { enabled: true },
       plotOptions: {

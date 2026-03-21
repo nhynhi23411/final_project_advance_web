@@ -50,6 +50,26 @@ export class AdminController {
     return this.adminPostsService.getGrowthStats(limitMonths);
   }
 
+  @Get("stats/match-rate")
+  getMatchRateStats(@Query("months") months?: string) {
+    const limitMonths = Math.min(
+      24,
+      Math.max(6, parseInt(months || "12", 10) || 12),
+    );
+    return this.adminPostsService.getMatchRateStats(limitMonths);
+  }
+
+  @Get("stats/moderation-workload")
+  getModerationWorkload() {
+    return this.adminPostsService.getModerationWorkload();
+  }
+
+  @Get("stats/platform-health")
+  async getPlatformHealth() {
+    const logs = await this.auditLogService.findAll({ action: "BAN_USER", limit: 10 });
+    return logs.data;
+  }
+
   @Get("stats/by-category")
   getStatsByCategory() {
     return this.adminPostsService.getStatsByCategory();
@@ -63,6 +83,48 @@ export class AdminController {
     const y = parseInt(year || String(new Date().getFullYear()), 10);
     const m = Math.min(12, Math.max(1, parseInt(month || String(new Date().getMonth() + 1), 10) || 1));
     return this.adminPostsService.getMonthlyReport(y, m);
+  }
+
+  @Get("reports/monthly/users")
+  getMonthlyUsers(
+    @Query("year") year?: string,
+    @Query("month") month?: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    const y = parseInt(year || String(new Date().getFullYear()), 10);
+    const m = Math.min(12, Math.max(1, parseInt(month || String(new Date().getMonth() + 1), 10) || 1));
+    const p = Math.max(1, parseInt(page || "1", 10));
+    const l = Math.min(100, Math.max(1, parseInt(limit || "10", 10)));
+    return this.adminPostsService.getMonthlyUsersPaginated(y, m, p, l);
+  }
+
+  @Get("reports/monthly/posts")
+  getMonthlyPosts(
+    @Query("year") year?: string,
+    @Query("month") month?: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    const y = parseInt(year || String(new Date().getFullYear()), 10);
+    const m = Math.min(12, Math.max(1, parseInt(month || String(new Date().getMonth() + 1), 10) || 1));
+    const p = Math.max(1, parseInt(page || "1", 10));
+    const l = Math.min(100, Math.max(1, parseInt(limit || "10", 10)));
+    return this.adminPostsService.getMonthlyPostsPaginated(y, m, p, l);
+  }
+
+  @Get("reports/monthly/claims")
+  getMonthlyClaims(
+    @Query("year") year?: string,
+    @Query("month") month?: string,
+    @Query("page") page?: string,
+    @Query("limit") limit?: string,
+  ) {
+    const y = parseInt(year || String(new Date().getFullYear()), 10);
+    const m = Math.min(12, Math.max(1, parseInt(month || String(new Date().getMonth() + 1), 10) || 1));
+    const p = Math.max(1, parseInt(page || "1", 10));
+    const l = Math.min(100, Math.max(1, parseInt(limit || "10", 10)));
+    return this.adminPostsService.getMonthlyClaimsPaginated(y, m, p, l);
   }
 
   @Get("users")
@@ -100,6 +162,8 @@ export class AdminController {
     const u = user as any;
     return { message: "Tạo user thành công", user: { _id: u._id, username: u.username, name: u.name, email: u.email, phone: u.phone, role: u.role, status: u.status } };
   }
+
+
 
   @Patch("users/:id")
   async updateUser(@Param("id") id: string, @Body() dto: AdminUpdateUserDto) {

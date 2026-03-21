@@ -145,4 +145,42 @@ export class UsersService {
       created_at: d.created_at,
     }));
   }
+
+  async countCreatedInMonth(year: number, month: number): Promise<number> {
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+    return this.userModel.countDocuments({ created_at: { $gte: start, $lte: end } }).exec();
+  }
+
+  async getCreatedInMonthPaginated(
+    year: number,
+    month: number,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<{ data: { _id: string; name: string; email: string; created_at: Date }[], total: number }> {
+    const start = new Date(year, month - 1, 1);
+    const end = new Date(year, month, 0, 23, 59, 59, 999);
+    const skip = (page - 1) * limit;
+
+    const [docs, total] = await Promise.all([
+      this.userModel
+        .find({ created_at: { $gte: start, $lte: end } })
+        .select("_id name email created_at")
+        .sort({ created_at: -1 })
+        .skip(skip)
+        .limit(limit)
+        .lean()
+        .exec(),
+      this.countCreatedInMonth(year, month)
+    ]);
+
+    const data = docs.map((d: any) => ({
+      _id: String(d._id),
+      name: d.name ?? "",
+      email: d.email ?? "",
+      created_at: d.created_at,
+    }));
+
+    return { data, total };
+  }
 }
