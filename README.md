@@ -283,7 +283,7 @@ Project sử dụng MongoDB với các collections chính:
 
 - **users** - Thông tin người dùng
 - **posts** - Bài đăng mất/tìm được vật phẩm
-- **claims** - Yêu cầu khôi phục
+- **claims** - Yêu cầu nhận đồ
 - **matches** - Kết quả khớp đối
 - **notifications** - Thông báo
 - **audit_logs** - Lịch sử hoạt động
