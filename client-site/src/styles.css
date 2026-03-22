@@ -32,15 +32,15 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 body {
-  font-family: 'Poppins', 'Inter', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
   color: var(--text-primary);
   background-color: var(--bg-light);
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.6;
   word-spacing: 0.02em;
 }
 p {
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.7;
   margin-bottom: 0.75em;
 }
@@ -50,7 +50,7 @@ p:last-child { margin-bottom: 0; }
 h1, .uel-heading-page {
   font-size: 28px;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.3;
 }
 @media (min-width: 768px) {
@@ -59,7 +59,7 @@ h1, .uel-heading-page {
 h2, .uel-section-title {
   font-size: 20px;
   font-weight: 600;
-  letter-spacing: 0.025em;
+  letter-spacing: -0.01em;
   line-height: 1.4;
 }
 @media (min-width: 768px) {
@@ -68,7 +68,7 @@ h2, .uel-section-title {
 h3, h4, h5, h6, .uel-card-title {
   font-size: 18px;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.45;
 }
 h6 { font-size: 1.125rem; }
@@ -151,10 +151,10 @@ textarea.form-control-uel {
   padding: 10px 14px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-input);
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.5;
   font-size: 14px;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 textarea.form-control-uel { min-height: 100px; }
@@ -326,17 +326,17 @@ label .uel-required { color: #FF7A45; }
 .card-uel .card-uel-title {
   color: var(--primary-blue);
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.4;
 }
 .card-uel .card-uel-meta {
   color: var(--text-secondary);
   font-size: 13px;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.55;
 }
 .card-uel p {
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.65;
 }
 .card-uel img.thumb { object-fit: cover; }
@@ -401,14 +401,14 @@ label .uel-required { color: #FF7A45; }
   background: rgba(255,255,255,0.2);
   font-weight: 700;
   font-size: 0.875rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   color: #fff;
   flex-shrink: 0;
 }
 .app-nav-logo-text {
   font-weight: 600;
   font-size: 1rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   color: #fff;
 }
 @media (max-width: 639px) {
@@ -489,7 +489,7 @@ label .uel-required { color: #FF7A45; }
   font-weight: 500;
   color: rgba(255,255,255,0.92);
   text-decoration: none;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   border: none;
   background: transparent;
   transition: color 0.2s;
@@ -532,7 +532,7 @@ label .uel-required { color: #FF7A45; }
   padding: 10px 20px;
   font-size: 0.875rem;
   font-weight: 500;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   text-decoration: none;
   border-radius: 10px;
   border: none;
@@ -785,7 +785,7 @@ label .uel-required { color: #FF7A45; }
   font-size: 1.75rem;
   font-weight: 700;
   color: var(--text-primary);
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   margin: 0 0 0.5rem 0;
 }
 @media (min-width: 768px) {
@@ -866,7 +866,7 @@ label .uel-required { color: #FF7A45; }
   font-weight: 600;
   color: var(--text-secondary);
   margin-bottom: 0.35rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   min-height: 1.15rem; /* Helps align empty labels like &nbsp; on the reset button */
 }
 .posts-search-wrap { grid-column: 1 / -1; }
@@ -1122,6 +1122,7 @@ label .uel-required { color: #FF7A45; }
   line-height: 1.35;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1132,6 +1133,7 @@ label .uel-required { color: #FF7A45; }
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1153,6 +1155,7 @@ label .uel-required { color: #FF7A45; }
 .posts-card-date {
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1290,7 +1293,7 @@ label .uel-required { color: #FF7A45; }
   border-radius: 999px;
 }
 .archive-card-body { padding: 1.25rem; }
-.archive-card-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0; color: var(--text-primary); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.archive-card-title { font-size: 1rem; font-weight: 600; margin: 0 0 0.5rem 0; color: var(--text-primary); line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .archive-card-meta { font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0.25rem 0; }
 .archive-card-meta i { margin-right: 0.35rem; color: var(--accent-blue); }
 .archive-card-date { font-size: 0.75rem; color: var(--text-secondary); margin: 0 0 0.75rem 0; }
@@ -1328,7 +1331,7 @@ label .uel-required { color: #FF7A45; }
   background: linear-gradient(180deg, var(--deep-navy) 0%, #174A8B 50%, #1a3a6e 100%) !important;
   color: rgba(255, 255, 255, 0.9);
   border-top: 1px solid rgba(255,255,255,0.06);
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 .footer-uel a { color: rgba(255, 255, 255, 0.88); transition: color 0.2s, opacity 0.2s; }
 .footer-uel a:hover { color: #fff; }
@@ -1374,7 +1377,7 @@ label .uel-required { color: #FF7A45; }
   background: rgba(255,255,255,0.12);
   font-weight: 700;
   font-size: 0.9375rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   color: #fff;
   flex-shrink: 0;
 }
@@ -1382,14 +1385,14 @@ label .uel-required { color: #FF7A45; }
   font-size: 1.0625rem;
   font-weight: 600;
   color: #fff;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.35;
 }
 .footer-uel .footer-desc {
   color: rgba(255,255,255,0.78);
   font-size: 0.875rem;
   line-height: 1.75;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   margin: 0;
 }
 .footer-uel .footer-heading {
@@ -1474,7 +1477,7 @@ label .uel-required { color: #FF7A45; }
   color: rgba(255,255,255,0.6);
   margin: 0;
   line-height: 1.6;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
 }
 
 /* ----- Support form card (landing) ----- */
@@ -1484,7 +1487,7 @@ label .uel-required { color: #FF7A45; }
   box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08), 0 2px 8px rgba(16, 24, 40, 0.04);
   border: 1px solid #D9E3F0;
   padding: 2rem 1.5rem;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 @media (min-width: 1024px) {
   .support-form-card { padding: 2.5rem 2.5rem; }
@@ -1500,7 +1503,7 @@ label .uel-required { color: #FF7A45; }
 .support-form-card .support-form-desc {
   font-size: 0.9375rem;
   color: #5C6B7A;
-  letter-spacing: 0.025em;
+  letter-spacing: -0.01em;
   line-height: 1.7;
   line-height: 1.5;
   margin-bottom: 1.5rem;
@@ -1508,7 +1511,7 @@ label .uel-required { color: #FF7A45; }
 .support-form-card label {
   font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
   display: block;
@@ -1519,7 +1522,7 @@ label .uel-required { color: #FF7A45; }
 .support-form-card textarea {
   width: 100%;
   padding: 12px 14px;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.5;
   border: 1px solid var(--border-color);
   border-radius: 10px;
@@ -1554,7 +1557,7 @@ label .uel-required { color: #FF7A45; }
   font-size: 15px;
   padding: 14px 20px;
   border: none;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   line-height: 1.5;
 }
 .hero-search-wrap input::placeholder { color: #5C6B7A; }
@@ -1733,7 +1736,7 @@ label .uel-required { color: #FF7A45; }
   font-weight: 700;
   color: var(--text-primary);
   margin: 0 0 0.5rem 0;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
 }
 .post-item-form-desc {
   font-size: 0.9375rem;
@@ -1756,7 +1759,7 @@ label .uel-required { color: #FF7A45; }
   color: var(--text-primary);
   margin: 0 0 1rem 0;
   padding-bottom: 0.75rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   border-bottom: 1px solid var(--border-color);
 }
 .post-item-section-title i {
@@ -1803,7 +1806,7 @@ label .uel-required { color: #FF7A45; }
   min-height: 48px;
   padding: 12px 14px;
   font-size: 0.9375rem;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: var(--text-primary);
   background: #fff;
   border: 1px solid var(--border-color);
@@ -1945,7 +1948,7 @@ label .uel-required { color: #FF7A45; }
   border: 1px solid var(--border-color);
   border-radius: 12px;
   font-size: 0.9375rem;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   color: var(--text-primary);
   background: #fff;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -2095,7 +2098,7 @@ label .uel-required { color: #FF7A45; }
   padding: 0 28px;
   font-size: 0.9375rem;
   font-weight: 600;
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
   border-radius: 10px;
   cursor: pointer;
   transition: filter 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
@@ -2127,7 +2130,7 @@ label .uel-required { color: #FF7A45; }
 .toast-box {
   border-radius: var(--radius);
   box-shadow: var(--shadow-soft);
-  font-family: 'Poppins', 'Inter', sans-serif;
+  font-family: 'Inter', sans-serif;
 }
 
 /* ----- Overrides for Tailwind classes (map to new palette) ----- */
@@ -2202,7 +2205,7 @@ label .uel-required { color: #FF7A45; }
 .static-hero-subtitle {
   font-size: 1rem;
   color: rgba(255,255,255,0.9);
-  letter-spacing: 0.025em;
+  letter-spacing: -0.01em;
   line-height: 1.6;
   margin: 0;
 }
@@ -2212,7 +2215,7 @@ label .uel-required { color: #FF7A45; }
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--text-primary, #1F2D3D);
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
   margin: 0 0 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--accent-orange, #FF7A45);
@@ -2265,7 +2268,7 @@ label .uel-required { color: #FF7A45; }
   font-weight: 600;
   color: var(--text-primary);
   margin: 0 0 0.75rem;
-  letter-spacing: 0.02em;
+  letter-spacing: normal;
 }
 .static-terms-section p, .static-terms-section ul {
   font-size: 0.9375rem;
