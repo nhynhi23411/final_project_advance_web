@@ -170,7 +170,6 @@ export class MatchesService {
             $setOnInsert: {
               lost_post_id: lostId,
               found_post_id: foundId,
-              status: "ACTIVE",
               review_status: "PENDING",
               created_at: new Date(),
             },

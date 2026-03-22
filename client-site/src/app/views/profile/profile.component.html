@@ -187,14 +187,7 @@
 
     <!-- Tab: Claims -->
     <section *ngIf="activeTab === 'claims'" class="prof-content-card">
-      <div class="prof-empty prof-empty-tab">
-        <i class="fas fa-file-contract prof-empty-icon" aria-hidden="true"></i>
-        <p class="prof-empty-text">Chưa có yêu cầu xác minh nào.</p>
-        <a routerLink="/posts" class="prof-btn prof-btn-primary">
-          <i class="fas fa-search" aria-hidden="true"></i>
-          Xem bài đăng
-        </a>
-      </div>
+      <app-my-claims></app-my-claims>
     </section>
 
     <!-- Tab: Archive -->
