@@ -1,29 +1,31 @@
 <app-auth-navbar></app-auth-navbar>
 
 <main class="sug-page">
-  <section class="sug-section">
+
+  <!-- ── Hero Section ─────────────────────────────────── -->
+  <section class="sug-hero">
+    <div class="sug-container sug-hero-inner">
+      <div class="sug-hero-icon"><i class="fas fa-magic"></i></div>
+      <h1 class="sug-hero-title">Gợi ý phù hợp</h1>
+      <p class="sug-hero-subtitle">
+        Chúng tôi đang hiển thị những bài đăng phù hợp nhất với nội dung và vị trí trong tin của bạn.
+      </p>
+      
+      <div class="sug-hero-actions">
+        <button *ngIf="authService.isLoggedIn" class="sug-btn-refresh" (click)="refreshSuggestions()" [disabled]="isRefreshing || isLoading">
+          <i class="fas" [ngClass]="isRefreshing ? 'fa-spinner sug-spin-inline' : 'fa-sync-alt'"></i>
+          <span>{{ isRefreshing ? 'Đang cập nhật...' : 'Làm mới kết quả' }}</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="sug-main-section">
     <div class="sug-container">
-
-      <!-- ── Page header ─────────────────────────────────── -->
-      <header class="sug-header">
-        <div class="sug-header-icon">🔍</div>
-        <h1 class="sug-title">Gợi ý phù hợp</h1>
-        <p class="sug-subtitle">Hệ thống tự động ghép nối bài đăng dựa trên nội dung và vị trí</p>
-        <div class="sug-header-actions">
-          <div *ngIf="authService.isLoggedIn && totalMatches > 0" class="sug-stat-pill">
-            <i class="fas fa-bolt" aria-hidden="true"></i>
-            {{ totalMatches }} gợi ý đang chờ bạn
-          </div>
-          <button *ngIf="authService.isLoggedIn" class="sug-btn-refresh" (click)="refreshSuggestions()" [disabled]="isRefreshing || isLoading">
-            <i class="fas" [ngClass]="isRefreshing ? 'fa-spinner sug-spin-inline' : 'fa-sync-alt'" aria-hidden="true"></i>
-            {{ isRefreshing ? 'Đang tải...' : 'Làm mới' }}
-          </button>
-        </div>
-      </header>
-
+      
       <!-- ── Error ───────────────────────────────────────── -->
       <div *ngIf="error" class="sug-error-banner">
-        <i class="fas fa-exclamation-circle" aria-hidden="true"></i> {{ error }}
+        <i class="fas fa-exclamation-circle"></i> {{ error }}
       </div>
 
       <!-- ── Not logged in ───────────────────────────────── -->
@@ -37,132 +39,139 @@
       <div *ngIf="authService.isLoggedIn">
         <ng-container *ngIf="!isLoading; else loadingTpl">
 
-          <!-- ════ SECTION 1: Exact matches ════════════════ -->
-          <ng-container *ngIf="groupedSuggestions.length > 0">
-            <div class="sug-section-head">
-              <span class="sug-section-badge sug-section-badge--match">
-                <i class="fas fa-link" aria-hidden="true"></i> Khớp chính xác
-              </span>
-              <span class="sug-section-count">{{ totalMatches }} kết quả</span>
-            </div>
+          <div class="sug-layout">
+            <!-- Left Column: Matches -->
+            <div class="sug-layout-main">
+              <!-- ════ SECTION 1: Exact matches ════════════════ -->
+              <ng-container *ngIf="groupedSuggestions.length > 0">
+                <div class="sug-section-head">
+                  <h2 class="sug-section-title">Kết quả phù hợp nhất hiện tại</h2>
+                  <span class="sug-section-count">{{ totalMatches }} gợi ý</span>
+                </div>
 
-            <div *ngFor="let group of groupedSuggestions" class="sug-group">
-              <!-- Group header: user's post -->
-              <div class="sug-group-header">
-                <div class="sug-group-thumb">
-                  <img *ngIf="group.myPost.images && group.myPost.images[0]" [src]="group.myPost.images[0]" [alt]="group.myPost.title" />
-                  <div *ngIf="!group.myPost.images || !group.myPost.images[0]" class="sug-thumb-ph">
-                    <i class="fas fa-image" aria-hidden="true"></i>
+                <div *ngFor="let group of groupedSuggestions" class="sug-group">
+                  <!-- Group header: user's post -->
+                  <div class="sug-group-header">
+                    <div class="sug-group-thumb">
+                      <img *ngIf="group.myPost.images && group.myPost.images[0]" [src]="group.myPost.images[0]" [alt]="group.myPost.title" />
+                      <div *ngIf="!group.myPost.images || !group.myPost.images[0]" class="sug-thumb-ph">
+                        <i class="fas fa-image"></i>
+                      </div>
+                    </div>
+                    <div class="sug-group-info">
+                      <span class="sug-badge" [ngClass]="getTypeClass(group.myPost.type || group.myPost.post_type)">
+                        Bài của bạn: {{ getTypeLabel(group.myPost.type || group.myPost.post_type) }}
+                      </span>
+                      <p class="sug-group-title" [title]="group.myPost.title">{{ group.myPost.title }}</p>
+                    </div>
+                    <div class="sug-group-matches-count">
+                      {{ group.matches.length }} khớp
+                    </div>
+                  </div>
+
+                  <!-- Match cards -->
+                  <div class="sug-match-list">
+                    <div *ngFor="let s of group.matches" class="sug-match-card" (click)="goToPost(s.matched_post?._id)">
+                      
+                      <!-- Thumbnail -->
+                      <div class="sug-match-thumb">
+                        <img *ngIf="s.matched_post?.images?.length" [src]="s.matched_post!.images[0]" [alt]="s.matched_post?.title" />
+                        <div *ngIf="!s.matched_post?.images?.length" class="sug-thumb-ph sug-thumb-ph--lg">
+                          <i class="fas fa-image"></i>
+                        </div>
+                        <span class="sug-source-badge" [class.sug-source-badge--manual]="s.source === 'manual'">
+                          {{ s.source === 'manual' ? '✋ Thủ công' : '🤖 AI' }}
+                        </span>
+                      </div>
+
+                      <!-- Details -->
+                      <div class="sug-match-content">
+                        <div class="sug-match-tags">
+                          <span class="sug-badge" [ngClass]="getTypeClass(s.matched_post?.type || s.matched_post?.post_type)">
+                            {{ getTypeLabel(s.matched_post?.type || s.matched_post?.post_type) }}
+                          </span>
+                          <span *ngIf="s.matched_post?.category" class="sug-match-tag">
+                            <i class="fas fa-tag"></i> {{ s.matched_post?.category }}
+                          </span>
+                          <span *ngIf="s.distance_km != null" class="sug-match-tag sug-match-tag--dist">
+                            <i class="fas fa-map-marker-alt"></i> Cách {{ s.distance_km | number:'1.1-1' }} km
+                          </span>
+                        </div>
+                        
+                        <h3 class="sug-match-title" [title]="s.matched_post?.title">{{ s.matched_post?.title || '(Không có tiêu đề)' }}</h3>
+                        
+                        <p class="sug-match-location" *ngIf="s.matched_post?.location_text" [title]="s.matched_post?.location_text">
+                          {{ s.matched_post?.location_text }}
+                        </p>
+
+                        <!-- Score pill -->
+                        <div class="sug-match-score-pill" [ngClass]="getScoreRing(s.score)">
+                          <i class="fas fa-bolt"></i> Độ khớp: <strong>{{ scorePercent(s.score) }}%</strong> ({{ getScoreLabel(s.score) }})
+                        </div>
+                      </div>
+
+                      <!-- Action -->
+                      <div class="sug-match-action">
+                        <button class="sug-btn-view">
+                          Xem chi tiết <i class="fas fa-arrow-right"></i>
+                        </button>
+                      </div>
+
+                    </div>
                   </div>
                 </div>
-                <div class="sug-group-info">
-                  <span class="sug-badge" [ngClass]="getTypeClass(group.myPost.type || group.myPost.post_type)">
-                    {{ getTypeLabel(group.myPost.type || group.myPost.post_type) }}
+              </ng-container>
+
+              <!-- ════ Empty state ══════════════════════════════ -->
+              <div *ngIf="groupedSuggestions.length === 0" class="sug-empty">
+                <div class="sug-empty-icon"><i class="fas fa-inbox"></i></div>
+                <h3 class="sug-empty-title">Chưa có gợi ý khớp chính xác</h3>
+                <p class="sug-empty-desc">
+                  Hệ thống AI hiện tại chưa tìm thấy bài đăng nào đủ yếu tố tương đồng với bài của bạn.
+                  <span *ngIf="items.length > 0" class="sug-empty-highlight">
+                    Tuy nhiên, bạn có thể tham khảo các <strong>Tin đăng liên quan</strong> ở phía dưới.
                   </span>
-                  <p class="sug-group-title">{{ group.myPost.title }}</p>
-                  <p class="sug-group-meta">{{ group.myPost.category || '—' }} · {{ group.myPost.location_text | slice:0:40 }}</p>
-                </div>
-                <div class="sug-group-matches-count">
-                  {{ group.matches.length }} khớp
-                </div>
+                  <span *ngIf="items.length === 0" class="sug-empty-highlight">
+                    Kết quả sẽ tự động được làm mới khi có bài đăng mới phù hợp.
+                  </span>
+                </p>
               </div>
 
-              <!-- Match cards -->
-              <div class="sug-match-list">
-                <div *ngFor="let s of group.matches" class="sug-match-card">
-
-                  <!-- Thumbnail -->
-                  <div class="sug-match-thumb">
-                    <img *ngIf="s.matched_post?.images?.length" [src]="s.matched_post!.images[0]" [alt]="s.matched_post?.title" />
-                    <div *ngIf="!s.matched_post?.images?.length" class="sug-thumb-ph">
-                      <i class="fas fa-image" aria-hidden="true"></i>
-                    </div>
-                    <!-- Source badge -->
-                    <span class="sug-source-badge" [class.sug-source-badge--manual]="s.source === 'manual'">
-                      {{ s.source === 'manual' ? '✋ Thủ công' : '🤖 AI' }}
-                    </span>
-                  </div>
-
-                  <!-- Details -->
-                  <div class="sug-match-details">
-                    <div class="sug-match-top">
-                      <span class="sug-badge" [ngClass]="getTypeClass(s.matched_post?.type || s.matched_post?.post_type)">
-                        {{ getTypeLabel(s.matched_post?.type || s.matched_post?.post_type) }}
-                      </span>
-                    </div>
-                    <h4 class="sug-match-title">{{ s.matched_post?.title || '(Không có tiêu đề)' }}</h4>
-                    <div class="sug-match-meta">
-                      <span *ngIf="s.matched_post?.category">
-                        <i class="fas fa-tag" aria-hidden="true"></i> {{ s.matched_post?.category }}
-                      </span>
-                      <span *ngIf="s.distance_km != null">
-                        <i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ s.distance_km | number:'1.1-1' }} km
-                      </span>
-                    </div>
-
-                    <!-- Score breakdown -->
-                    <div class="sug-score-row">
-                      <!-- Overall ring -->
-                      <div class="sug-score-ring" [ngClass]="getScoreRing(s.score)">
-                        <span class="sug-score-num">{{ scorePercent(s.score) }}</span>
-                        <span class="sug-score-pct">%</span>
-                      </div>
-                      <!-- Bar breakdown -->
-                      <div class="sug-score-bars">
-                        <div class="sug-score-bar-row">
-                          <span class="sug-score-bar-label">Tổng thể</span>
-                          <div class="sug-score-track">
-                            <div class="sug-score-fill sug-score-fill--total" [style.width.%]="scorePercent(s.score)"></div>
-                          </div>
-                          <span class="sug-score-bar-val sug-score-bar-val--total">{{ scorePercent(s.score) }}%</span>
-                        </div>
-                        <div *ngIf="s.text_score != null" class="sug-score-bar-row">
-                          <span class="sug-score-bar-label">Nội dung</span>
-                          <div class="sug-score-track">
-                            <div class="sug-score-fill sug-score-fill--text" [style.width.%]="scorePercent(s.text_score)"></div>
-                          </div>
-                          <span class="sug-score-bar-val">{{ scorePercent(s.text_score) }}%</span>
-                        </div>
-                        <div *ngIf="s.distance_km != null" class="sug-score-bar-row">
-                          <span class="sug-score-bar-label">Khoảng cách</span>
-                          <div class="sug-score-track">
-                            <div class="sug-score-fill sug-score-fill--dist"
-                                 [style.width.%]="distScore(s.distance_km)"></div>
-                          </div>
-                          <span class="sug-score-bar-val">{{ s.distance_km | number:'1.1-1' }} km</span>
-                        </div>
-                      </div>
-                      <!-- Score label -->
-                      <span class="sug-score-label" [ngClass]="getScoreRing(s.score)">
-                        {{ getScoreLabel(s.score) }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- Action -->
-                  <div class="sug-match-action">
-                    <button class="sug-btn-view" (click)="goToPost(s.matched_post?._id)">
-                      Xem chi tiết
-                      <i class="fas fa-arrow-right" aria-hidden="true"></i>
-                    </button>
-                  </div>
-
-                </div>
-              </div>
             </div>
-          </ng-container>
 
-          <!-- Divider -->
-          <div *ngIf="groupedSuggestions.length > 0 && items.length > 0" class="sug-divider">
-            <span>Tin đăng có thể liên quan</span>
+            <!-- Right Column: Sidebar -->
+            <aside class="sug-layout-sidebar">
+              <div class="sug-info-card">
+                <h3 class="sug-info-title"><i class="fas fa-info-circle text-blue-500 mr-2"></i>Cách hệ thống gợi ý</h3>
+                <p class="sug-info-text">Trí tuệ nhân tạo (AI) của chúng tôi phân tích các yếu tố sau để tìm ra bài đăng khớp nhất:</p>
+                <ul class="sug-info-list">
+                  <li>
+                    <i class="fas fa-bullseye"></i> 
+                    <span><strong>Độ tương đồng nội dung:</strong> Dựa trên loại đồ vật, mô tả, và danh mục.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-map-marker-alt"></i> 
+                    <span><strong>Khoảng cách địa lý:</strong> Ưu tiên các bài đăng sát gần định vị của bạn.</span>
+                  </li>
+                  <li>
+                    <i class="fas fa-clock"></i> 
+                    <span><strong>Thời gian:</strong> Các bài mất / nhặt diễn ra trong cùng một khung ngày giờ.</span>
+                  </li>
+                </ul>
+                <div class="sug-info-alert">
+                  <i class="fas fa-lightbulb"></i> Kết quả sẽ tự động được cập nhật liên tục mỗi khi có bài đăng mới tham gia vào hệ thống.
+                </div>
+              </div>
+            </aside>
           </div>
 
           <!-- ════ SECTION 2: Related items ════════════════ -->
           <ng-container *ngIf="items.length > 0">
-            <div *ngIf="groupedSuggestions.length === 0" class="sug-section-head">
-              <span class="sug-section-badge sug-section-badge--related">
-                <i class="fas fa-compass" aria-hidden="true"></i> Tin đăng liên quan
-              </span>
+            <div class="sug-section-head sug-section-head--mt">
+              <div>
+                <h2 class="sug-section-title">Tin đăng liên quan</h2>
+                <p class="sug-section-subtitle">Các bài đăng có chung danh mục hoặc khu vực địa lý có khả năng liên quan đến bạn.</p>
+              </div>
             </div>
 
             <div class="sug-grid">
@@ -170,36 +179,29 @@
                 <div class="sug-card-thumb">
                   <img *ngIf="item.images?.length" [src]="item.images[0]" [alt]="item.title" />
                   <div *ngIf="!item.images?.length" class="sug-thumb-ph sug-thumb-ph--lg">
-                    <i class="fas fa-image" aria-hidden="true"></i>
+                    <i class="fas fa-image"></i>
                   </div>
                   <span class="sug-card-type-badge sug-badge" [ngClass]="getItemTypeClass(item.type || item.post_type)">
                     {{ getItemTypeLabel(item.type || item.post_type) }}
                   </span>
                 </div>
                 <div class="sug-card-body">
-                  <p class="sug-card-title">{{ item.title }}</p>
+                  <p class="sug-card-title" [title]="item.title">{{ item.title }}</p>
                   <p class="sug-card-meta">
-                    <i class="fas fa-tag" aria-hidden="true"></i> {{ item.category || '—' }}
+                    <i class="fas fa-tag"></i> {{ item.category || '—' }}
                   </p>
-                  <p class="sug-card-meta">
-                    <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                  <p class="sug-card-meta" [title]="item.location_text">
+                    <i class="fas fa-map-marker-alt"></i>
                     {{ item.location_text | slice:0:45 }}{{ (item.location_text?.length || 0) > 45 ? '…' : '' }}
                   </p>
                 </div>
                 <div class="sug-card-footer">
                   <span class="sug-card-date">{{ (item.lost_found_date || item.created_at) | date:'dd/MM/yyyy' }}</span>
-                  <span class="sug-card-link">Xem <i class="fas fa-arrow-right" aria-hidden="true"></i></span>
+                  <span class="sug-card-link">Xem chi tiết <i class="fas fa-arrow-right"></i></span>
                 </div>
               </article>
             </div>
           </ng-container>
-
-          <!-- ════ Empty state ══════════════════════════════ -->
-          <div *ngIf="groupedSuggestions.length === 0 && items.length === 0" class="sug-empty">
-            <div class="sug-empty-icon">📭</div>
-            <p class="sug-empty-title">Chưa có gợi ý nào</p>
-            <p class="sug-empty-desc">Hệ thống sẽ tự động tìm bài khớp mỗi 5 phút. Hãy quay lại sau hoặc cập nhật thông tin bài đăng của bạn.</p>
-          </div>
 
         </ng-container>
 
@@ -207,7 +209,7 @@
         <ng-template #loadingTpl>
           <div class="sug-loading">
             <span class="sug-spin"></span>
-            <p>Đang tìm kiếm gợi ý phù hợp…</p>
+            <p>Đang tìm kiếm và phân tích dữ liệu gợi ý…</p>
           </div>
         </ng-template>
       </div>

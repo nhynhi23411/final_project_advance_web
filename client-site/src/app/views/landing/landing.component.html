@@ -1,13 +1,33 @@
 <app-auth-navbar></app-auth-navbar>
 <main>
-  <!-- Hero: bản đẹp, chữ thoáng, ấn tượng -->
+  <!-- Hero: bản đẹp, chữ thoáng, ấn tượng, video background -->
   <div class="relative pt-24 pb-32 flex content-center items-center justify-center overflow-hidden" style="min-height: 78vh;">
-    <div
-      class="absolute top-0 left-0 w-full h-full bg-center bg-cover"
-      style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"
-    >
-      <span class="w-full h-full absolute left-0 top-0 bg-black" style="opacity: 0.52;"></span>
+    
+    <!-- Vùng chứa Background (Fallback, Video, Overlay) -->
+    <div class="absolute top-0 left-0 w-full h-full z-0 pointer-events-none">
+      <!-- 1. Fallback Image -->
+      <div
+        class="absolute top-0 left-0 w-full h-full bg-center bg-cover"
+        style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');"
+      ></div>
+
+      <!-- 2. Video Background -->
+      <!-- Dùng /assets/... để đảm bảo luôn trỏ đúng gốc server -->
+      <video
+        autoplay
+        loop
+        muted
+        playsinline
+        class="absolute top-0 left-0 w-full h-full object-cover"
+      >
+        <source src="/assets/video/videolostandfound.mp4" type="video/mp4" />
+      </video>
+
+      <!-- 3. Overlay (Tối nhẹ, màu xanh đen dịu, tuyệt đối KHÔNG dùng mix-blend gây đen xì) -->
+      <div class="absolute top-0 left-0 w-full h-full" style="background-color: rgba(15, 30, 70, 0.45);"></div>
     </div>
+
+    <!-- Content (Phải có z-10 để nằm trên video) -->
     <div class="container relative mx-auto px-4 z-10">
       <div class="flex flex-wrap items-center justify-center">
         <div class="w-full max-w-2xl px-4 text-center">
@@ -254,7 +274,7 @@
               <div class="landing-recent-card-head">
                 <div class="landing-recent-card-head-top">
                   <span
-                    class="landing-recent-badge inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase"
+                    class="landing-recent-badge"
                     [ngClass]="{
                       'landing-badge-lost': item.type === 'LOST',
                       'landing-badge-found': item.type === 'FOUND'
@@ -263,7 +283,7 @@
                     <i [ngClass]="item.type === 'LOST' ? 'fas fa-exclamation-circle' : 'fas fa-hand-holding-heart'"></i>
                     {{ item.type === "LOST" ? "Mất đồ" : "Nhặt được" }}
                   </span>
-                  <span class="landing-recent-meta text-xs text-blueGray-500">{{ item.lost_found_date | date: "short" }}</span>
+                  <span class="landing-recent-meta">{{ item.lost_found_date | date: "dd/MM/yyyy" }}</span>
                 </div>
                 <h3 class="landing-recent-card-title" [title]="item.title">
                   {{ item.title }}
@@ -285,11 +305,11 @@
                 <div class="landing-recent-card-meta">
                   <div class="landing-meta-line">
                     <i class="fas fa-map-marker-alt landing-meta-icon" aria-hidden="true"></i>
-                    <span class="landing-meta-text line-clamp-2">{{ item.location_text || '—' }}</span>
+                    <span class="landing-meta-text line-clamp-2" [title]="item.location_text || ''">{{ item.location_text || '—' }}</span>
                   </div>
                   <div class="landing-meta-line">
                     <i class="fas fa-tag landing-meta-icon" aria-hidden="true"></i>
-                    <span class="landing-meta-text">Màu: {{ item.color || "—" }} · {{ item.category || "—" }}</span>
+                    <span class="landing-meta-text line-clamp-1" [title]="'Màu: ' + (item.color || '—') + ' · ' + (item.category || '—')">Màu: {{ item.color || "—" }} · {{ item.category || "—" }}</span>
                   </div>
                 </div>
                 <button type="button" (click)="viewItemDetail(item._id)" class="landing-recent-card-btn">

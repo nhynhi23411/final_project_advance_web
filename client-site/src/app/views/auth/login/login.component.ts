@@ -9,6 +9,7 @@ import { Router } from "@angular/router";
 export class LoginComponent implements OnInit {
   email = "";
   password = "";
+  showPassword = false;
   errorMessage = "";
 
   constructor(

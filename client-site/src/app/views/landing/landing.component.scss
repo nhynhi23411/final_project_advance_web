@@ -488,16 +488,16 @@ $blue-medium: #1C5FA8;
 
 .landing-recent-card-head {
   flex-shrink: 0;
-  padding: 1rem 1.25rem 0.875rem;
-  border-bottom: 1px solid #e2e8f0;
+  padding: 1.25rem 1.25rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 .landing-recent-card-head-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.5rem;
+  gap: 1rem;
+  margin-bottom: 1rem;
 }
 
 .landing-recent-card-title {
@@ -506,27 +506,47 @@ $blue-medium: #1C5FA8;
   -webkit-box-orient: vertical;
   overflow: hidden;
   margin: 0;
-  font-size: 0.9375rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #1e293b;
-  letter-spacing: 0.01em;
-  line-height: 1.4;
+  letter-spacing: 0.02em;
+  line-height: 1.5;
+  min-height: 3rem; /* 2 lines * 1.5 * 1rem */
 }
 
 .landing-recent-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+
+  i {
+    font-size: 0.875rem;
+  }
+
   &.landing-badge-lost {
-    background: rgba(239, 68, 68, 0.12);
-    color: #b91c1c;
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
   }
   &.landing-badge-found {
-    background: rgba(16, 185, 129, 0.12);
-    color: #047857;
+    background: #F0FDF4;
+    color: #059669;
+    border: 1px solid #A7F3D0;
   }
 }
 
 .landing-recent-meta {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
   letter-spacing: 0.02em;
-  line-height: 1.4;
+  white-space: nowrap;
 }
 
 /* Khung ảnh lớn hơn, tỷ lệ ~70% chiều cao */
@@ -581,15 +601,15 @@ $blue-medium: #1C5FA8;
 .landing-recent-card-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .landing-meta-line {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  line-height: 1.6;
   letter-spacing: 0.02em;
   font-size: 0.8125rem;
   color: #475569;
@@ -599,7 +619,8 @@ $blue-medium: #1C5FA8;
     width: 1rem;
     text-align: center;
     color: $blue-medium;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
+    margin-top: 0.15rem;
   }
 
   .landing-meta-text {

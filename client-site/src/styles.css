@@ -170,6 +170,14 @@ textarea.form-control-uel { min-height: 100px; }
 .uel-helper-error { color: #FF7A45; font-size: 12px; }
 label .uel-required { color: #FF7A45; }
 
+.uel-pwd-toggle {
+  color: var(--text-secondary);
+  transition: color 0.2s;
+}
+.uel-pwd-toggle:hover {
+  color: var(--primary-blue);
+}
+
 /* ----- Login page: link contrast (readable on light or dark bg) ----- */
 .login-links a.login-link {
   text-decoration: none;
@@ -824,15 +832,13 @@ label .uel-required { color: #FF7A45; }
   background: #fff;
   border-radius: 16px;
   box-shadow: var(--shadow-soft);
-  padding: 1.25rem;
+  padding: 1rem;
   margin-bottom: 1.5rem;
   border: 1px solid var(--border-color);
-  position: sticky;
-  top: 72px;
-  z-index: 10;
+  /* Removed sticky position to prevent overlapping post cards when scrolling */
 }
 @media (min-width: 768px) {
-  .posts-filter-card { padding: 1.5rem; }
+  .posts-filter-card { padding: 1.25rem; }
 }
 .posts-filter-form { margin: 0; }
 .posts-filter-row {
@@ -861,6 +867,7 @@ label .uel-required { color: #FF7A45; }
   color: var(--text-secondary);
   margin-bottom: 0.35rem;
   letter-spacing: 0.02em;
+  min-height: 1.15rem; /* Helps align empty labels like &nbsp; on the reset button */
 }
 .posts-search-wrap { grid-column: 1 / -1; }
 @media (min-width: 768px) {
