@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { Router } from "@angular/router";
 import { ItemService, Item } from "../../services/item.service";
+import { AuthService } from "../../services/auth.service";
 
 @Component({
   selector: "app-landing",
@@ -30,6 +31,7 @@ export class LandingComponent implements OnInit {
   constructor(
     private router: Router,
     private itemService: ItemService,
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
@@ -119,5 +121,13 @@ export class LandingComponent implements OnInit {
       /^https?:\/\//i.test(url) &&
       url.trim().length > 0
     );
+  }
+
+  goToPostItem(): void {
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(["/post-item"]);
+    } else {
+      this.router.navigate(["/auth/login"]);
+    }
   }
 }

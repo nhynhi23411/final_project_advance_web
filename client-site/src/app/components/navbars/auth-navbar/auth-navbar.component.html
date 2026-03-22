@@ -21,7 +21,7 @@
       <div class="app-nav-links">
         <a [routerLink]="['/']" routerLinkActive="is-active" [routerLinkActiveOptions]="{exact: true}" class="app-nav-link">Trang chủ</a>
         <a [routerLink]="['/posts']" routerLinkActive="is-active" class="app-nav-link">Bài đăng</a>
-        <a [routerLink]="['/post-item']" routerLinkActive="is-active" class="app-nav-link">Đăng tin</a>
+        <a *ngIf="authService.isLoggedIn" [routerLink]="['/post-item']" routerLinkActive="is-active" class="app-nav-link">Đăng tin</a>
         <a [routerLink]="['/about']" routerLinkActive="is-active" class="app-nav-link">Về chúng tôi</a>
         <a *ngIf="authService.isLoggedIn" [routerLink]="['/suggestions']" routerLinkActive="is-active" class="app-nav-link">Gợi ý</a>
       </div>

@@ -2,13 +2,27 @@
 
 <main class="edit-item-page">
   <section class="edit-item-card" *ngIf="!loading; else loadingTpl">
-    <h1 class="edit-item-title">Chỉnh sửa bài đăng</h1>
+    <div class="edit-item-header">
+      <button type="button" class="edit-item-back-btn" (click)="onCancel()" aria-label="Quay lại">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        <span>Quay lại</span>
+      </button>
+      <h1 class="edit-item-title">Chỉnh sửa bài đăng</h1>
+    </div>
 
     <div *ngIf="rejectReason" class="edit-item-alert">
       <i class="fas fa-info-circle" aria-hidden="true"></i>
       <div>
         <p class="edit-item-alert-title">Admin yêu cầu cập nhật</p>
         <p class="edit-item-alert-text">{{ rejectReason }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="isEditingLocked" class="edit-item-alert edit-item-alert-locked">
+      <i class="fas fa-lock" aria-hidden="true"></i>
+      <div>
+        <p class="edit-item-alert-title">Bài đăng bị khóa</p>
+        <p class="edit-item-alert-text">{{ lockedReason }}</p>
       </div>
     </div>
 
@@ -102,7 +116,7 @@
         <button type="button" class="prof-btn prof-btn-secondary" (click)="onCancel()" [disabled]="saving">
           Hủy
         </button>
-        <button type="submit" class="prof-btn prof-btn-primary" [disabled]="saving || form.invalid">
+        <button type="submit" class="prof-btn prof-btn-primary" [disabled]="saving || form.invalid || isEditingLocked">
           <i *ngIf="saving" class="fas fa-spinner prof-spinner" aria-hidden="true"></i>
           <i *ngIf="!saving" class="fas fa-save" aria-hidden="true"></i>
           {{ saving ? "Đang lưu…" : "Lưu thay đổi" }}

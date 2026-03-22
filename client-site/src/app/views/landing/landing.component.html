@@ -474,7 +474,7 @@
     <div class="container mx-auto px-4 text-center">
       <h2 class="landing-heading-section text-2xl md:text-3xl font-semibold mb-3" style="color: #1F2D3D;">Bạn vừa làm mất đồ?</h2>
       <p class="landing-body text-blueGray-600 max-w-xl mx-auto mb-8">Đăng tin ngay để cộng đồng hỗ trợ tìm kiếm. Hoặc nếu bạn nhặt được đồ của ai đó, hãy đăng tin để trả lại đúng chủ.</p>
-      <a [routerLink]="['/post-item']" class="landing-cta-btn landing-cta-btn-orange landing-cta-btn-post">
+      <a (click)="goToPostItem()" class="landing-cta-btn landing-cta-btn-orange landing-cta-btn-post">
         <i class="landing-cta-btn-icon fas fa-plus-circle" aria-hidden="true"></i>
         <span class="landing-cta-btn-text">Đăng tin tìm đồ ngay</span>
       </a>

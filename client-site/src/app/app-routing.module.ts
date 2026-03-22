@@ -45,7 +45,7 @@ const routes: Routes = [
   { path: "archive", component: ArchiveComponent, canActivate: [AuthGuard] },
   { path: "edit-item/:id", component: EditItemComponent, canActivate: [AuthGuard] },
   { path: "my-claims", component: MyClaimsComponent, canActivate: [AuthGuard] },
-  { path: "post-item", component: PostItemComponent },
+  { path: "post-item", component: PostItemComponent, canActivate: [AuthGuard] },
   { path: "posts", component: PostsComponent },
   { path: "suggestions", component: SuggestionsComponent },
   { path: "about", component: AboutComponent },

@@ -19,6 +19,8 @@ export class EditItemComponent implements OnInit {
   previewImage: string | null = null;
   uploadError: string | null = null;
   rejectReason: string | null = null;
+  isEditingLocked = false;
+  lockedReason = "";
 
   /** File ảnh được chọn trong phiên chỉnh sửa */
   selectedFile: File | null = null;
@@ -61,6 +63,18 @@ export class EditItemComponent implements OnInit {
     this.itemService.getItemById(this.itemId).subscribe({
       next: (item) => {
         this.item = item;
+        const anyItem: any = item as any;
+        
+        // Check if editing is locked based on status
+        if (anyItem.status === "REJECTED" || anyItem.status === "ARCHIVED") {
+          this.isEditingLocked = true;
+          if (anyItem.status === "REJECTED") {
+            this.lockedReason = "Bài đăng này đã bị từ chối và không thể chỉnh sửa.";
+          } else if (anyItem.status === "ARCHIVED") {
+            this.lockedReason = "Bài đăng này đã được lưu trữ và không thể chỉnh sửa.";
+          }
+        }
+        
         this.form.patchValue({
           title: item.title,
           description: item.description,
@@ -72,8 +86,13 @@ export class EditItemComponent implements OnInit {
             ? new Date(item.lost_found_date).toISOString().substring(0, 10)
             : "",
         });
+        
+        // Disable form if editing is locked
+        if (this.isEditingLocked) {
+          this.form.disable();
+        }
+        
         this.previewImage = item.images && item.images.length > 0 ? item.images[0] : null;
-        const anyItem: any = item as any;
         if (anyItem.status === "NEEDS_UPDATE" && anyItem.reject_reason) {
           this.rejectReason = anyItem.reject_reason;
         }
