@@ -124,14 +124,54 @@
 
 .metric-link {
   display: block;
+  height: 100%;
   color: inherit;
   text-decoration: none;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-4);
+}
+
+.metric-item {
+  min-width: 0;
+  height: 100%;
+}
+
+:host ::ng-deep .metric-item app-card {
+  display: block;
+  height: 100%;
+}
+
+@media (min-width: 768px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1200px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 :host ::ng-deep .metric-card.card {
   border: 1px solid transparent;
   box-shadow: none;
+  height: 100%;
+  min-height: 188px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+:host ::ng-deep .metric-card.card .card-body {
+  height: 100%;
+  display: grid;
+  grid-template-rows: 48px 44px minmax(44px, auto);
+  align-content: stretch;
+  row-gap: 10px;
+  padding: 14px 16px 14px;
 }
 
 .metric-link:hover :host ::ng-deep .metric-card.card,
@@ -165,60 +205,91 @@
   color: #6d28d9;
 }
 
+:host ::ng-deep .metric-card.bg-c-teal {
+  background: linear-gradient(150deg, #e9fbff 0%, #cff3fb 100%);
+  color: #0f6d85;
+}
+
 .metric-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
+  min-height: 48px;
 }
 
 .metric-title {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.35;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  max-width: 80%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .metric-icon {
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.62);
+  flex-shrink: 0;
 
   i {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 
 .metric-value {
-  margin-top: var(--space-3);
-  font-size: 34px;
+  margin-top: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  font-size: clamp(34px, 2.8vw, 42px);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
 }
 
 .metric-footer {
-  margin-top: var(--space-2);
-  display: flex;
-  gap: var(--space-2);
-  justify-content: space-between;
-  align-items: flex-start;
+  margin-top: 0;
+  padding-top: 0;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px;
+  align-items: start;
 }
 
 .metric-label {
-  font-size: 11px;
-  opacity: 0.88;
+  font-size: 12px;
+  line-height: 1.35;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .metric-note {
-  font-size: 11px;
-  line-height: 1.4;
-  max-width: 55%;
+  justify-self: end;
+  font-size: 12px;
+  line-height: 1.35;
+  max-width: 100%;
   text-align: right;
-  opacity: 0.88;
+  opacity: 0.9;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  &.empty {
+    visibility: hidden;
+  }
 }
 
 .chart-empty {
@@ -356,12 +427,6 @@
   color: #1d4ed8;
 }
 
-@media (max-width: 1200px) {
-  .metric-note {
-    display: none;
-  }
-}
-
 @media (max-width: 768px) {
   .dashboard-shell {
     gap: var(--space-4);
@@ -375,8 +440,14 @@
     padding: var(--space-3) var(--space-4) var(--space-4);
   }
 
+  :host ::ng-deep .metric-card.card .card-body {
+    grid-template-rows: 44px 42px minmax(38px, auto);
+    row-gap: 8px;
+    padding: 12px 14px;
+  }
+
   .metric-value {
-    font-size: 30px;
+    font-size: clamp(30px, 8vw, 36px);
   }
 
   .activity-list li {

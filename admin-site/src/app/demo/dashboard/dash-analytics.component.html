@@ -24,9 +24,9 @@
         <p class="mb-0">Chưa có dữ liệu thống kê.</p>
       </div>
     } @else {
-      <div class="row g-4 metrics-grid">
+      <div class="metrics-grid">
         @for (card of cards; track card.title) {
-          <div class="col-12 col-md-6 col-xl-3">
+          <div class="metric-item">
             @if (card.url) {
               <a [routerLink]="card.url" class="metric-link">
                 <app-card [hidHeader]="true" cardClass="metric-card {{ card.background }} card-clickable">
@@ -37,9 +37,7 @@
                   <div class="metric-value">{{ card.number }}</div>
                   <div class="metric-footer">
                     <span class="metric-label">{{ card.text }}</span>
-                    @if (card.no) {
-                      <span class="metric-note">{{ card.no }}</span>
-                    }
+                    <span class="metric-note" [class.empty]="!card.no">{{ card.no || ' ' }}</span>
                   </div>
                 </app-card>
               </a>
@@ -52,9 +50,7 @@
                 <div class="metric-value">{{ card.number }}</div>
                 <div class="metric-footer">
                   <span class="metric-label">{{ card.text }}</span>
-                  @if (card.no) {
-                    <span class="metric-note">{{ card.no }}</span>
-                  }
+                  <span class="metric-note" [class.empty]="!card.no">{{ card.no || ' ' }}</span>
                 </div>
               </app-card>
             }
@@ -233,7 +229,7 @@
 
             <a [routerLink]="['/matches']" class="quick-action">
               <span class="quick-label">Theo dõi kết quả ghép cặp</span>
-              <span class="quick-meta">{{ cards[4]?.number || 'Chưa có' }}</span>
+              <span class="quick-meta">{{ cards[5]?.number || 'Chưa có' }}</span>
             </a>
           </app-card>
         </div>

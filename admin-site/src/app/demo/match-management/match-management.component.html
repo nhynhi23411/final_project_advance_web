@@ -81,17 +81,17 @@
           Không có cặp ghép nào.
         </div>
 
-        <div *ngFor="let m of items" class="match-card card border shadow-sm mb-4">
-          <div class="card-body">
-            <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
-              <div>
-                <span class="badge bg-secondary me-1">{{ m.source || 'auto' }}</span>
+        <div *ngFor="let m of items" class="match-card card mb-4">
+          <div class="card-body match-card-body">
+            <div class="match-header">
+              <div class="match-tags">
+                <span class="badge badge-soft badge-source">{{ m.source || 'Auto' }}</span>
                 <span
-                  class="badge"
+                  class="badge badge-soft"
                   [ngClass]="{
-                    'bg-warning text-dark': (m.review_status || 'PENDING') === 'PENDING',
-                    'bg-success': m.review_status === 'CONFIRMED',
-                    'bg-danger': m.review_status === 'REJECTED'
+                    'badge-pending': (m.review_status || 'PENDING') === 'PENDING',
+                    'badge-confirmed': m.review_status === 'CONFIRMED',
+                    'badge-rejected': m.review_status === 'REJECTED'
                   }"
                 >
                   {{
@@ -103,25 +103,27 @@
                   }}
                 </span>
               </div>
-              <div class="text-end">
-                <div class="fw-semibold text-primary fs-5">Độ tin cậy: {{ confidenceLabel(m) }}</div>
-                <div class="small text-muted">
+
+              <div class="confidence-chip">
+                <span class="confidence-label">Độ tin cậy</span>
+                <strong class="confidence-value">{{ confidenceLabel(m) }}</strong>
+                <span class="confidence-meta">
                   Văn bản: {{ textSimilarityLabel(m) }}
                   <span *ngIf="m.distance_km != null"> · Cách: {{ m.distance_km }} km</span>
-                </div>
+                </span>
               </div>
             </div>
 
             <div class="row g-3 compare-row">
               <div class="col-md-6">
-                <div class="post-panel lost h-100 p-3 rounded border border-danger border-opacity-25 bg-danger bg-opacity-5">
-                  <h6 class="text-danger mb-2"><i class="feather icon-search me-1"></i> Bài Mất</h6>
+                <div class="post-panel lost">
+                  <h6 class="panel-title"><i class="feather icon-search me-1"></i> Bài Mất</h6>
                   <ng-container *ngIf="asPost(m.lost_post_id) as lost">
-                    <p class="fw-semibold mb-1">{{ lost.title || '—' }}</p>
-                    <p class="small text-muted mb-2">{{ lost.category || '—' }}</p>
-                    <p class="small mb-2 text-break">{{ lost.description || '—' }}</p>
-                    <p class="small mb-0"><strong>Vị trí:</strong> {{ locationLabel(lost) }}</p>
-                    <p class="small mb-0"><strong>Ngày:</strong> {{ metaDate(lost) }}</p>
+                    <p class="post-title">{{ lost.title || '—' }}</p>
+                    <p class="post-category">{{ lost.category || '—' }}</p>
+                    <p class="post-desc text-break">{{ lost.description || '—' }}</p>
+                    <p class="post-meta"><strong>Vị trí:</strong> {{ locationLabel(lost) }}</p>
+                    <p class="post-meta"><strong>Ngày:</strong> {{ metaDate(lost) }}</p>
                     <div *ngIf="lost.images?.[0] as lostImg" class="mt-2">
                       <img [src]="lostImg" alt="" class="thumb-img rounded" />
                     </div>
@@ -129,14 +131,14 @@
                 </div>
               </div>
               <div class="col-md-6">
-                <div class="post-panel found h-100 p-3 rounded border border-success border-opacity-25 bg-success bg-opacity-5">
-                  <h6 class="text-success mb-2"><i class="feather icon-package me-1"></i> Bài Nhặt được</h6>
+                <div class="post-panel found">
+                  <h6 class="panel-title"><i class="feather icon-package me-1"></i> Bài Nhặt được</h6>
                   <ng-container *ngIf="asPost(m.found_post_id) as found">
-                    <p class="fw-semibold mb-1">{{ found.title || '—' }}</p>
-                    <p class="small text-muted mb-2">{{ found.category || '—' }}</p>
-                    <p class="small mb-2">{{ found.description || '—' }}</p>
-                    <p class="small mb-0"><strong>Vị trí:</strong> {{ locationLabel(found) }}</p>
-                    <p class="small mb-0"><strong>Ngày:</strong> {{ metaDate(found) }}</p>
+                    <p class="post-title">{{ found.title || '—' }}</p>
+                    <p class="post-category">{{ found.category || '—' }}</p>
+                    <p class="post-desc">{{ found.description || '—' }}</p>
+                    <p class="post-meta"><strong>Vị trí:</strong> {{ locationLabel(found) }}</p>
+                    <p class="post-meta"><strong>Ngày:</strong> {{ metaDate(found) }}</p>
                     <div *ngIf="found.images?.[0] as foundImg" class="mt-2">
                       <img [src]="foundImg" alt="" class="thumb-img rounded" />
                     </div>
@@ -145,7 +147,7 @@
               </div>
             </div>
 
-            <div *ngIf="isPending(m)" class="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
+            <div *ngIf="isPending(m)" class="match-actions">
               <button
                 type="button"
                 class="btn btn-success btn-sm"
