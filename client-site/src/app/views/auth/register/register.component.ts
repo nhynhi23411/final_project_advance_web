@@ -13,6 +13,7 @@ export class RegisterComponent implements OnInit {
   email = "";
   phone = "";
   password = "";
+  showPassword = false;
 
   constructor(
     private authService: AuthService,

@@ -2,13 +2,21 @@
   display: block;
 }
 
+* {
+  box-sizing: border-box;
+}
+
+$primary-blue: #1E5AA8;
+$primary-hover: #174A8B;
+$border-light: #E2E8F0;
+
 /* ── Modal shell ─────────────────────────────────── */
 .claim-modal-shell {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.18);
-  width: min(680px, 96vw);
-  max-height: min(90vh, 720px);
+  width: 100%;
+  max-width: 100%;
+  max-height: calc(100vh - 48px);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -21,24 +29,175 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.5rem;
-  background-color: #F0F5FA;
-  border-bottom: 1px solid #E3E8EE;
+  padding: 1.25rem 1.5rem;
+  background-color: #F8FAFC;
+  border-bottom: 1px solid $border-light;
+}
+
+/* ── Form wrapper ────────────────────────────────── */
+.claim-modal-form {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 100%;
 }
 
 /* ── Scrollable body ──────────────────────────────── */
 .claim-modal-scroll {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   overscroll-behavior: contain;
+  width: 100%;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem; /* Replaces tailwind space-y-5 */
 
   /* Custom scrollbar */
   &::-webkit-scrollbar { width: 6px; }
-  &::-webkit-scrollbar-track { background: #f1f5f9; }
+  &::-webkit-scrollbar-track { background: transparent; }
   &::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
+    background: #CBD5E1;
     border-radius: 4px;
-    &:hover { background: #94a3b8; }
+    &:hover { background: #94A3B8; }
   }
 }
 
+/* ── Input Safety & Spacing ───────────────────────── */
+.form-group-safe {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Spacing between label, helper text, and input */
+
+  label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem; /* Spacing for icon and text inside label */
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: #334155;
+    margin: 0;
+
+    span.optional {
+      font-weight: 400;
+      color: #94A3B8;
+      font-size: 0.875rem;
+    }
+  }
+
+  .helper-text {
+    font-size: 0.8125rem;
+    color: #64748B;
+    margin: 0 0 0.25rem 0;
+  }
+
+  input, textarea {
+    width: 100%;
+    max-width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #CBD5E1;
+    border-radius: 8px;
+    font-size: 0.9375rem;
+    color: #0F172A;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: $primary-blue;
+      box-shadow: 0 0 0 3px rgba(30, 90, 168, 0.1);
+    }
+    
+    &::placeholder {
+      color: #94A3B8;
+    }
+  }
+}
+
+.upload-box-safe {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border-radius: 12px;
+  background-color: #F8FAFC;
+  
+  i {
+    font-size: 2.5rem;
+  }
+
+  span {
+    font-size: 0.9375rem;
+  }
+}
+
+/* ── Footer ───────────────────────────────────────── */
+.claim-modal-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid $border-light;
+  background: #fff;
+  width: 100%;
+}
+
+/* ── Buttons ──────────────────────────────────────── */
+.claim-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &--secondary {
+    background: #fff;
+    color: #475569;
+    border: 1px solid #CBD5E1;
+
+    &:hover {
+      background: #F8FAFC;
+      border-color: #94A3B8;
+    }
+  }
+
+  &--primary {
+    background: $primary-blue;
+    color: #fff;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: $primary-hover;
+    }
+
+    &:disabled {
+      background: #94A3B8;
+      cursor: not-allowed;
+    }
+  }
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 640px) {
+  .claim-modal-footer {
+    flex-direction: column-reverse; /* Primary button on top */
+  }
+  .claim-btn {
+    width: 100%;
+  }
+}

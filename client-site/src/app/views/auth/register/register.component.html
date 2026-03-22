@@ -35,9 +35,25 @@
 
             <div class="relative w-full mb-3">
               <label class="block text-blueGray-700 text-sm font-bold mb-2" for="reg-password">Mật khẩu</label>
-              <input id="reg-password" type="password" name="password" [(ngModel)]="password" autocomplete="new-password"
-                class="form-control-uel border px-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full"
-                placeholder="••••••••" />
+              <div class="relative flex items-center w-full">
+                <input id="reg-password" [type]="showPassword ? 'text' : 'password'" name="password" [(ngModel)]="password" autocomplete="new-password"
+                  class="form-control-uel border pl-3 py-3 placeholder-blueGray-400 text-blueGray-700 bg-white w-full pr-12"
+                  style="padding-right: 48px;"
+                  placeholder="••••••••" />
+                <button type="button" tabindex="-1" (click)="showPassword = !showPassword"
+                  class="absolute right-0 top-0 bottom-0 flex items-center justify-center bg-transparent border-0 cursor-pointer focus:outline-none uel-pwd-toggle"
+                  style="width: 48px; border-radius: 0 10px 10px 0;"
+                  aria-label="Toggle password visibility">
+                  <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                  </svg>
+                  <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                    <circle cx="12" cy="12" r="3"></circle>
+                  </svg>
+                </button>
+              </div>
             </div>
 
             <div>
@@ -57,8 +73,9 @@
           </form>
         </div>
       </div>
-      <div class="flex flex-wrap mt-6 relative justify-center">
-        <a [routerLink]="['/auth/login']" class="text-white opacity-90 hover:opacity-100"><small>Đã có tài khoản? Đăng nhập</small></a>
+      <div class="login-links flex flex-wrap mt-6 relative justify-center items-center gap-2">
+        <span style="color: #64748b; font-size: 0.875rem;">Đã có tài khoản?</span>
+        <a [routerLink]="['/auth/login']" class="login-link login-link-register" style="font-size: 0.875rem; font-weight: 600;">Đăng nhập</a>
       </div>
     </div>
   </div>

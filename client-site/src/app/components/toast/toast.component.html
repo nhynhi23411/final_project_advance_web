@@ -1,9 +1,29 @@
-<div *ngIf="message" role="status" aria-live="polite" aria-atomic="true"
-  class="toast-box fixed top-4 right-4 z-[9999] max-w-sm rounded-xl px-4 py-3 text-white flex items-center justify-between gap-4"
-  [ngClass]="typeClass">
-  <span>{{ message.text }}</span>
-  <button type="button" (click)="toastService.dismiss()" aria-label="Đóng"
-    class="flex-shrink-0 text-white hover:opacity-80 transition-opacity focus:outline-none rounded">
-    <i class="fas fa-times" aria-hidden="true"></i>
-  </button>
+<div class="toast-wrapper">
+  <div *ngFor="let toast of toasts; trackBy: trackById"
+       class="toast-item"
+       [ngClass]="getThemeClass(toast.type)"
+       [@toastAnimation]
+       (mouseenter)="onHover(toast)"
+       (mouseleave)="onLeave(toast)">
+    
+    <div class="toast-content">
+      <div class="toast-icon">
+        <i [class]="getIconClass(toast.type)"></i>
+      </div>
+      <div class="toast-body">
+        <h4 *ngIf="toast.title" class="toast-title">{{ toast.title }}</h4>
+        <p class="toast-message">{{ toast.message }}</p>
+      </div>
+      <button class="toast-close" (click)="close(toast.id, $event)">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="toast-progress-track" *ngIf="toast.duration > 0">
+      <div class="toast-progress-fill"
+           [style.animation-duration.ms]="toast.duration"
+           [style.animation-play-state]="toast.paused ? 'paused' : 'running'">
+      </div>
+    </div>
+  </div>
 </div>

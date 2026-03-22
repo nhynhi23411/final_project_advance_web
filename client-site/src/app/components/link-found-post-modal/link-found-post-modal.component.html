@@ -2,10 +2,12 @@
 
   <!-- ── Header ── -->
   <div class="lfm__header">
-    <div class="lfm__header-icon">🤝</div>
-    <div class="lfm__header-text">
-      <h2 class="lfm__title">Tôi đang giữ món đồ này</h2>
-      <p class="lfm__subtitle">Sắp tìm thấy chủ nhân rồi! Chọn bài nhặt được của bạn để kết nối với người đang tìm.</p>
+    <div class="lfm__header-content">
+      <div class="lfm__header-icon"><i class="fas fa-handshake"></i></div>
+      <div class="lfm__header-text">
+        <h2 class="lfm__title">Tôi đang giữ món đồ này</h2>
+        <p class="lfm__subtitle">Sắp tìm thấy chủ nhân rồi! Chọn bài nhặt được để kết nối với người đang tìm.</p>
+      </div>
     </div>
     <button type="button" class="lfm__close" (click)="closeModal()" aria-label="Đóng">
       <i class="fas fa-times" aria-hidden="true"></i>
@@ -31,7 +33,7 @@
       <!-- Zone A: Owner's lost item -->
       <div class="lfm__zone-owner">
         <div class="lfm__zone-label">
-          <span class="lfm__badge lfm__badge--lost">🔍 Đồ cần tìm chủ nhân</span>
+          <span class="lfm__badge lfm__badge--lost"><i class="fas fa-search"></i> Đồ cần tìm chủ nhân</span>
         </div>
         <div *ngIf="lostItem" class="lfm__owner-card">
           <div class="lfm__owner-thumb">
@@ -41,25 +43,30 @@
             </div>
           </div>
           <div class="lfm__owner-info">
-            <p class="lfm__owner-title">{{ lostItem.title }}</p>
-            <p class="lfm__owner-meta">
-              <span *ngIf="lostItem.category"><i class="fas fa-tag" aria-hidden="true"></i> {{ lostItem.category }}</span>
-              <span *ngIf="lostItem.location_text"><i class="fas fa-map-marker-alt" aria-hidden="true"></i> {{ lostItem.location_text | slice:0:45 }}{{ (lostItem.location_text?.length || 0) > 45 ? '…' : '' }}</span>
-            </p>
+            <p class="lfm__owner-title line-clamp-2" [title]="lostItem.title">{{ lostItem.title }}</p>
+            <div class="lfm__owner-meta mt-2">
+              <div class="lfm__meta-item" *ngIf="lostItem.category">
+                <i class="fas fa-tag"></i> <span class="line-clamp-1">{{ lostItem.category }}</span>
+              </div>
+              <div class="lfm__meta-item" *ngIf="lostItem.location_text">
+                <i class="fas fa-map-marker-alt"></i> <span class="line-clamp-1" [title]="lostItem.location_text">{{ lostItem.location_text }}</span>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="lfm__connector">
-          <div class="lfm__connector-line"></div>
-          <span class="lfm__connector-icon">🔗</span>
-          <div class="lfm__connector-line"></div>
+        <div class="lfm__connector-wrap">
+          <div class="lfm__connector">
+            <div class="lfm__connector-line"></div>
+            <i class="fas fa-link lfm__connector-icon"></i>
+            <div class="lfm__connector-line"></div>
+          </div>
         </div>
-        <p class="lfm__zone-hint">Ghép nối với bài nhặt được của bạn bên cạnh →</p>
       </div>
 
       <!-- Zone B: Finder's FOUND posts -->
       <div class="lfm__zone-finder">
         <div class="lfm__zone-label">
-          <span class="lfm__badge lfm__badge--found">📦 Bài nhặt được của bạn</span>
+          <span class="lfm__badge lfm__badge--found"><i class="fas fa-box-open"></i> Bài nhặt được của bạn</span>
         </div>
 
         <!-- Empty state -->
@@ -88,8 +95,10 @@
               </div>
             </div>
             <div class="lfm__post-info">
-              <p class="lfm__post-title">{{ post.title }}</p>
-              <p class="lfm__post-meta">{{ post.category || '—' }} · {{ post.location_text | slice:0:35 }}{{ (post.location_text?.length || 0) > 35 ? '…' : '' }}</p>
+              <p class="lfm__post-title line-clamp-1" [title]="post.title">{{ post.title }}</p>
+              <div class="lfm__post-meta">
+                <span class="line-clamp-1" [title]="(post.category || '—') + ' · ' + (post.location_text || '—')">{{ post.category || '—' }} · {{ post.location_text || '—' }}</span>
+              </div>
             </div>
             <div class="lfm__post-check" [class.is-visible]="selectedFoundPostId === post._id">
               <i class="fas fa-check-circle" aria-hidden="true"></i>
