@@ -119,6 +119,7 @@ export class DashAnalyticsComponent implements OnInit {
 
   private buildCards(stats: DashboardStats): void {
     type CardItem = { background: string; title: string; icon: string; text: string; number: string; no?: string; url?: string };
+    const totalModeratedPosts = Number(stats.activePosts || 0) + Number(stats.pendingAdmin || 0);
     const base: CardItem[] = [
       {
         background: 'bg-c-blue',
@@ -151,19 +152,25 @@ export class DashAnalyticsComponent implements OnInit {
         text: 'Đã giải quyết',
         number: String(stats.resolvedClaims),
         url: '/moderation'
+      },
+      {
+        background: 'bg-c-teal',
+        title: 'Tổng bài đăng',
+        icon: 'feather icon-file-text',
+        text: 'Đã duyệt + Chờ duyệt',
+        number: String(totalModeratedPosts),
+        url: '/moderation'
       }
     ];
-    if (stats.matchRate !== undefined) {
-      const pct = (stats.matchRate * 100).toFixed(1);
-      base.push({
-        background: 'bg-c-purple',
-        title: 'Tỷ lệ khớp',
-        icon: 'feather icon-percent',
-        text: 'Claim thành công / Bài thất lạc đã duyệt',
-        number: pct + '%',
-        no: 'Thấp => cần cải thiện thuật toán ghép cặp'
-      });
-    }
+    const pct = ((stats.matchRate ?? 0) * 100).toFixed(1);
+    base.push({
+      background: 'bg-c-purple',
+      title: 'Tỷ lệ khớp',
+      icon: 'feather icon-percent',
+      text: 'Claim thành công / Bài thất lạc đã duyệt',
+      number: pct + '%',
+      no: 'Thấp => cần cải thiện thuật toán ghép cặp'
+    });
     this.cards = base;
   }
 
