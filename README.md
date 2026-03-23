@@ -120,7 +120,7 @@ CLOUDINARY_API_SECRET=your_api_secret
 # Reset Password
 RESET_PASSWORD_EXPIRES_MINUTES=20
 ADMIN_RESET_PASSWORD_URL=http://localhost:4200/reset-password
-CLIENT_RESET_PASSWORD_URL=http://localhost:4201/auth/reset-password
+CLIENT_RESET_PASSWORD_URL=http://localhost:4300/auth/reset-password
 
 # Port
 PORT=3000
@@ -161,7 +161,7 @@ Admin site chạy tại `http://localhost:4200`
 cd client-site
 ng serve --port 4201
 ```
-Client site chạy tại `http://localhost:4201`
+Client site chạy tại `http://localhost:4300`
 
 ---
 
