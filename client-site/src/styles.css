@@ -612,6 +612,26 @@ label .uel-required {
   color: #fff;
   font-weight: 600;
 }
+.app-nav-link-chat {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.app-nav-chat-dot {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--accent-orange);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1;
+}
 @media (min-width: 1024px) {
   .app-nav-link {
     padding: 0.5rem 0.75rem;
