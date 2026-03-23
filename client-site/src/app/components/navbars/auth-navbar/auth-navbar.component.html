@@ -52,8 +52,14 @@
           *ngIf="authService.isLoggedIn"
           [routerLink]="['/chat']"
           routerLinkActive="is-active"
-          class="app-nav-link"
-          >Chat</a
+          class="app-nav-link app-nav-link-chat"
+          (click)="onChatLinkClick()"
+          >
+          <span>Chat</span>
+          <span *ngIf="chatUnreadCount > 0" class="app-nav-chat-dot">{{
+            chatUnreadCount > 99 ? '99+' : chatUnreadCount
+          }}</span>
+        </a
         >
       </div>
       <div class="app-nav-actions">
