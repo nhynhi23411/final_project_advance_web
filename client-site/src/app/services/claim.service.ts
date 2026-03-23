@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export const MAX_CLAIMS_LIMIT = 5;
@@ -29,13 +30,24 @@ export class ClaimService {
 
     constructor(private http: HttpClient) { }
 
-    /** Upload evidence image via items/upload-image endpoint. */
+    /** Upload evidence image via backend upload endpoint. */
     uploadEvidenceImage(file: File): Observable<{ url: string; publicId: string }> {
         const fd = new FormData();
         fd.append('file', file, file.name);
         return this.http.post<{ url: string; publicId: string }>(
             `${this.base}/items/upload-image`,
             fd
+        ).pipe(
+            // Backward-compatible fallback if environment still exposes /posts/upload-image.
+            catchError((err) => {
+                if (err?.status !== 404) {
+                    return throwError(err);
+                }
+                return this.http.post<{ url: string; publicId: string }>(
+                    `${this.base}/posts/upload-image`,
+                    fd,
+                );
+            }),
         );
     }
 

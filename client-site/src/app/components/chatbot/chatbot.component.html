@@ -1,0 +1,94 @@
+<div class="chatbot-container">
+  <!-- Chat Toggle Button (for floating chat) -->
+  <button
+    class="chat-toggle-btn"
+    (click)="toggleChat()"
+    *ngIf="!showChat"
+    title="Open Chat"
+  >
+    💬
+  </button>
+
+  <!-- Chat Window -->
+  <div class="chat-window" *ngIf="showChat">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="chat-header-content">
+        <h2 class="chat-title">Chat with AI</h2>
+        <p class="chat-subtitle">Powered by n8n</p>
+      </div>
+      <div class="chat-header-actions">
+        <button
+          class="clear-btn"
+          (click)="clearChat()"
+          title="Clear conversation"
+        >
+          🗑️
+        </button>
+        <button
+          class="close-btn"
+          (click)="toggleChat()"
+          title="Close chat"
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages Container -->
+    <div class="messages-container" #messagesContainer>
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="messages.length === 0">
+        <div class="empty-icon">🤖</div>
+        <p class="empty-text">Start a conversation with our AI assistant!</p>
+      </div>
+
+      <!-- Messages -->
+      <div
+        class="message-group"
+        *ngFor="let message of messages"
+        [ngClass]="message.sender"
+      >
+        <div class="message-bubble" [ngClass]="message.sender">
+          <p class="message-text">{{ message.message }}</p>
+          <span class="message-time">{{
+            message.timestamp | date : "HH:mm"
+          }}</span>
+        </div>
+      </div>
+
+      <!-- Bot Typing Indicator -->
+      <div class="message-group bot" *ngIf="isLoading">
+        <div class="message-bubble bot">
+          <div class="typing-indicator">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <p class="typing-text">Bot is typing...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Container -->
+    <div class="input-container">
+      <textarea
+        class="message-input"
+        [(ngModel)]="inputMessage"
+        (keypress)="handleKeyPress($event)"
+        placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+        [disabled]="isLoading"
+        rows="1"
+      ></textarea>
+      <button
+        class="send-btn"
+        (click)="sendMessage()"
+        [disabled]="!inputMessage.trim() || isLoading"
+        title="Send message"
+      >
+        <span *ngIf="!isLoading">Send</span>
+        <span *ngIf="isLoading">...</span>
+      </button>
+    </div>
+  </div>
+</div>

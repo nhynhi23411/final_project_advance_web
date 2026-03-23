@@ -250,6 +250,16 @@
                 >
                   Người dùng chưa cập nhật thông tin liên hệ.
                 </p>
+                <!-- Message button -->
+                <button
+                  type="button"
+                  *ngIf="authService.isLoggedIn && claim.claimant_user_id?._id"
+                  (click)="messageClaimer(claim.claimant_user_id._id, claim.claimant_user_id.name || claim.claimant_user_id.username || 'Người dùng')"
+                  class="item-detail-btn item-detail-btn-chat"
+                  style="margin-top: 12px; width: 100%;"
+                >
+                  <i class="fas fa-comment" aria-hidden="true"></i> NHẮN TIN
+                </button>
               </div>
               <div
                 *ngIf="

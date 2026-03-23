@@ -10,7 +10,10 @@ import {
 } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { MAT_DIALOG_DATA, MatDialogRef } from "@angular/material/dialog";
+import { Router } from "@angular/router";
 import { ClaimService } from "../../services/claim.service";
+import { AuthService } from "../../services/auth.service";
+import { ToastService } from "../../services/toast.service";
 
 @Component({
   selector: "app-claim-modal",
@@ -36,6 +39,9 @@ export class ClaimModalComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private claimService: ClaimService,
+    private authService: AuthService,
+    private router: Router,
+    private toastService: ToastService,
     @Inject(LOCALE_ID) public localeId: string,
     @Optional() private dialogRef: MatDialogRef<ClaimModalComponent>,
     @Optional()
@@ -58,21 +64,24 @@ export class ClaimModalComponent implements OnInit {
     });
   }
 
-  onImageSelected(event: any): void {
-    const files: FileList = event.target.files;
-    if (!files.length) return;
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files: FileList | null = input?.files ?? null;
+    if (!files || files.length === 0) return;
 
     const file = files[0];
     this.selectedFileName = file.name;
 
-    const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-    if (!validTypes.includes(file.type)) {
-      this.error = "Chỉ chấp nhận hình ảnh (JPEG, PNG, GIF, WebP)";
+    const isImageMime = typeof file.type === "string" && file.type.startsWith("image/");
+    if (!isImageMime) {
+      this.error = "Chỉ chấp nhận tệp hình ảnh";
+      input.value = "";
       return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
       this.error = "Kích thước hình ảnh không được vượt quá 5MB";
+      input.value = "";
       return;
     }
 
@@ -93,8 +102,34 @@ export class ClaimModalComponent implements OnInit {
       },
       error: (err) => {
         console.error("Upload error:", err);
-        this.error = "Lỗi tải lên hình ảnh. Vui lòng thử lại.";
+        
+        // Handle 401 Unauthorized - token expired or invalid
+        if (err?.status === 401) {
+          this.error = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+          this.uploadingImage = false;
+          input.value = "";
+          
+          // Auto logout after brief delay
+          setTimeout(() => {
+            this.authService.logout();
+            this.router.navigate(["/auth/login"], {
+              queryParams: { returnUrl: this.router.url },
+            });
+            this.toastService.error("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+          }, 1500);
+          return;
+        }
+        
+        const backendMessage = err?.error?.message;
+        const normalized = Array.isArray(backendMessage)
+          ? backendMessage.join(", ")
+          : backendMessage;
+        this.error =
+          typeof normalized === "string" && normalized.trim().length > 0
+            ? `Lỗi tải ảnh: ${normalized}`
+            : "Lỗi tải lên hình ảnh. Vui lòng thử lại.";
         this.uploadingImage = false;
+        input.value = "";
       },
     });
   }
@@ -143,6 +178,20 @@ export class ClaimModalComponent implements OnInit {
       error: (err) => {
         console.error("Submit error:", err);
         this.isSubmitting = false;
+        
+        // Handle 401 Unauthorized
+        if (err?.status === 401) {
+          this.error = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+          setTimeout(() => {
+            this.authService.logout();
+            this.router.navigate(["/auth/login"], {
+              queryParams: { returnUrl: this.router.url },
+            });
+            this.toastService.error("Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.");
+          }, 1500);
+          return;
+        }
+        
         this.error =
           err.error?.message || "Lỗi khi gửi yêu cầu. Vui lòng thử lại.";
       },

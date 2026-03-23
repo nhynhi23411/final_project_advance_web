@@ -48,19 +48,6 @@
           class="app-nav-link"
           >Gợi ý</a
         >
-        <a
-          *ngIf="authService.isLoggedIn"
-          [routerLink]="['/chat']"
-          routerLinkActive="is-active"
-          class="app-nav-link app-nav-link-chat"
-          (click)="onChatLinkClick()"
-          >
-          <span>Chat</span>
-          <span *ngIf="chatUnreadCount > 0" class="app-nav-chat-dot">{{
-            chatUnreadCount > 99 ? '99+' : chatUnreadCount
-          }}</span>
-        </a
-        >
       </div>
       <div class="app-nav-actions">
         <ng-container *ngIf="!authService.isLoggedIn">
@@ -79,6 +66,22 @@
           *ngIf="authService.isLoggedIn"
           class="app-nav-actions-logged flex items-center gap-2"
         >
+          <!-- Chat Button -->
+          <div class="app-nav-chat-wrap">
+            <a
+              [routerLink]="['/chat']"
+              class="app-nav-chat-btn"
+              aria-label="Chat"
+              (click)="onChatLinkClick()"
+            >
+              <i class="fas fa-comment-dots"></i>
+              <span *ngIf="chatUnreadCount > 0" class="app-nav-chat-dot">{{
+                chatUnreadCount > 99 ? '99+' : chatUnreadCount
+              }}</span>
+            </a>
+          </div>
+
+          <!-- Notifications Button -->
           <div class="app-nav-notif-wrap" [class.open]="notifOpen">
             <button
               type="button"

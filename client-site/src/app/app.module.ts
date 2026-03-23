@@ -42,6 +42,7 @@ import { ClaimModalComponent } from "./components/claim-modal/claim-modal.compon
 import { LinkFoundPostModalComponent } from "./components/link-found-post-modal/link-found-post-modal.component";
 import { ClosePostModalComponent } from "./components/close-post-modal/close-post-modal.component";
 import { ToastComponent } from "./components/toast/toast.component";
+import { ChatbotComponent } from "./components/chatbot/chatbot.component";
 import { AuthNavbarComponent } from "./components/navbars/auth-navbar/auth-navbar.component";
 import { IndexNavbarComponent } from "./components/navbars/index-navbar/index-navbar.component";
 
@@ -92,6 +93,7 @@ const socketConfig: SocketIoConfig = {
     LinkFoundPostModalComponent,
     ClosePostModalComponent,
     ToastComponent,
+    ChatbotComponent,
     PostsComponent,
     SuggestionsComponent,
     AboutComponent,
