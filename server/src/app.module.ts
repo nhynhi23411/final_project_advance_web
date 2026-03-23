@@ -18,6 +18,7 @@ import { ModerationModule } from "./moderation/moderation.module";
 import { TasksModule } from "./tasks/tasks.module";
 import { MatchesModule } from "./matches/matches.module";
 import { NotificationsModule } from "./notifications/notifications.module";
+import { ChatModule } from "./chat/chat.module";
 
 @Module({
   imports: [
@@ -47,8 +48,9 @@ import { NotificationsModule } from "./notifications/notifications.module";
     AdminModule,
     TasksModule,
     NotificationsModule,
+    ChatModule,
   ],
   controllers: [AppController, MeController],
   providers: [],
 })
-export class AppModule { }
+export class AppModule {}

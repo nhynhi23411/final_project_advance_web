@@ -1,10 +1,17 @@
 import { Component, OnInit, OnDestroy } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
 import { BehaviorSubject, Observable, Subject } from "rxjs";
-import { debounceTime, switchMap, map, takeUntil, startWith } from "rxjs/operators";
+import {
+  debounceTime,
+  switchMap,
+  map,
+  takeUntil,
+  startWith,
+} from "rxjs/operators";
 import { ItemService, Item } from "../../services/item.service";
 import { CATEGORIES } from "../../config/category-metadata.config";
 import { THU_DUC_WARDS } from "../post-item/post-item.component";
+import { AuthService } from "../../services/auth.service";
 
 type PostTypeFilter = "" | "LOST" | "FOUND";
 type TimeRangeKey = "" | "today" | "3days" | "7days" | "30days";
@@ -62,14 +69,17 @@ export class PostsComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private itemService: ItemService
+    private itemService: ItemService,
+    public authService: AuthService,
   ) {}
 
   ngOnInit(): void {
-    this.route.queryParams.pipe(takeUntil(this.destroy$)).subscribe((params) => {
-      this.searchQuery = params["q"] || "";
-      this.loadItems();
-    });
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((params) => {
+        this.searchQuery = params["q"] || "";
+        this.loadItems();
+      });
   }
 
   ngOnDestroy(): void {
@@ -87,11 +97,15 @@ export class PostsComponent implements OnInit, OnDestroy {
         try {
           const raw = Array.isArray(data)
             ? data
-            : (data && typeof data === "object" && (data as any).data && Array.isArray((data as any).data)
+            : data &&
+                typeof data === "object" &&
+                (data as any).data &&
+                Array.isArray((data as any).data)
               ? (data as any).data
-              : []);
+              : [];
           const safeList = (raw || []).filter(
-            (item: any) => item != null && item !== undefined && item.status === "APPROVED"
+            (item: any) =>
+              item != null && item !== undefined && item.status === "APPROVED",
           );
           this.allItems = safeList.map((it: any) => this.normalizeItem(it));
           this.applyFilters();
@@ -107,8 +121,7 @@ export class PostsComponent implements OnInit, OnDestroy {
         console.error("Error fetching posts", err);
         this.allItems = [];
         this.filteredItems = [];
-        this.error =
-          err?.error?.message || "Không thể tải danh sách bài đăng.";
+        this.error = err?.error?.message || "Không thể tải danh sách bài đăng.";
         this.isLoading = false;
       },
     });
@@ -142,137 +155,144 @@ export class PostsComponent implements OnInit, OnDestroy {
     try {
       let list = Array.isArray(this.allItems) ? [...this.allItems] : [];
 
-    const type = this.filterPostType;
-    if (type === "LOST" || type === "FOUND") {
-      list = list.filter((item) => (item.type || item.post_type) === type);
-    }
-
-    if (this.filterCategory?.trim()) {
-      const cat = this.filterCategory.trim();
-      list = list.filter(
-        (item) => (item.category || "").toLowerCase() === cat.toLowerCase()
-      );
-    }
-
-    if (this.filterWard?.trim()) {
-      const ward = this.filterWard.trim();
-      list = list.filter((item) =>
-        (item.location_text || "").includes(ward)
-      );
-    }
-
-    if (this.filterTimeRange) {
-      const now = new Date();
-      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const dayMs = 24 * 60 * 60 * 1000;
-      let since: Date;
-      switch (this.filterTimeRange) {
-        case "today":
-          since = todayStart;
-          break;
-        case "3days":
-          since = new Date(todayStart.getTime() - 3 * dayMs);
-          break;
-        case "7days":
-          since = new Date(todayStart.getTime() - 7 * dayMs);
-          break;
-        case "30days":
-          since = new Date(todayStart.getTime() - 30 * dayMs);
-          break;
-        default:
-          since = new Date(0);
+      const type = this.filterPostType;
+      if (type === "LOST" || type === "FOUND") {
+        list = list.filter((item) => (item.type || item.post_type) === type);
       }
-      list = list.filter((item) => {
-        const d = this.getItemDate(item);
-        return d && d.getTime() >= since.getTime();
-      });
-    }
 
-    if (this.chipHasImage) {
-      list = list.filter((item) => this.hasImage(item));
-    }
-
-    if (this.chipRecent) {
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      list = list.filter((item) => {
-        const d = this.getItemDate(item);
-        return d && d.getTime() >= weekAgo.getTime();
-      });
-    }
-
-    switch (this.sortBy) {
-      case "oldest":
-        // Sort ascending: oldest first (smallest dates first)
-        list.sort((a, b) => {
-          const dateA = this.getItemDate(a);
-          const dateB = this.getItemDate(b);
-          if (!dateA && !dateB) return 0;
-          if (!dateA) return 1; // null dates go to end
-          if (!dateB) return -1;
-          return dateA.getTime() - dateB.getTime(); // ascending
-        });
-        break;
-      case "title":
-        // Alphabetical sort
-        list.sort((a, b) =>
-          (a.title || "").localeCompare(b.title || "", "vi")
+      if (this.filterCategory?.trim()) {
+        const cat = this.filterCategory.trim();
+        list = list.filter(
+          (item) => (item.category || "").toLowerCase() === cat.toLowerCase(),
         );
-        break;
-      case "hasImage":
-        // Items with images first, then by newest
-        list.sort((a, b) => {
-          const ah = this.hasImage(a) ? 1 : 0;
-          const bh = this.hasImage(b) ? 1 : 0;
-          if (bh !== ah) return bh - ah;
-          // Then by date descending (newest first)
-          const dateA = this.getItemDate(a);
-          const dateB = this.getItemDate(b);
-          if (!dateA && !dateB) return 0;
-          if (!dateA) return 1;
-          if (!dateB) return -1;
-          return dateB.getTime() - dateA.getTime(); // descending
+      }
+
+      if (this.filterWard?.trim()) {
+        const ward = this.filterWard.trim();
+        list = list.filter((item) => (item.location_text || "").includes(ward));
+      }
+
+      if (this.filterTimeRange) {
+        const now = new Date();
+        const todayStart = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+        );
+        const dayMs = 24 * 60 * 60 * 1000;
+        let since: Date;
+        switch (this.filterTimeRange) {
+          case "today":
+            since = todayStart;
+            break;
+          case "3days":
+            since = new Date(todayStart.getTime() - 3 * dayMs);
+            break;
+          case "7days":
+            since = new Date(todayStart.getTime() - 7 * dayMs);
+            break;
+          case "30days":
+            since = new Date(todayStart.getTime() - 30 * dayMs);
+            break;
+          default:
+            since = new Date(0);
+        }
+        list = list.filter((item) => {
+          const d = this.getItemDate(item);
+          return d && d.getTime() >= since.getTime();
         });
-        break;
-      case "newest":
-      default:
-        // Sort descending: newest first (largest dates first)
-        list.sort((a, b) => {
-          const dateA = this.getItemDate(a);
-          const dateB = this.getItemDate(b);
-          if (!dateA && !dateB) return 0;
-          if (!dateA) return 1; // null dates go to end
-          if (!dateB) return -1;
-          return dateB.getTime() - dateA.getTime(); // descending (b before a if b is newer)
+      }
+
+      if (this.chipHasImage) {
+        list = list.filter((item) => this.hasImage(item));
+      }
+
+      if (this.chipRecent) {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        list = list.filter((item) => {
+          const d = this.getItemDate(item);
+          return d && d.getTime() >= weekAgo.getTime();
         });
-        break;
-    }
+      }
+
+      switch (this.sortBy) {
+        case "oldest":
+          // Sort ascending: oldest first (smallest dates first)
+          list.sort((a, b) => {
+            const dateA = this.getItemDate(a);
+            const dateB = this.getItemDate(b);
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1; // null dates go to end
+            if (!dateB) return -1;
+            return dateA.getTime() - dateB.getTime(); // ascending
+          });
+          break;
+        case "title":
+          // Alphabetical sort
+          list.sort((a, b) =>
+            (a.title || "").localeCompare(b.title || "", "vi"),
+          );
+          break;
+        case "hasImage":
+          // Items with images first, then by newest
+          list.sort((a, b) => {
+            const ah = this.hasImage(a) ? 1 : 0;
+            const bh = this.hasImage(b) ? 1 : 0;
+            if (bh !== ah) return bh - ah;
+            // Then by date descending (newest first)
+            const dateA = this.getItemDate(a);
+            const dateB = this.getItemDate(b);
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1;
+            if (!dateB) return -1;
+            return dateB.getTime() - dateA.getTime(); // descending
+          });
+          break;
+        case "newest":
+        default:
+          // Sort descending: newest first (largest dates first)
+          list.sort((a, b) => {
+            const dateA = this.getItemDate(a);
+            const dateB = this.getItemDate(b);
+            if (!dateA && !dateB) return 0;
+            if (!dateA) return 1; // null dates go to end
+            if (!dateB) return -1;
+            return dateB.getTime() - dateA.getTime(); // descending (b before a if b is newer)
+          });
+          break;
+      }
 
       this.filteredItems = list;
     } catch (e) {
       console.error("applyFilters error", e);
-      this.filteredItems = Array.isArray(this.allItems) ? [...this.allItems] : [];
+      this.filteredItems = Array.isArray(this.allItems)
+        ? [...this.allItems]
+        : [];
     }
   }
 
   private getItemDate(item: Item): Date | null {
     try {
       // Try lost_found_date first, then metadata, then created_at
-      let raw = item.lost_found_date || (item as any).metadata?.lost_found_date || item.created_at;
-      
+      let raw =
+        item.lost_found_date ||
+        (item as any).metadata?.lost_found_date ||
+        item.created_at;
+
       if (!raw) return null;
-      
+
       // If already a Date object, validate and return
       if (raw instanceof Date) {
         return isNaN(raw.getTime()) ? null : raw;
       }
-      
+
       // If it's a string, parse it
       if (typeof raw === "string") {
         const d = new Date(raw);
         return isNaN(d.getTime()) ? null : d;
       }
-      
+
       return null;
     } catch (e) {
       console.error("Error parsing date:", e, item);
@@ -280,14 +300,18 @@ export class PostsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private compareDate(a: Date | null, b: Date | null, ascending: boolean): number {
+  private compareDate(
+    a: Date | null,
+    b: Date | null,
+    ascending: boolean,
+  ): number {
     // Both null -> equal
     if (!a && !b) return 0;
     // a is null -> put at end (positive for ascending, negative for descending)
     if (!a) return ascending ? 1 : -1;
     // b is null -> put at end
     if (!b) return ascending ? -1 : 1;
-    
+
     // Both have dates -> compare them
     const ta = a.getTime();
     const tb = b.getTime();
@@ -300,7 +324,7 @@ export class PostsComponent implements OnInit, OnDestroy {
       (url) =>
         typeof url === "string" &&
         url.trim().length > 0 &&
-        /^https?:\/\//i.test(url)
+        /^https?:\/\//i.test(url),
     );
   }
 
@@ -352,6 +376,30 @@ export class PostsComponent implements OnInit, OnDestroy {
     this.router.navigate(["/items", itemId]);
   }
 
+  canMessagePostOwner(item: Item): boolean {
+    const ownerId = this.getPostOwnerId(item);
+    const myId = this.authService.currentUserId;
+    if (!ownerId) return false;
+    if (!myId) return true;
+    return String(ownerId) !== String(myId);
+  }
+
+  startChatWithPostOwner(item: Item): void {
+    const ownerId = this.getPostOwnerId(item);
+    if (!ownerId) return;
+    if (!this.authService.isLoggedIn) {
+      this.router.navigate(["/auth/login"]);
+      return;
+    }
+    this.router.navigate(["/chat"], {
+      queryParams: {
+        targetUserId: ownerId,
+        postId: item._id,
+        postTitle: item.title || "Bài đăng",
+      },
+    });
+  }
+
   onSearch(): void {
     this.router.navigate(["/posts"], {
       queryParams: this.searchQuery?.trim()
@@ -366,9 +414,7 @@ export class PostsComponent implements OnInit, OnDestroy {
   }
 
   getItemTypeClass(type: string): string {
-    return type === "LOST"
-      ? "posts-badge-lost"
-      : "posts-badge-found";
+    return type === "LOST" ? "posts-badge-lost" : "posts-badge-found";
   }
 
   getItemImage(item: any): string | null {
@@ -430,11 +476,27 @@ export class PostsComponent implements OnInit, OnDestroy {
   getStatusUelClass(s: string | undefined): string {
     if (!s) return "badge-uel-archived";
     if (s === "APPROVED") return "badge-uel-approved";
-    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN") return "badge-uel-pending";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN")
+      return "badge-uel-pending";
     if (s === "NEEDS_UPDATE") return "badge-uel-need-update";
     if (s === "REJECTED") return "badge-uel-rejected";
     if (s === "ARCHIVED") return "badge-uel-archived";
     if (s === "RETURNED") return "badge-uel-returned";
     return "badge-uel-archived";
+  }
+
+  private getPostOwnerId(item: Item): string {
+    const direct = (item as any)?.created_by_user_id;
+    if (typeof direct === "string") return direct;
+    if (direct && typeof direct === "object") {
+      if (typeof direct._id === "string") return direct._id;
+      if (typeof direct.id === "string") return direct.id;
+    }
+
+    const fallback = (item as any)?.created_by;
+    if (typeof fallback === "string" && /^[a-f\d]{24}$/i.test(fallback)) {
+      return fallback;
+    }
+    return "";
   }
 }

@@ -24,6 +24,7 @@ import { ReturnProcessComponent } from "./views/return-process/return-process.co
 import { TermsComponent } from "./views/terms/terms.component";
 import { EditItemComponent } from "./views/edit-item/edit-item.component";
 import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
+import { ChatComponent } from "./views/chat/chat.component";
 
 import { AuthGuard } from "./guards/auth.guard";
 
@@ -43,8 +44,13 @@ const routes: Routes = [
   // application views
   { path: "profile", component: ProfileComponent, canActivate: [AuthGuard] },
   { path: "archive", component: ArchiveComponent, canActivate: [AuthGuard] },
-  { path: "edit-item/:id", component: EditItemComponent, canActivate: [AuthGuard] },
+  {
+    path: "edit-item/:id",
+    component: EditItemComponent,
+    canActivate: [AuthGuard],
+  },
   { path: "my-claims", component: MyClaimsComponent, canActivate: [AuthGuard] },
+  { path: "chat", component: ChatComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent, canActivate: [AuthGuard] },
   { path: "posts", component: PostsComponent },
   { path: "suggestions", component: SuggestionsComponent },
@@ -64,4 +70,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -1,0 +1,173 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="chat-page">
+  <div class="chat-shell">
+    <aside class="chat-sidebar">
+      <div class="chat-sidebar-head">
+        <h2>Tin nhắn</h2>
+      </div>
+
+      <div *ngIf="loadingConversations" class="chat-placeholder">
+        Đang tải hội thoại...
+      </div>
+      <div
+        *ngIf="!loadingConversations && !conversations.length"
+        class="chat-placeholder"
+      >
+        Chưa có hội thoại nào.
+      </div>
+
+      <button
+        type="button"
+        class="conversation-item"
+        *ngFor="let conv of conversations; trackBy: trackByConversation"
+        [class.active]="
+          selectedConversation?.conversationId === conv.conversationId
+        "
+        (click)="openConversation(conv)"
+      >
+        <div class="avatar-wrap">
+          <span class="avatar">{{
+            conv.otherUser?.name?.charAt(0) || "U"
+          }}</span>
+          <span
+            class="status-dot"
+            [class.online]="conv.otherUser?.isOnline"
+          ></span>
+        </div>
+        <div class="meta">
+          <div class="name-row">
+            <strong>{{
+              conv.otherUser?.name || conv.otherUser?.username || "Người dùng"
+            }}</strong>
+            <small>{{ formatTime(conv.lastMessageAt) }}</small>
+          </div>
+          <p>{{ conv.lastMessagePreview || "Chưa có tin nhắn" }}</p>
+        </div>
+        <span *ngIf="conv.unreadCount > 0" class="unread">{{
+          conv.unreadCount
+        }}</span>
+      </button>
+    </aside>
+
+    <main
+      class="chat-main"
+      *ngIf="selectedConversation as active; else emptyState"
+    >
+      <header class="chat-header">
+        <div>
+          <h3>
+            {{
+              active.otherUser?.name ||
+                active.otherUser?.username ||
+                "Người dùng"
+            }}
+          </h3>
+          <div class="status-line">
+            <span
+              class="status-dot"
+              [class.online]="active.otherUser?.isOnline"
+            ></span>
+            <span>{{ userStatusLabel(active) }}</span>
+          </div>
+        </div>
+      </header>
+
+      <div
+        #messageScroller
+        class="messages"
+        (scroll)="onScrollMessages($event)"
+      >
+        <div class="loading-old" *ngIf="loadingOlder">
+          Đang tải tin nhắn cũ...
+        </div>
+        <div class="loading-old" *ngIf="loadingMessages">
+          Đang tải tin nhắn...
+        </div>
+
+        <article
+          class="message"
+          *ngFor="let msg of messages; trackBy: trackByMessage"
+          [class.mine]="isMine(msg)"
+        >
+          <div
+            class="bubble"
+            [class.image]="msg.messageType === 'IMAGE'"
+            [class.post-context]="isPostContextMessage(msg)"
+          >
+            <ng-container *ngIf="msg.messageType === 'TEXT'; else imageTpl">
+              <ng-container *ngIf="isPostContextMessage(msg); else plainTextTpl">
+                <button
+                  type="button"
+                  class="post-context-card"
+                  (click)="openPostContext(msg)"
+                >
+                  <div class="post-context-thumb">
+                    <img
+                      *ngIf="getPostContextPreview(msg)?.imageUrl"
+                      [src]="getPostContextPreview(msg)?.imageUrl"
+                      alt="post image"
+                    />
+                    <div *ngIf="!getPostContextPreview(msg)?.imageUrl" class="post-context-thumb-ph">
+                      <i class="fas fa-image"></i>
+                    </div>
+                  </div>
+                  <div class="post-context-body">
+                    <p class="post-context-tag">Bài đăng đang trao đổi</p>
+                    <span
+                      class="post-context-type-badge"
+                      [ngClass]="getPostTypeClass(getPostContextPreview(msg)?.postType)"
+                    >
+                      {{ getPostTypeLabel(getPostContextPreview(msg)?.postType) }}
+                    </span>
+                    <h4>{{ getPostContextPreview(msg)?.title }}</h4>
+                    <p *ngIf="getPostContextPreview(msg)?.category || getPostContextPreview(msg)?.location" class="post-context-meta">
+                      {{ getPostContextPreview(msg)?.category || 'Đồ thất lạc' }}
+                      <span *ngIf="getPostContextPreview(msg)?.location"> · {{ getPostContextPreview(msg)?.location }}</span>
+                    </p>
+                    <span class="post-context-link">Mở bài đăng</span>
+                  </div>
+                </button>
+              </ng-container>
+              <ng-template #plainTextTpl>{{ msg.content }}</ng-template>
+            </ng-container>
+            <ng-template #imageTpl>
+              <img [src]="msg.imageUrl" alt="chat image" />
+            </ng-template>
+          </div>
+          <time>{{ formatTime(msg.createdAt) }}</time>
+        </article>
+      </div>
+
+      <footer class="composer">
+        <label class="upload-btn" [class.disabled]="imageUploading">
+          <input type="file" accept="image/*" (change)="onPickImage($event)" />
+          <i class="fas fa-image"></i>
+        </label>
+
+        <input
+          type="text"
+          [(ngModel)]="draftMessage"
+          placeholder="Nhập tin nhắn..."
+          (keyup.enter)="sendText()"
+        />
+
+        <button type="button" (click)="sendText()" [disabled]="sending">
+          Gửi
+        </button>
+      </footer>
+    </main>
+
+    <ng-template #emptyState>
+      <main class="chat-main empty">
+        <div class="chat-placeholder">
+          Chọn một hội thoại để bắt đầu trò chuyện.
+        </div>
+      </main>
+    </ng-template>
+  </div>
+
+  <p *ngIf="error" class="error">{{ error }}</p>
+</main>
+
+<app-footer></app-footer>

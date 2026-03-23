@@ -29,6 +29,12 @@ export class User {
   @Prop({ default: 0 })
   warning_count!: number;
 
+  @Prop({ default: false })
+  is_online!: boolean;
+
+  @Prop({ type: Date, default: null })
+  last_seen_at?: Date | null;
+
   @Prop({ type: String, default: null })
   password_reset_token_hash?: string | null;
 
