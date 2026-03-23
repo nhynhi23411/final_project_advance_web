@@ -88,10 +88,17 @@ export class PostsController {
     @UploadedFile() file: File | undefined,
   ): Promise<{ url: string; publicId: string }> {
     if (!file?.buffer) throw new BadRequestException("Chưa chọn ảnh");
-    const result = await this.cloudinary.uploadBuffer(file.buffer, {
-      folder: "lost-found",
-    });
-    return { url: result.secure_url, publicId: result.public_id };
+    
+    try {
+      const result = await this.cloudinary.uploadBuffer(file.buffer, {
+        folder: "lost-found",
+      });
+      return { url: result.secure_url, publicId: result.public_id };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Cloudinary upload failed:", errorMessage);
+      throw new BadRequestException(`Không thể tải ảnh lên: ${errorMessage}`);
+    }
   }
 
   @Post()

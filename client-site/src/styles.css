@@ -835,6 +835,43 @@ label .uel-required {
   align-items: center;
   justify-content: center;
 }
+.app-nav-chat-wrap {
+  position: relative;
+}
+.app-nav-chat-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: background 0.2s;
+  text-decoration: none;
+}
+.app-nav-chat-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+.app-nav-chat-dot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  background: var(--accent-orange);
+  color: #fff;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
 .app-nav-notif-dropdown {
   position: absolute;
   top: 100%;

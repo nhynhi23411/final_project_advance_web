@@ -17,6 +17,7 @@ import { memoryStorage, File } from "multer";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { ChatService } from "./chat.service";
+import { N8nChatbotService } from "./n8n-chatbot.service";
 
 const uploadOpts = {
   storage: memoryStorage(),
@@ -29,6 +30,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly cloudinary: CloudinaryService,
+    private readonly n8nChatbotService: N8nChatbotService,
   ) {}
 
   @Get("conversations")
@@ -95,9 +97,33 @@ export class ChatController {
     @UploadedFile() file: File | undefined,
   ): Promise<{ url: string; publicId: string }> {
     if (!file?.buffer) throw new BadRequestException("Chưa chọn ảnh");
-    const result = await this.cloudinary.uploadBuffer(file.buffer, {
-      folder: "lost-found/chat",
+    
+    try {
+      const result = await this.cloudinary.uploadBuffer(file.buffer, {
+        folder: "lost-found/chat",
+      });
+      return { url: result.secure_url, publicId: result.public_id };
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error";
+      console.error("Cloudinary upload failed:", errorMessage);
+      throw new BadRequestException(`Không thể tải ảnh lên: ${errorMessage}`);
+    }
+  }
+
+  @Post("n8n-chatbot")
+  async chatWithN8n(
+    @Request() req: { user: { userId: string } },
+    @Body() body: { message: string },
+  ) {
+    if (!body?.message || typeof body.message !== "string") {
+      throw new BadRequestException("message là bắt buộc");
+    }
+
+    const result = await this.n8nChatbotService.sendMessageToN8n({
+      chatInput: body.message.trim(),
+      userId: req.user.userId,
     });
-    return { url: result.secure_url, publicId: result.public_id };
+
+    return result;
   }
 }

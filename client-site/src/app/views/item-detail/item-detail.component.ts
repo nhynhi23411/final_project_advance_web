@@ -358,6 +358,23 @@ export class ItemDetailComponent implements OnInit {
     });
   }
 
+  /** Message claimer directly via chat. */
+  messageClaimer(claimerId: string, claimerName: string): void {
+    if (!this.authService.isLoggedIn) {
+      this.goToLogin();
+      return;
+    }
+
+    this.router.navigate(["/chat"], {
+      queryParams: {
+        targetUserId: claimerId,
+        postId: this.item?._id || "",
+        postTitle: this.item?.title || "Bài đăng",
+        claimerName: claimerName,
+      },
+    });
+  }
+
   async handleDirectClaim(): Promise<void> {
     if (!this.item) return;
     this.isSubmitting = true;
