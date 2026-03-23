@@ -13,34 +13,90 @@
     >
       <i class="fas fa-bars"></i>
     </button>
-    <div
-      class="app-nav-menu"
-      [class.is-open]="navbarOpen"
-      id="navbar-menu"
-    >
+    <div class="app-nav-menu" [class.is-open]="navbarOpen" id="navbar-menu">
       <div class="app-nav-links">
-        <a [routerLink]="['/']" routerLinkActive="is-active" [routerLinkActiveOptions]="{exact: true}" class="app-nav-link">Trang chủ</a>
-        <a [routerLink]="['/posts']" routerLinkActive="is-active" class="app-nav-link">Bài đăng</a>
-        <a *ngIf="authService.isLoggedIn" [routerLink]="['/post-item']" routerLinkActive="is-active" class="app-nav-link">Đăng tin</a>
-        <a [routerLink]="['/about']" routerLinkActive="is-active" class="app-nav-link">Về chúng tôi</a>
-        <a *ngIf="authService.isLoggedIn" [routerLink]="['/suggestions']" routerLinkActive="is-active" class="app-nav-link">Gợi ý</a>
+        <a
+          [routerLink]="['/']"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="app-nav-link"
+          >Trang chủ</a
+        >
+        <a
+          [routerLink]="['/posts']"
+          routerLinkActive="is-active"
+          class="app-nav-link"
+          >Bài đăng</a
+        >
+        <a
+          *ngIf="authService.isLoggedIn"
+          [routerLink]="['/post-item']"
+          routerLinkActive="is-active"
+          class="app-nav-link"
+          >Đăng tin</a
+        >
+        <a
+          [routerLink]="['/about']"
+          routerLinkActive="is-active"
+          class="app-nav-link"
+          >Về chúng tôi</a
+        >
+        <a
+          *ngIf="authService.isLoggedIn"
+          [routerLink]="['/suggestions']"
+          routerLinkActive="is-active"
+          class="app-nav-link"
+          >Gợi ý</a
+        >
+        <a
+          *ngIf="authService.isLoggedIn"
+          [routerLink]="['/chat']"
+          routerLinkActive="is-active"
+          class="app-nav-link"
+          >Chat</a
+        >
       </div>
       <div class="app-nav-actions">
         <ng-container *ngIf="!authService.isLoggedIn">
-          <a [routerLink]="['/auth/login']" class="app-nav-btn app-nav-btn-secondary">Đăng nhập</a>
-          <a [routerLink]="['/auth/register']" class="app-nav-btn app-nav-btn-primary">Đăng ký</a>
+          <a
+            [routerLink]="['/auth/login']"
+            class="app-nav-btn app-nav-btn-secondary"
+            >Đăng nhập</a
+          >
+          <a
+            [routerLink]="['/auth/register']"
+            class="app-nav-btn app-nav-btn-primary"
+            >Đăng ký</a
+          >
         </ng-container>
-        <div *ngIf="authService.isLoggedIn" class="app-nav-actions-logged flex items-center gap-2">
+        <div
+          *ngIf="authService.isLoggedIn"
+          class="app-nav-actions-logged flex items-center gap-2"
+        >
           <div class="app-nav-notif-wrap" [class.open]="notifOpen">
-            <button type="button" class="app-nav-notif-btn" (click)="toggleNotif()" aria-label="Thông báo">
+            <button
+              type="button"
+              class="app-nav-notif-btn"
+              (click)="toggleNotif()"
+              aria-label="Thông báo"
+            >
               <i class="fas fa-bell"></i>
-              <ng-container *ngIf="(notificationService.unreadCount$ | async) as count">
-              <span *ngIf="count > 0" class="app-nav-notif-dot">{{ count }}</span>
-            </ng-container>
+              <ng-container
+                *ngIf="notificationService.unreadCount$ | async as count"
+              >
+                <span *ngIf="count > 0" class="app-nav-notif-dot">{{
+                  count
+                }}</span>
+              </ng-container>
             </button>
             <div class="app-nav-notif-dropdown" *ngIf="notifOpen">
               <div class="app-nav-notif-title">Thông báo</div>
-              <div *ngIf="notifLoading" class="app-nav-notif-item text-blueGray-400">Đang tải thông báo...</div>
+              <div
+                *ngIf="notifLoading"
+                class="app-nav-notif-item text-blueGray-400"
+              >
+                Đang tải thông báo...
+              </div>
               <ng-container *ngIf="!notifLoading && notifications.length > 0">
                 <button
                   *ngFor="let notification of notifications"
@@ -53,29 +109,81 @@
                     <i class="fas fa-check-circle text-emerald-500"></i>
                   </span>
                   <span class="app-nav-notif-copy">
-                    <span class="app-nav-notif-heading">{{ notification.title }}</span>
-                    <span class="app-nav-notif-message">{{ notification.message }}</span>
-                    <span class="app-nav-notif-time">{{ notification.occurredAt | date:'HH:mm dd/MM/yyyy' }}</span>
+                    <span class="app-nav-notif-heading">{{
+                      notification.title
+                    }}</span>
+                    <span class="app-nav-notif-message">{{
+                      notification.message
+                    }}</span>
+                    <span class="app-nav-notif-time">{{
+                      notification.occurredAt | date: "HH:mm dd/MM/yyyy"
+                    }}</span>
                   </span>
                 </button>
               </ng-container>
-              <div *ngIf="!notifLoading && notifications.length === 0" class="app-nav-notif-item text-blueGray-400">Chưa có thông báo mới</div>
+              <div
+                *ngIf="!notifLoading && notifications.length === 0"
+                class="app-nav-notif-item text-blueGray-400"
+              >
+                Chưa có thông báo mới
+              </div>
             </div>
           </div>
           <div class="app-nav-user-wrap" [class.open]="userMenuOpen">
-          <button type="button" class="app-nav-user-btn" (click)="toggleUserMenu()" aria-haspopup="true" [attr.aria-expanded]="userMenuOpen">
-            <span class="app-nav-user-avatar"><i class="fas fa-user"></i></span>
-            <span class="app-nav-user-name">Tài khoản</span>
-            <i class="fas fa-chevron-down app-nav-user-chevron"></i>
-          </button>
-          <div class="app-nav-user-dropdown" *ngIf="userMenuOpen">
-            <a routerLink="/profile" routerLinkActive="app-nav-user-item-active" [routerLinkActiveOptions]="{exact: false}" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-user" aria-hidden="true"></i><span>Profile</span></a>
-            <a routerLink="/profile" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-list" aria-hidden="true"></i><span>My Posts</span></a>
-            <a routerLink="/my-claims" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-file-contract" aria-hidden="true"></i><span>My Claims</span></a>
-            <a routerLink="/archive" class="app-nav-user-item" (click)="closeUserMenu()"><i class="fas fa-archive" aria-hidden="true"></i><span>Archive</span></a>
-            <hr class="app-nav-user-divider" />
-            <button type="button" class="app-nav-user-item app-nav-user-item-logout" (click)="logout(); closeUserMenu()"><i class="fas fa-sign-out-alt" aria-hidden="true"></i><span>Đăng xuất</span></button>
-          </div>
+            <button
+              type="button"
+              class="app-nav-user-btn"
+              (click)="toggleUserMenu()"
+              aria-haspopup="true"
+              [attr.aria-expanded]="userMenuOpen"
+            >
+              <span class="app-nav-user-avatar"
+                ><i class="fas fa-user"></i
+              ></span>
+              <span class="app-nav-user-name">Tài khoản</span>
+              <i class="fas fa-chevron-down app-nav-user-chevron"></i>
+            </button>
+            <div class="app-nav-user-dropdown" *ngIf="userMenuOpen">
+              <a
+                routerLink="/profile"
+                routerLinkActive="app-nav-user-item-active"
+                [routerLinkActiveOptions]="{ exact: false }"
+                class="app-nav-user-item"
+                (click)="closeUserMenu()"
+                ><i class="fas fa-user" aria-hidden="true"></i
+                ><span>Profile</span></a
+              >
+              <a
+                routerLink="/profile"
+                class="app-nav-user-item"
+                (click)="closeUserMenu()"
+                ><i class="fas fa-list" aria-hidden="true"></i
+                ><span>My Posts</span></a
+              >
+              <a
+                routerLink="/my-claims"
+                class="app-nav-user-item"
+                (click)="closeUserMenu()"
+                ><i class="fas fa-file-contract" aria-hidden="true"></i
+                ><span>My Claims</span></a
+              >
+              <a
+                routerLink="/archive"
+                class="app-nav-user-item"
+                (click)="closeUserMenu()"
+                ><i class="fas fa-archive" aria-hidden="true"></i
+                ><span>Archive</span></a
+              >
+              <hr class="app-nav-user-divider" />
+              <button
+                type="button"
+                class="app-nav-user-item app-nav-user-item-logout"
+                (click)="logout(); closeUserMenu()"
+              >
+                <i class="fas fa-sign-out-alt" aria-hidden="true"></i
+                ><span>Đăng xuất</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

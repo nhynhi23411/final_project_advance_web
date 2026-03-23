@@ -43,10 +43,16 @@ export class LandingComponent implements OnInit {
     this.itemService.getItems({}).subscribe({
       next: (list) => {
         try {
-          const raw = Array.isArray(list) ? list : (list && (list as any).data && Array.isArray((list as any).data) ? (list as any).data : []);
+          const raw = Array.isArray(list)
+            ? list
+            : list && (list as any).data && Array.isArray((list as any).data)
+              ? (list as any).data
+              : [];
           const arr = raw || [];
           this.statsTotalPosts = arr.length > 0 ? String(arr.length) : "0";
-          const returned = arr.filter((i: any) => i != null && i.status === "RETURNED").length;
+          const returned = arr.filter(
+            (i: any) => i != null && i.status === "RETURNED",
+          ).length;
           this.statsFound = String(returned);
           this.statsUsers = "—";
         } catch (_) {
@@ -72,11 +78,21 @@ export class LandingComponent implements OnInit {
     this.itemService.getItems({ status: "APPROVED" }).subscribe({
       next: (data) => {
         try {
-          const raw = Array.isArray(data) ? data : (data && (data as any).data && Array.isArray((data as any).data) ? (data as any).data : []);
-          const safe = (raw || []).filter((item: any) => item != null && item.status === "APPROVED");
+          const raw = Array.isArray(data)
+            ? data
+            : data && (data as any).data && Array.isArray((data as any).data)
+              ? (data as any).data
+              : [];
+          const safe = (raw || []).filter(
+            (item: any) => item != null && item.status === "APPROVED",
+          );
           const sorted = [...safe].sort((a: any, b: any) => {
-            const da = new Date(a.lost_found_date || a.created_at || 0).getTime();
-            const db = new Date(b.lost_found_date || b.created_at || 0).getTime();
+            const da = new Date(
+              a.lost_found_date || a.created_at || 0,
+            ).getTime();
+            const db = new Date(
+              b.lost_found_date || b.created_at || 0,
+            ).getTime();
             return db - da;
           });
           this.items = sorted.slice(0, this.HOME_RECENT_LIMIT);
@@ -95,6 +111,30 @@ export class LandingComponent implements OnInit {
 
   viewItemDetail(itemId: string): void {
     this.router.navigate(["/items", itemId]);
+  }
+
+  canMessagePostOwner(item: Item): boolean {
+    const ownerId = this.getPostOwnerId(item);
+    const myId = this.authService.currentUserId;
+    if (!ownerId) return false;
+    if (!myId) return true;
+    return String(ownerId) !== String(myId);
+  }
+
+  startChatWithPostOwner(item: Item): void {
+    const ownerId = this.getPostOwnerId(item);
+    if (!ownerId) return;
+    if (!this.authService.isLoggedIn) {
+      this.router.navigate(["/auth/login"]);
+      return;
+    }
+    this.router.navigate(["/chat"], {
+      queryParams: {
+        targetUserId: ownerId,
+        postId: item._id,
+        postTitle: item.title || "Bài đăng",
+      },
+    });
   }
 
   onSearch(): void {
@@ -129,5 +169,20 @@ export class LandingComponent implements OnInit {
     } else {
       this.router.navigate(["/auth/login"]);
     }
+  }
+
+  private getPostOwnerId(item: Item): string {
+    const direct = (item as any)?.created_by_user_id;
+    if (typeof direct === "string") return direct;
+    if (direct && typeof direct === "object") {
+      if (typeof direct._id === "string") return direct._id;
+      if (typeof direct.id === "string") return direct.id;
+    }
+
+    const fallback = (item as any)?.created_by;
+    if (typeof fallback === "string" && /^[a-f\d]{24}$/i.test(fallback)) {
+      return fallback;
+    }
+    return "";
   }
 }

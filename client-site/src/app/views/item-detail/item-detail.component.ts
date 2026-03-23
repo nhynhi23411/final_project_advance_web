@@ -4,10 +4,7 @@ import { ItemService, Item } from "../../services/item.service";
 import { ClaimService, MAX_CLAIMS_LIMIT } from "../../services/claim.service";
 import { AuthService } from "../../services/auth.service";
 import { ToastService } from "../../services/toast.service";
-import {
-  HttpClient,
-  HttpErrorResponse,
-} from "@angular/common/http";
+import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { environment } from "../../../environments/environment";
 import { MatDialog } from "@angular/material/dialog";
 import { ClaimModalComponent } from "../../components/claim-modal/claim-modal.component";
@@ -134,12 +131,14 @@ export class ItemDetailComponent implements OnInit {
         this.hasFinderSuggestion = list.some(
           (suggestion) =>
             suggestion?.matched_post?._id === itemId &&
-            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) === "FOUND",
+            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) ===
+              "FOUND",
         );
         this.hasOwnerSuggestionForThisPost = list.some(
           (suggestion) =>
             suggestion?.matched_post?._id === itemId &&
-            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) === "LOST",
+            (suggestion?.my_post?.type || suggestion?.my_post?.post_type) ===
+              "LOST",
         );
       },
       error: (err) => {
@@ -155,6 +154,31 @@ export class ItemDetailComponent implements OnInit {
     const ownerId = this.item.created_by_user_id || this.item.created_by;
     const myId = this.authService.currentUserId;
     return myId != null && ownerId != null && String(ownerId) === String(myId);
+  }
+
+  canMessageOwner(): boolean {
+    if (!this.item) return false;
+    const ownerId = this.getItemOwnerId();
+    const myId = this.authService.currentUserId;
+    if (!ownerId) return false;
+    if (!myId) return true;
+    return String(ownerId) !== String(myId);
+  }
+
+  messageOwner(): void {
+    const ownerId = this.getItemOwnerId();
+    if (!ownerId) return;
+    if (!this.authService.isLoggedIn) {
+      this.goToLogin();
+      return;
+    }
+    this.router.navigate(["/chat"], {
+      queryParams: {
+        targetUserId: ownerId,
+        postId: this.item?._id || "",
+        postTitle: this.item?.title || "Bài đăng",
+      },
+    });
   }
 
   loadClaimsForPost(postId: string): void {
@@ -231,7 +255,9 @@ export class ItemDetailComponent implements OnInit {
   }
 
   getPrimaryActionTitle(): string {
-    return this.isLostItem() ? "Tôi đang giữ món đồ này" : "Xác nhận quyền sở hữu";
+    return this.isLostItem()
+      ? "Tôi đang giữ món đồ này"
+      : "Xác nhận quyền sở hữu";
   }
 
   getPrimaryActionDescription(): string {
@@ -296,22 +322,24 @@ export class ItemDetailComponent implements OnInit {
       data: { lostItem: this.item },
     });
 
-    dialogRef.afterClosed().subscribe((result?: { success?: boolean; createNew?: boolean }) => {
-      if (result?.createNew && this.item?._id) {
-        this.router.navigate(["/post-item"], {
-          queryParams: { type: "FOUND", linkLostId: this.item._id },
-        });
-        return;
-      }
+    dialogRef
+      .afterClosed()
+      .subscribe((result?: { success?: boolean; createNew?: boolean }) => {
+        if (result?.createNew && this.item?._id) {
+          this.router.navigate(["/post-item"], {
+            queryParams: { type: "FOUND", linkLostId: this.item._id },
+          });
+          return;
+        }
 
-      if (result?.success) {
-        this.hasFinderSuggestion = true;
-        this.successMessage = "Đã gửi gợi ý khớp tới chủ bài mất đồ.";
-        setTimeout(() => {
-          this.successMessage = null;
-        }, 5000);
-      }
-    });
+        if (result?.success) {
+          this.hasFinderSuggestion = true;
+          this.successMessage = "Đã gửi gợi ý khớp tới chủ bài mất đồ.";
+          setTimeout(() => {
+            this.successMessage = null;
+          }, 5000);
+        }
+      });
   }
 
   openClaimModal(): void {
@@ -336,10 +364,8 @@ export class ItemDetailComponent implements OnInit {
 
     try {
       const body = { post_id: this.item._id };
- 
-      await this.http
-        .post(`${environment.apiUrl}/claims`, body)
-        .toPromise();
+
+      await this.http.post(`${environment.apiUrl}/claims`, body).toPromise();
 
       this.onClaimSuccess();
     } catch (error: any) {
@@ -386,8 +412,16 @@ export class ItemDetailComponent implements OnInit {
           .filter((i) => i._id !== current._id)
           .filter(
             (i) =>
-              (i.category && current.category && i.category === current.category) ||
-              (i.location_text && current.location_text && String(i.location_text).toLowerCase().includes(String(current.location_text).toLowerCase().slice(0, 20)))
+              (i.category &&
+                current.category &&
+                i.category === current.category) ||
+              (i.location_text &&
+                current.location_text &&
+                String(i.location_text)
+                  .toLowerCase()
+                  .includes(
+                    String(current.location_text).toLowerCase().slice(0, 20),
+                  )),
           )
           .slice(0, 6);
       },
@@ -418,7 +452,9 @@ export class ItemDetailComponent implements OnInit {
     });
     dialogRef.afterClosed().subscribe((result?: { success?: boolean }) => {
       if (result?.success) {
-        this.toastService.success("Bài đăng đã được đóng. Quản trị viên đã được thông báo.");
+        this.toastService.success(
+          "Bài đăng đã được đóng. Quản trị viên đã được thông báo.",
+        );
         this.loadItemDetail(this.item!._id);
       }
     });
@@ -429,7 +465,9 @@ export class ItemDetailComponent implements OnInit {
   }
 
   getPageTitle(): string {
-    return this.isFoundItem() ? "Chi tiết đồ nhặt được" : "Chi tiết đồ thất lạc";
+    return this.isFoundItem()
+      ? "Chi tiết đồ nhặt được"
+      : "Chi tiết đồ thất lạc";
   }
 
   getItemTypeLabel(): string {
@@ -469,7 +507,8 @@ export class ItemDetailComponent implements OnInit {
     if (!this.item?.status) return "badge-uel-archived";
     const s = this.item.status;
     if (s === "APPROVED") return "badge-uel-approved";
-    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN" || s === "PENDING") return "badge-uel-pending";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN" || s === "PENDING")
+      return "badge-uel-pending";
     if (s === "NEEDS_UPDATE") return "badge-uel-need-update";
     if (s === "REJECTED") return "badge-uel-rejected";
     if (s === "ARCHIVED") return "badge-uel-archived";
@@ -480,8 +519,13 @@ export class ItemDetailComponent implements OnInit {
   getRelatedStatusLabel(s: string | undefined): string {
     if (!s) return "—";
     const m: Record<string, string> = {
-      PENDING_SYSTEM: "Chờ duyệt", PENDING_ADMIN: "Chờ admin", APPROVED: "Đã duyệt",
-      NEEDS_UPDATE: "Cần cập nhật", RETURNED: "Đã trả", REJECTED: "Từ chối", ARCHIVED: "Lưu trữ",
+      PENDING_SYSTEM: "Chờ duyệt",
+      PENDING_ADMIN: "Chờ admin",
+      APPROVED: "Đã duyệt",
+      NEEDS_UPDATE: "Cần cập nhật",
+      RETURNED: "Đã trả",
+      REJECTED: "Từ chối",
+      ARCHIVED: "Lưu trữ",
     };
     return m[s] || s;
   }
@@ -489,7 +533,8 @@ export class ItemDetailComponent implements OnInit {
   getRelatedStatusClass(s: string | undefined): string {
     if (!s) return "badge-uel-archived";
     if (s === "APPROVED") return "badge-uel-approved";
-    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN") return "badge-uel-pending";
+    if (s === "PENDING_SYSTEM" || s === "PENDING_ADMIN")
+      return "badge-uel-pending";
     if (s === "REJECTED") return "badge-uel-rejected";
     if (s === "ARCHIVED") return "badge-uel-archived";
     if (s === "RETURNED") return "badge-uel-returned";
@@ -546,5 +591,20 @@ export class ItemDetailComponent implements OnInit {
       hour: "2-digit",
       minute: "2-digit",
     });
+  }
+
+  private getItemOwnerId(): string {
+    const direct = (this.item as any)?.created_by_user_id;
+    if (typeof direct === "string") return direct;
+    if (direct && typeof direct === "object") {
+      if (typeof direct._id === "string") return direct._id;
+      if (typeof direct.id === "string") return direct.id;
+    }
+
+    const fallback = (this.item as any)?.created_by;
+    if (typeof fallback === "string" && /^[a-f\d]{24}$/i.test(fallback)) {
+      return fallback;
+    }
+    return "";
   }
 }

@@ -5,9 +5,15 @@
     <!-- Header -->
     <header class="posts-header">
       <h1 class="posts-title">Tất cả bài đăng</h1>
-      <p class="posts-desc">Tìm đồ thất lạc trong khu vực Thủ Đức. Lọc theo loại, danh mục và địa điểm để tìm nhanh hơn.</p>
+      <p class="posts-desc">
+        Tìm đồ thất lạc trong khu vực Thủ Đức. Lọc theo loại, danh mục và địa
+        điểm để tìm nhanh hơn.
+      </p>
       <!-- Quick stats -->
-      <div class="posts-stats" *ngIf="!isLoading && (allItems || []).length > 0">
+      <div
+        class="posts-stats"
+        *ngIf="!isLoading && (allItems || []).length > 0"
+      >
         <div class="posts-stat-card">
           <span class="posts-stat-value">{{ getStats().total }}</span>
           <span class="posts-stat-label">Tổng bài đăng</span>
@@ -32,7 +38,9 @@
       <form (ngSubmit)="onSearch()" class="posts-filter-form">
         <div class="posts-filter-row posts-filter-row-1">
           <div class="posts-filter-group posts-search-wrap">
-            <label class="posts-filter-label" for="posts-search">Tìm kiếm</label>
+            <label class="posts-filter-label" for="posts-search"
+              >Tìm kiếm</label
+            >
             <div class="posts-search-inner">
               <input
                 id="posts-search"
@@ -49,7 +57,9 @@
             </div>
           </div>
           <div class="posts-filter-group">
-            <label class="posts-filter-label" for="filter-type">Loại bài đăng</label>
+            <label class="posts-filter-label" for="filter-type"
+              >Loại bài đăng</label
+            >
             <select
               id="filter-type"
               class="posts-select"
@@ -63,7 +73,9 @@
             </select>
           </div>
           <div class="posts-filter-group">
-            <label class="posts-filter-label" for="filter-category">Danh mục</label>
+            <label class="posts-filter-label" for="filter-category"
+              >Danh mục</label
+            >
             <select
               id="filter-category"
               class="posts-select"
@@ -72,13 +84,17 @@
               (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả danh mục</option>
-              <option *ngFor="let c of (categories || [])" [value]="c">{{ c }}</option>
+              <option *ngFor="let c of categories || []" [value]="c">
+                {{ c }}
+              </option>
             </select>
           </div>
         </div>
         <div class="posts-filter-row posts-filter-row-2">
           <div class="posts-filter-group">
-            <label class="posts-filter-label" for="filter-ward">Khu vực / Phường</label>
+            <label class="posts-filter-label" for="filter-ward"
+              >Khu vực / Phường</label
+            >
             <select
               id="filter-ward"
               class="posts-select"
@@ -87,11 +103,13 @@
               (ngModelChange)="updateFilter()"
             >
               <option value="">Tất cả phường</option>
-              <option *ngFor="let w of (wards || [])" [value]="w">{{ w }}</option>
+              <option *ngFor="let w of wards || []" [value]="w">{{ w }}</option>
             </select>
           </div>
           <div class="posts-filter-group">
-            <label class="posts-filter-label" for="filter-time">Thời gian</label>
+            <label class="posts-filter-label" for="filter-time"
+              >Thời gian</label
+            >
             <select
               id="filter-time"
               class="posts-select"
@@ -156,8 +174,12 @@
     </section>
 
     <!-- Result count -->
-    <p class="posts-result-count" *ngIf="!isLoading && (allItems || []).length > 0">
-      Đang hiển thị <strong>{{ (filteredItems || []).length }}</strong> / {{ (allItems || []).length }} bài đăng
+    <p
+      class="posts-result-count"
+      *ngIf="!isLoading && (allItems || []).length > 0"
+    >
+      Đang hiển thị <strong>{{ (filteredItems || []).length }}</strong> /
+      {{ (allItems || []).length }} bài đăng
       <span *ngIf="hasActiveFilters" class="posts-result-tag">(đã lọc)</span>
     </p>
 
@@ -172,11 +194,13 @@
         <ng-container *ngIf="(filteredItems || []).length > 0; else emptyTpl">
           <div class="posts-grid">
             <article
-              *ngFor="let item of (filteredItems || [])"
+              *ngFor="let item of filteredItems || []"
               class="posts-card"
             >
               <div class="posts-card-image-wrap">
-                <ng-container *ngIf="getItemImage(item) as imageUrl; else noImageBlock">
+                <ng-container
+                  *ngIf="getItemImage(item) as imageUrl; else noImageBlock"
+                >
                   <img
                     [src]="imageUrl"
                     [alt]="item.title"
@@ -207,23 +231,31 @@
               <div class="posts-card-body">
                 <h2 class="posts-card-title">{{ item.title }}</h2>
                 <p class="posts-card-desc" *ngIf="item.description">
-                  {{ item.description | slice:0:80 }}{{ (item.description?.length || 0) > 80 ? '…' : '' }}
+                  {{ item.description | slice: 0 : 80
+                  }}{{ (item.description?.length || 0) > 80 ? "…" : "" }}
                 </p>
                 <div class="posts-card-meta">
                   <span class="posts-card-cat" *ngIf="item.category">
                     <i class="fas fa-tag"></i> {{ item.category }}
                   </span>
                   <span class="posts-card-loc" *ngIf="item.location_text">
-                    <i class="fas fa-map-marker-alt"></i> {{ item.location_text | slice:0:50 }}{{ (item.location_text?.length || 0) > 50 ? '…' : '' }}
+                    <i class="fas fa-map-marker-alt"></i>
+                    {{ item.location_text | slice: 0 : 50
+                    }}{{ (item.location_text?.length || 0) > 50 ? "…" : "" }}
                   </span>
                   <span class="posts-card-user">
-                    <i class="fas fa-user"></i> {{ item.created_by || '—' }}
+                    <i class="fas fa-user"></i> {{ item.created_by || "—" }}
                   </span>
                   <span class="posts-card-date">
                     <i class="fas fa-calendar-alt"></i>
-                    {{ item.lost_found_date || item.created_at | date:'short' }}
+                    {{
+                      item.lost_found_date || item.created_at | date: "short"
+                    }}
                   </span>
-                  <span class="posts-card-views"><i class="fas fa-eye"></i> {{ item.view_count != null ? item.view_count : 0 }}</span>
+                  <span class="posts-card-views"
+                    ><i class="fas fa-eye"></i>
+                    {{ item.view_count != null ? item.view_count : 0 }}</span
+                  >
                 </div>
                 <button
                   type="button"
@@ -231,6 +263,15 @@
                   (click)="viewItemDetail(item._id)"
                 >
                   Xem chi tiết
+                </button>
+                <button
+                  *ngIf="canMessagePostOwner(item)"
+                  type="button"
+                  class="posts-card-btn posts-card-btn-secondary"
+                  (click)="startChatWithPostOwner(item)"
+                >
+                  <i class="fas fa-comments"></i>
+                  Nhắn tin với người đăng
                 </button>
               </div>
             </article>
@@ -240,7 +281,10 @@
 
       <ng-template #loadingTpl>
         <div class="posts-skeleton-grid posts-grid">
-          <div *ngFor="let i of [1,2,3,4,5,6]" class="posts-card skeleton-card">
+          <div
+            *ngFor="let i of [1, 2, 3, 4, 5, 6]"
+            class="posts-card skeleton-card"
+          >
             <div class="skeleton skeleton-image"></div>
             <div class="posts-card-body">
               <div class="skeleton skeleton-line w-100"></div>
@@ -258,11 +302,19 @@
           <div class="posts-empty-icon">
             <i class="fas fa-inbox"></i>
           </div>
-          <h2 class="posts-empty-title">{{ hasActiveFilters || searchQuery?.trim() ? 'Chưa có bài đăng phù hợp' : 'Chưa có bài đăng nào' }}</h2>
+          <h2 class="posts-empty-title">
+            {{
+              hasActiveFilters || searchQuery?.trim()
+                ? "Chưa có bài đăng phù hợp"
+                : "Chưa có bài đăng nào"
+            }}
+          </h2>
           <p class="posts-empty-desc">
-            {{ hasActiveFilters || searchQuery?.trim()
-              ? 'Hãy thử thay đổi từ khóa hoặc bộ lọc để tìm kết quả phù hợp hơn.'
-              : 'Chưa có bài đăng nào. Hãy đăng tin đầu tiên!' }}
+            {{
+              hasActiveFilters || searchQuery?.trim()
+                ? "Hãy thử thay đổi từ khóa hoặc bộ lọc để tìm kết quả phù hợp hơn."
+                : "Chưa có bài đăng nào. Hãy đăng tin đầu tiên!"
+            }}
           </p>
           <button
             type="button"

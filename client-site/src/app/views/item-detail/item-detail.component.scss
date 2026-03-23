@@ -1,8 +1,8 @@
 /* ========== Variables ========== */
-$orange-accent: #FF7A45;
-$blue-main: #123E7C;
-$blue-medium: #1C5FA8;
-$blue-dark: #0F2F8F;
+$orange-accent: #ff7a45;
+$blue-main: #123e7c;
+$blue-medium: #1c5fa8;
+$blue-dark: #0f2f8f;
 $gray-50: #f8fafc;
 $gray-100: #f1f5f9;
 $gray-200: #e2e8f0;
@@ -65,7 +65,11 @@ $gray-800: #1e293b;
   border: 1px solid $gray-200;
   border-radius: 10px;
   cursor: pointer;
-  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition:
+    color 0.2s,
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 
   i {
     font-size: 0.875rem;
@@ -146,8 +150,12 @@ $gray-800: #1e293b;
 }
 
 @keyframes item-detail-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ========== Main layout: 2 columns ========== */
@@ -260,7 +268,9 @@ $gray-800: #1e293b;
   overflow: hidden;
   background: #fff;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     border-color: $blue-medium;
@@ -345,12 +355,34 @@ $gray-800: #1e293b;
 }
 
 .item-detail-badge-status {
-  &.badge-uel-approved { background: #FF7A45; color: #ffffff; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
-  &.badge-uel-pending { background: rgba(245, 158, 11, 0.15); color: #b45309; }
-  &.badge-uel-need-update { background: rgba(59, 130, 246, 0.15); color: #1d4ed8; }
-  &.badge-uel-rejected { background: rgba(239, 68, 68, 0.12); color: #b91c1c; }
-  &.badge-uel-archived { background: $gray-200; color: $gray-700; }
-  &.badge-uel-returned { background: rgba(16, 185, 129, 0.12); color: #047857; }
+  &.badge-uel-approved {
+    background: #ff7a45;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  &.badge-uel-pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+  }
+  &.badge-uel-need-update {
+    background: rgba(59, 130, 246, 0.15);
+    color: #1d4ed8;
+  }
+  &.badge-uel-rejected {
+    background: rgba(239, 68, 68, 0.12);
+    color: #b91c1c;
+  }
+  &.badge-uel-archived {
+    background: $gray-200;
+    color: $gray-700;
+  }
+  &.badge-uel-returned {
+    background: rgba(16, 185, 129, 0.12);
+    color: #047857;
+  }
 }
 
 /* Metadata grid */
@@ -477,10 +509,22 @@ $gray-800: #1e293b;
   white-space: nowrap;
 }
 
-.item-detail-claim-pending { background: #fef3c7; color: #b45309; }
-.item-detail-claim-verifying { background: #dbeafe; color: #1d4ed8; }
-.item-detail-claim-success { background: #d1fae5; color: #047857; }
-.item-detail-claim-rejected { background: #fee2e2; color: #b91c1c; }
+.item-detail-claim-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+.item-detail-claim-verifying {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+.item-detail-claim-success {
+  background: #d1fae5;
+  color: #047857;
+}
+.item-detail-claim-rejected {
+  background: #fee2e2;
+  color: #b91c1c;
+}
 
 .item-detail-claim-body {
   font-size: 0.875rem;
@@ -575,7 +619,9 @@ $gray-800: #1e293b;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  transition: filter 0.2s, box-shadow 0.2s;
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s;
 
   i {
     font-size: 0.75rem;
@@ -619,6 +665,16 @@ $gray-800: #1e293b;
   &:hover {
     filter: brightness(0.96);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.item-detail-btn-chat {
+  background: rgba(15, 118, 110, 0.14);
+  color: #0f766e;
+
+  &:hover {
+    filter: brightness(0.98);
+    box-shadow: 0 2px 8px rgba(15, 118, 110, 0.24);
   }
 }
 
@@ -704,7 +760,10 @@ $gray-800: #1e293b;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
   text-transform: uppercase;
   letter-spacing: 0.03em;
 
@@ -750,7 +809,10 @@ $gray-800: #1e293b;
   background: $gray-50;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    box-shadow 0.2s;
 
   &:hover {
     border-color: $orange-accent;
@@ -798,11 +860,30 @@ $gray-800: #1e293b;
   margin-bottom: 0.25rem;
   text-transform: uppercase;
 
-  &.badge-uel-approved { background: #FF7A45; color: #ffffff; font-weight: 600; font-size: 12px; padding: 4px 10px; border-radius: 999px; }
-  &.badge-uel-pending { background: rgba(245, 158, 11, 0.2); color: #b45309; }
-  &.badge-uel-rejected { background: rgba(239, 68, 68, 0.15); color: #b91c1c; }
-  &.badge-uel-archived { background: $gray-200; color: $gray-700; }
-  &.badge-uel-returned { background: rgba(16, 185, 129, 0.15); color: #047857; }
+  &.badge-uel-approved {
+    background: #ff7a45;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 12px;
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+  &.badge-uel-pending {
+    background: rgba(245, 158, 11, 0.2);
+    color: #b45309;
+  }
+  &.badge-uel-rejected {
+    background: rgba(239, 68, 68, 0.15);
+    color: #b91c1c;
+  }
+  &.badge-uel-archived {
+    background: $gray-200;
+    color: $gray-700;
+  }
+  &.badge-uel-returned {
+    background: rgba(16, 185, 129, 0.15);
+    color: #047857;
+  }
 }
 
 .item-detail-related-title {

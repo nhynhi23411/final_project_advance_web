@@ -14,13 +14,19 @@
   </header>
 
   <!-- Success -->
-  <div *ngIf="successMessage" class="item-detail-container item-detail-message item-detail-message-success">
+  <div
+    *ngIf="successMessage"
+    class="item-detail-container item-detail-message item-detail-message-success"
+  >
     <i class="fas fa-check-circle" aria-hidden="true"></i>
     <span>{{ successMessage }}</span>
   </div>
 
   <!-- Error -->
-  <div *ngIf="error" class="item-detail-container item-detail-message item-detail-message-error">
+  <div
+    *ngIf="error"
+    class="item-detail-container item-detail-message item-detail-message-error"
+  >
     <i class="fas fa-exclamation-circle" aria-hidden="true"></i>
     <span>{{ error }}</span>
   </div>
@@ -32,7 +38,10 @@
   </div>
 
   <!-- Main content: 2 columns -->
-  <div *ngIf="!isLoading && item" class="item-detail-container item-detail-main">
+  <div
+    *ngIf="!isLoading && item"
+    class="item-detail-container item-detail-main"
+  >
     <div class="item-detail-layout">
       <!-- Left column: image + detail card -->
       <section class="item-detail-primary">
@@ -45,12 +54,18 @@
               [alt]="item.title"
               class="item-detail-gallery-img"
             />
-            <div *ngIf="!getMainImageUrl()" class="item-detail-gallery-placeholder">
+            <div
+              *ngIf="!getMainImageUrl()"
+              class="item-detail-gallery-placeholder"
+            >
               <i class="fas fa-image" aria-hidden="true"></i>
               <p>Không có hình ảnh</p>
             </div>
           </div>
-          <div *ngIf="item.images && item.images.length > 1" class="item-detail-gallery-thumbs">
+          <div
+            *ngIf="item.images && item.images.length > 1"
+            class="item-detail-gallery-thumbs"
+          >
             <button
               *ngFor="let img of item.images; let i = index"
               type="button"
@@ -58,7 +73,11 @@
               [class.item-detail-thumb-active]="selectedImageIndex === i"
               class="item-detail-thumb"
             >
-              <img [src]="img" [alt]="'Hình ' + (i + 1)" class="item-detail-thumb-img" />
+              <img
+                [src]="img"
+                [alt]="'Hình ' + (i + 1)"
+                class="item-detail-thumb-img"
+              />
             </button>
           </div>
         </div>
@@ -69,12 +88,18 @@
             <h2 class="item-detail-title">{{ item.title }}</h2>
             <div class="item-detail-badges">
               <span
-                [class]="getItemTypeClass() + ' item-detail-badge item-detail-badge-type'"
+                [class]="
+                  getItemTypeClass() +
+                  ' item-detail-badge item-detail-badge-type'
+                "
               >
                 <i [class]="getItemTypeIcon()" aria-hidden="true"></i>
                 {{ getItemTypeLabel() }}
               </span>
-              <span class="item-detail-badge item-detail-badge-status" [ngClass]="getStatusUelClass()">
+              <span
+                class="item-detail-badge item-detail-badge-status"
+                [ngClass]="getStatusUelClass()"
+              >
                 {{ getStatusLabel() }}
               </span>
               <button
@@ -119,10 +144,15 @@
 
           <div class="item-detail-description-block">
             <h3 class="item-detail-subtitle">Mô tả</h3>
-            <p class="item-detail-description">{{ item.description || "Không có mô tả" }}</p>
+            <p class="item-detail-description">
+              {{ item.description || "Không có mô tả" }}
+            </p>
           </div>
 
-          <div *ngIf="item.distinctive_marks" class="item-detail-description-block item-detail-distinctive">
+          <div
+            *ngIf="item.distinctive_marks"
+            class="item-detail-description-block item-detail-distinctive"
+          >
             <h3 class="item-detail-subtitle">Đặc điểm nhận dạng</h3>
             <p class="item-detail-description">{{ item.distinctive_marks }}</p>
           </div>
@@ -138,28 +168,32 @@
             Danh sách yêu cầu Claim
           </h3>
           <div class="item-detail-claims-list">
-            <div *ngFor="let claim of postClaims" class="item-detail-claim-item">
+            <div
+              *ngFor="let claim of postClaims"
+              class="item-detail-claim-item"
+            >
               <div class="item-detail-claim-header">
                 <div>
                   <h4 class="item-detail-claim-name">
-                    {{ claim.claimant_user_id?.name || claim.claimant_user_id?.username || "Người dùng ẩn danh" }}
+                    {{
+                      claim.claimant_user_id?.name ||
+                        claim.claimant_user_id?.username ||
+                        "Người dùng ẩn danh"
+                    }}
                   </h4>
                   <p class="item-detail-claim-date">
                     <i class="fas fa-clock" aria-hidden="true"></i>
                     {{ formatDate(claim.created_at) }}
                   </p>
                 </div>
-                <span
-                  class="item-detail-claim-status"
-                  [ngClass]="{
-                    'item-detail-claim-pending': claim.status === 'PENDING',
-                    'item-detail-claim-verifying': claim.status === 'UNDER_VERIFICATION',
-                    'item-detail-claim-success': claim.status === 'SUCCESSFUL',
-                    'item-detail-claim-rejected': claim.status === 'REJECTED' || claim.status === 'CANCELLED'
-                  }"
-                >
-                  {{ getClaimStatusLabel(claim.status) }}
-                </span>
+<span class="item-detail-claim-status"
+  [class.item-detail-claim-pending]="claim.status === 'PENDING'"
+  [class.item-detail-claim-verifying]="claim.status === 'UNDER_VERIFICATION'"
+  [class.item-detail-claim-success]="claim.status === 'SUCCESSFUL'"
+  [class.item-detail-claim-rejected]="claim.status === 'REJECTED' || claim.status === 'CANCELLED'"
+>
+  {{ getClaimStatusLabel(claim.status) }}
+</span>
               </div>
               <div class="item-detail-claim-body">
                 <div *ngIf="claim.message" class="item-detail-claim-row">
@@ -168,32 +202,65 @@
                 </div>
                 <div *ngIf="claim.secret_info" class="item-detail-claim-row">
                   <strong>Thông tin bí mật / Bằng chứng:</strong>
-                  <span class="item-detail-claim-italic">{{ claim.secret_info }}</span>
+                  <span class="item-detail-claim-italic">{{
+                    claim.secret_info
+                  }}</span>
                 </div>
-                <div *ngIf="claim.image_proof_url" class="item-detail-claim-row">
+                <div
+                  *ngIf="claim.image_proof_url"
+                  class="item-detail-claim-row"
+                >
                   <strong>Ảnh chứng thực:</strong>
-                  <a [href]="claim.image_proof_url" target="_blank" rel="noopener" class="item-detail-claim-img-link">
-                    <img [src]="claim.image_proof_url" alt="Ảnh chứng thực" class="item-detail-claim-img" />
+                  <a
+                    [href]="claim.image_proof_url"
+                    target="_blank"
+                    rel="noopener"
+                    class="item-detail-claim-img-link"
+                  >
+                    <img
+                      [src]="claim.image_proof_url"
+                      alt="Ảnh chứng thực"
+                      class="item-detail-claim-img"
+                    />
                   </a>
                 </div>
                 <hr class="item-detail-claim-hr" />
                 <p *ngIf="claim.claimant_user_id?.email">
                   <strong>Email liên hệ:</strong>
-                  <a href="mailto:{{ claim.claimant_user_id.email }}" class="item-detail-link">{{ claim.claimant_user_id.email }}</a>
+                  <a
+                    href="mailto:{{ claim.claimant_user_id.email }}"
+                    class="item-detail-link"
+                    >{{ claim.claimant_user_id.email }}</a
+                  >
                 </p>
                 <p *ngIf="claim.claimant_user_id?.phone">
                   <strong>Điện thoại:</strong>
-                  <a href="tel:{{ claim.claimant_user_id.phone }}" class="item-detail-link">{{ claim.claimant_user_id.phone }}</a>
+                  <a
+                    href="tel:{{ claim.claimant_user_id.phone }}"
+                    class="item-detail-link"
+                    >{{ claim.claimant_user_id.phone }}</a
+                  >
                 </p>
-                <p *ngIf="!claim.claimant_user_id?.email && !claim.claimant_user_id?.phone" class="item-detail-claim-muted">
+                <p
+                  *ngIf="
+                    !claim.claimant_user_id?.email &&
+                    !claim.claimant_user_id?.phone
+                  "
+                  class="item-detail-claim-muted"
+                >
                   Người dùng chưa cập nhật thông tin liên hệ.
                 </p>
               </div>
               <div
-                *ngIf="claim.status === 'PENDING' || claim.status === 'UNDER_VERIFICATION'"
+                *ngIf="
+                  claim.status === 'PENDING' ||
+                  claim.status === 'UNDER_VERIFICATION'
+                "
                 class="item-detail-claim-actions"
               >
-                <span class="item-detail-claim-actions-label">Xử lý yêu cầu:</span>
+                <span class="item-detail-claim-actions-label"
+                  >Xử lý yêu cầu:</span
+                >
                 <div class="item-detail-claim-buttons">
                   <button
                     *ngIf="claim.status === 'PENDING'"
@@ -201,14 +268,16 @@
                     (click)="reviewClaim(claim._id, 'UNDER_VERIFICATION')"
                     class="item-detail-btn item-detail-btn-primary"
                   >
-                    <i class="fas fa-comment-dots" aria-hidden="true"></i> Đang liên hệ
+                    <i class="fas fa-comment-dots" aria-hidden="true"></i> Đang
+                    liên hệ
                   </button>
                   <button
                     type="button"
                     (click)="reviewClaim(claim._id, 'SUCCESSFUL')"
                     class="item-detail-btn item-detail-btn-success"
                   >
-                    <i class="fas fa-check" aria-hidden="true"></i> Duyệt / Giao đồ
+                    <i class="fas fa-check" aria-hidden="true"></i> Duyệt / Giao
+                    đồ
                   </button>
                   <button
                     type="button"
@@ -226,26 +295,40 @@
 
       <!-- Right column: sidebar -->
       <aside class="item-detail-sidebar">
-        <div *ngIf="shouldShowPrimaryActionCard()" class="item-detail-sidebar-card">
-          <h3 class="item-detail-sidebar-title">{{ getPrimaryActionTitle() }}</h3>
+        <div
+          *ngIf="shouldShowPrimaryActionCard()"
+          class="item-detail-sidebar-card"
+        >
+          <h3 class="item-detail-sidebar-title">
+            {{ getPrimaryActionTitle() }}
+          </h3>
           <p class="item-detail-sidebar-desc">
             {{ getPrimaryActionDescription() }}
           </p>
-          <button
-            type="button"
-            (click)="handleClaimClick()"
-            [disabled]="isPrimaryActionDisabled()"
-            [ngClass]="{
-              'item-detail-btn-claim': true,
-              'item-detail-btn-claim-submitted': hasClaimed || hasFinderSuggestion,
-              'item-detail-btn-claim-disabled': isPrimaryActionDisabled()
-            }"
-          >
-            <i *ngIf="isSubmitting" class="fas fa-spinner item-detail-spinner" aria-hidden="true"></i>
-            <i *ngIf="!isSubmitting && (hasClaimed || hasFinderSuggestion)" class="fas fa-check-circle" aria-hidden="true"></i>
+         <button
+  type="button"
+  (click)="handleClaimClick()"
+  [disabled]="isPrimaryActionDisabled()"
+  class="item-detail-btn-claim"
+  [class.item-detail-btn-claim-submitted]="hasClaimed || hasFinderSuggestion"
+  [class.item-detail-btn-claim-disabled]="isPrimaryActionDisabled()"
+>
+            <i
+              *ngIf="isSubmitting"
+              class="fas fa-spinner item-detail-spinner"
+              aria-hidden="true"
+            ></i>
+            <i
+              *ngIf="!isSubmitting && (hasClaimed || hasFinderSuggestion)"
+              class="fas fa-check-circle"
+              aria-hidden="true"
+            ></i>
             {{ getPrimaryActionButtonLabel() }}
           </button>
-          <p *ngIf="!isLostItem() && activeClaimsCount >= MAX_CLAIMS_LIMIT" class="item-detail-claim-limit">
+          <p
+            *ngIf="!isLostItem() && activeClaimsCount >= MAX_CLAIMS_LIMIT"
+            class="item-detail-claim-limit"
+          >
             Bạn đã đạt giới hạn yêu cầu
           </p>
         </div>
@@ -254,14 +337,51 @@
         <div class="item-detail-sidebar-card">
           <h3 class="item-detail-sidebar-title">Thông tin đăng</h3>
           <ul class="item-detail-sidebar-list">
-            <li><span class="item-detail-sidebar-label">Người đăng</span><span class="item-detail-sidebar-value">{{ item.created_by || '—' }}</span></li>
-            <li><span class="item-detail-sidebar-label">Lượt xem</span><span class="item-detail-sidebar-value">{{ item.view_count != null ? item.view_count : 0 }}</span></li>
-            <li><span class="item-detail-sidebar-label">Ngày đăng</span><span class="item-detail-sidebar-value">{{ formatDate(item.created_at) }}</span></li>
-            <li><span class="item-detail-sidebar-label">Cập nhật</span><span class="item-detail-sidebar-value">{{ formatDate(item.updated_at) }}</span></li>
+            <li>
+              <span class="item-detail-sidebar-label">Người đăng</span
+              ><span class="item-detail-sidebar-value">{{
+                item.created_by || "—"
+              }}</span>
+            </li>
+            <li>
+              <span class="item-detail-sidebar-label">Lượt xem</span
+              ><span class="item-detail-sidebar-value">{{
+                item.view_count != null ? item.view_count : 0
+              }}</span>
+            </li>
+            <li>
+              <span class="item-detail-sidebar-label">Ngày đăng</span
+              ><span class="item-detail-sidebar-value">{{
+                formatDate(item.created_at)
+              }}</span>
+            </li>
+            <li>
+              <span class="item-detail-sidebar-label">Cập nhật</span
+              ><span class="item-detail-sidebar-value">{{
+                formatDate(item.updated_at)
+              }}</span>
+            </li>
           </ul>
-          <div *ngIf="isOwner() && canClosePost()" class="item-detail-sidebar-close">
-            <button type="button" (click)="closePost()" class="item-detail-btn item-detail-btn-secondary item-detail-btn-block">
+          <div
+            *ngIf="isOwner() && canClosePost()"
+            class="item-detail-sidebar-close"
+          >
+            <button
+              type="button"
+              (click)="closePost()"
+              class="item-detail-btn item-detail-btn-secondary item-detail-btn-block"
+            >
               <i class="fas fa-lock" aria-hidden="true"></i> Đóng bài đăng
+            </button>
+          </div>
+          <div *ngIf="canMessageOwner()" class="item-detail-sidebar-close">
+            <button
+              type="button"
+              (click)="messageOwner()"
+              class="item-detail-btn item-detail-btn-secondary item-detail-btn-block item-detail-btn-chat"
+            >
+              <i class="fas fa-comments" aria-hidden="true"></i> Nhắn tin với
+              người đăng
             </button>
           </div>
         </div>
@@ -277,23 +397,44 @@
               class="item-detail-related-item"
             >
               <div class="item-detail-related-thumb">
-                <img *ngIf="rel.images && rel.images[0]" [src]="rel.images[0]" [alt]="rel.title" class="item-detail-related-thumb-img" />
-                <div *ngIf="!rel.images || !rel.images.length" class="item-detail-related-thumb-placeholder">
+                <img
+                  *ngIf="rel.images && rel.images[0]"
+                  [src]="rel.images[0]"
+                  [alt]="rel.title"
+                  class="item-detail-related-thumb-img"
+                />
+                <div
+                  *ngIf="!rel.images || !rel.images.length"
+                  class="item-detail-related-thumb-placeholder"
+                >
                   <i class="fas fa-image" aria-hidden="true"></i>
                 </div>
               </div>
               <div class="item-detail-related-content">
-                <span class="item-detail-related-badge" [ngClass]="getRelatedStatusClass(rel.status)">{{ getRelatedStatusLabel(rel.status) }}</span>
+                <span
+                  class="item-detail-related-badge"
+                  [ngClass]="getRelatedStatusClass(rel.status)"
+                  >{{ getRelatedStatusLabel(rel.status) }}</span
+                >
                 <p class="item-detail-related-title">{{ rel.title }}</p>
-                <p class="item-detail-related-meta">{{ rel.category }} · {{ rel.location_text | slice:0:30 }}{{ (rel.location_text?.length || 0) > 30 ? '…' : '' }}</p>
+                <p class="item-detail-related-meta">
+                  {{ rel.category }} · {{ rel.location_text | slice: 0 : 30
+                  }}{{ (rel.location_text?.length || 0) > 30 ? "…" : "" }}
+                </p>
               </div>
-              <i class="fas fa-chevron-right item-detail-related-arrow" aria-hidden="true"></i>
+              <i
+                class="fas fa-chevron-right item-detail-related-arrow"
+                aria-hidden="true"
+              ></i>
             </a>
           </div>
         </div>
 
         <!-- Empty state: không có bài liên quan -->
-        <div *ngIf="relatedItems.length === 0 && !isLoading && item" class="item-detail-sidebar-card item-detail-sidebar-empty">
+        <div
+          *ngIf="relatedItems.length === 0 && !isLoading && item"
+          class="item-detail-sidebar-card item-detail-sidebar-empty"
+        >
           <p class="item-detail-empty-text">Chưa có bài đăng liên quan.</p>
         </div>
       </aside>

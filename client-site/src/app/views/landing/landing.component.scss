@@ -1,7 +1,7 @@
 /* ========== Màu accent cam (#FF7A45) ========== */
-$orange-accent: #FF7A45;
-$blue-main: #123E7C;
-$blue-medium: #1C5FA8;
+$orange-accent: #ff7a45;
+$blue-main: #123e7c;
+$blue-medium: #1c5fa8;
 
 /* Viền rõ khi hover - UEL palette */
 .card-lost:hover {
@@ -94,7 +94,10 @@ $blue-medium: #1C5FA8;
 
 /* ========== Category pills – hover cam ========== */
 .landing-cat-pill {
-  transition: border-color 0.2s, color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
   .landing-cat-icon {
     color: $blue-medium;
     transition: color 0.2s;
@@ -205,7 +208,9 @@ $blue-medium: #1C5FA8;
 }
 
 .landing-step-card {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 12px 32px rgba(16, 24, 40, 0.12);
@@ -256,7 +261,11 @@ $blue-medium: #1C5FA8;
         content: "";
         width: 100%;
         height: 2px;
-        background: linear-gradient(90deg, rgba(28, 95, 168, 0.35), rgba(255, 122, 69, 0.25));
+        background: linear-gradient(
+          90deg,
+          rgba(28, 95, 168, 0.35),
+          rgba(255, 122, 69, 0.25)
+        );
         border-radius: 1px;
       }
     }
@@ -275,7 +284,10 @@ $blue-medium: #1C5FA8;
     border: 1px solid rgba(28, 95, 168, 0.08);
     position: relative;
     overflow: hidden;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease,
+      border-color 0.25s ease;
 
     &::before {
       content: "";
@@ -325,19 +337,19 @@ $blue-medium: #1C5FA8;
   }
 
   .landing-process-step-1 {
-    background: linear-gradient(145deg, #123E7C, #1a4d92);
+    background: linear-gradient(145deg, #123e7c, #1a4d92);
   }
   .landing-process-step-2 {
-    background: linear-gradient(145deg, #1C5FA8, #2470b8);
+    background: linear-gradient(145deg, #1c5fa8, #2470b8);
   }
   .landing-process-step-3 {
-    background: linear-gradient(145deg, #0F2F8F, #1a3d9e);
+    background: linear-gradient(145deg, #0f2f8f, #1a3d9e);
   }
 
   .landing-process-card-title {
     font-size: 1.125rem;
     font-weight: 700;
-    color: #1F2D3D;
+    color: #1f2d3d;
     letter-spacing: 0.02em;
     line-height: 1.35;
     margin: 0 0 0.75rem;
@@ -362,7 +374,10 @@ $blue-medium: #1C5FA8;
 
 /* ========== CTA button – cam nổi bật ========== */
 .landing-cta-btn {
-  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
   &:hover {
     filter: brightness(1.05);
     box-shadow: 0 8px 24px rgba(18, 62, 124, 0.3);
@@ -436,7 +451,10 @@ $blue-medium: #1C5FA8;
   text-decoration: none;
   letter-spacing: 0.02em;
   line-height: 1.4;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
 
   .landing-view-all-icon {
     font-size: 0.75rem;
@@ -530,14 +548,14 @@ $blue-medium: #1C5FA8;
   }
 
   &.landing-badge-lost {
-    background: #FEF2F2;
-    color: #DC2626;
-    border: 1px solid #FECACA;
+    background: #fef2f2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
   }
   &.landing-badge-found {
-    background: #F0FDF4;
+    background: #f0fdf4;
     color: #059669;
-    border: 1px solid #A7F3D0;
+    border: 1px solid #a7f3d0;
   }
 }
 
@@ -640,12 +658,30 @@ $blue-medium: #1C5FA8;
   border: none;
   border-radius: 10px;
   letter-spacing: 0.02em;
-  transition: filter 0.2s, box-shadow 0.2s;
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s;
   cursor: pointer;
 
   &:hover {
     filter: brightness(1.08);
     box-shadow: 0 4px 12px rgba(28, 95, 168, 0.3);
+  }
+}
+
+.landing-recent-card-actions {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.landing-recent-card-btn-chat {
+  margin-top: 0;
+  background: #0f766e;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(15, 118, 110, 0.28);
   }
 }
 

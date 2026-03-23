@@ -4,7 +4,9 @@ import { NgModule, ErrorHandler } from "@angular/core";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { MatDialogModule } from "@angular/material/dialog";
+import { SocketIoConfig, SocketIoModule } from "ngx-socket-io";
 import { AuthInterceptor } from "./services/auth.interceptor";
+import { environment } from "../environments/environment";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
@@ -32,6 +34,7 @@ import { ReturnProcessComponent } from "./views/return-process/return-process.co
 import { TermsComponent } from "./views/terms/terms.component";
 import { EditItemComponent } from "./views/edit-item/edit-item.component";
 import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
+import { ChatComponent } from "./views/chat/chat.component";
 
 // shared components
 import { ImageUploaderComponent } from "./components/image-uploader/image-uploader.component";
@@ -52,6 +55,16 @@ import { TableDropdownComponent } from "./components/dropdowns/table-dropdown/ta
 import { NotificationDropdownComponent } from "./components/dropdowns/notification-dropdown/notification-dropdown.component";
 import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user-dropdown.component";
 import { GlobalErrorHandler } from "./global-error.handler";
+
+const socketConfig: SocketIoConfig = {
+  url: `${environment.apiUrl.replace(/\/api$/, "")}/chat`,
+  options: {
+    path: "/socket.io",
+    autoConnect: false,
+    transports: ["websocket"],
+    withCredentials: true,
+  },
+};
 
 @NgModule({
   declarations: [
@@ -88,6 +101,7 @@ import { GlobalErrorHandler } from "./global-error.handler";
     TermsComponent,
     EditItemComponent,
     MyClaimsComponent,
+    ChatComponent,
   ],
   imports: [
     BrowserModule,
@@ -97,6 +111,7 @@ import { GlobalErrorHandler } from "./global-error.handler";
     ReactiveFormsModule,
     HttpClientModule,
     MatDialogModule,
+    SocketIoModule.forRoot(socketConfig),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
