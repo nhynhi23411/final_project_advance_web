@@ -118,6 +118,10 @@ export class ChatService {
     return this.socket.fromEvent("conversationRead");
   }
 
+  onNewNotification(): Observable<any> {
+    return this.socket.fromEvent("newNotification");
+  }
+
   getConversations(): Observable<ConversationItem[]> {
     return this.http
       .get<{ data: ConversationItem[] }>(`${this.baseUrl}/chat/conversations`)

@@ -6,7 +6,7 @@ import {
   OnInit,
   ViewChild,
 } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
 import { Subscription } from "rxjs";
 import {
   ChatMessage,
@@ -71,6 +71,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   constructor(
     private readonly chatService: ChatService,
+    private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly itemService: ItemService,
   ) {}
@@ -378,7 +379,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   openPostContext(msg: ChatMessage): void {
     const preview = this.getPostContextPreview(msg);
     if (!preview?.postId) return;
-    window.open(`/items/${preview.postId}`, "_blank");
+    this.router.navigate(["/items", preview.postId], {
+      state: { fromChat: true },
+    });
   }
 
   private markCurrentConversationRead(): void {

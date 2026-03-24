@@ -48,4 +48,8 @@ export class UpdatePostDto {
   @IsArray()
   @IsString({ each: true })
   image_public_ids?: string[];
+
+  @IsOptional()
+  @IsString()
+  existing_image?: string;
 }

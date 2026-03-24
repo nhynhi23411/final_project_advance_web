@@ -1,5 +1,5 @@
 import { Injectable, Logger } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
+import { OnEvent, EventEmitter2 } from "@nestjs/event-emitter";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model, Types } from "mongoose";
 import { KeywordService } from "../keyword/keyword.service";
@@ -20,6 +20,7 @@ export class ModerationListener {
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     private readonly usersService: UsersService,
     private readonly keywordService: KeywordService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   @OnEvent("item.created")
@@ -94,6 +95,21 @@ export class ModerationListener {
         },
       })
       .exec();
+
+    if (nextStatus === "PENDING_ADMIN") {
+      this.eventEmitter.emit("post.flagged", {
+        postId: itemId,
+        userId,
+        reasons,
+      });
+    } else if (nextStatus === "REJECTED") {
+      this.eventEmitter.emit("post.rejected", {
+        postId: itemId,
+        userId,
+        adminUserId: "SYSTEM",
+        rejectReason,
+      });
+    }
 
     this.logger.log(
       `Auto-moderated post=${itemId} -> ${nextStatus}${

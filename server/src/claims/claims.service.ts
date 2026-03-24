@@ -86,7 +86,7 @@ export class ClaimsService {
     async review(claimId: string, dto: ReviewClaimDto, userId: string) {
         const claim = await this.claimModel.findById(claimId);
         if (!claim) throw new NotFoundException("Claim không tồn tại");
-        if (claim.status !== "PENDING") {
+        if (claim.status !== "PENDING" && claim.status !== "UNDER_VERIFICATION") {
             throw new BadRequestException("Claim đã được xử lý");
         }
 
@@ -174,7 +174,7 @@ export class ClaimsService {
 
             await this.postModel.findByIdAndUpdate(claim.post_id, {
                 status: "RETURNED",
-                $inc: { active_claim_count: -rejectedCount },
+                $inc: { active_claim_count: -(rejectedCount + 1) },
             });
 
             // Emit notification for successful claim

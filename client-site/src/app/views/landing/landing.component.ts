@@ -110,7 +110,7 @@ export class LandingComponent implements OnInit {
   }
 
   viewItemDetail(itemId: string): void {
-    this.router.navigate(["/items", itemId]);
+    this.router.navigate(["/items", itemId], { state: { fromHome: true } });
   }
 
   canMessagePostOwner(item: Item): boolean {

@@ -1,5 +1,6 @@
 import { Component, OnInit } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
+import { Location } from "@angular/common";
 import { ItemService, Item } from "../../services/item.service";
 import { ClaimService, MAX_CLAIMS_LIMIT } from "../../services/claim.service";
 import { AuthService } from "../../services/auth.service";
@@ -40,6 +41,7 @@ export class ItemDetailComponent implements OnInit {
     private toastService: ToastService,
     private http: HttpClient,
     private dialog: MatDialog,
+    private location: Location,
   ) {}
 
   ngOnInit(): void {
@@ -478,7 +480,14 @@ export class ItemDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(["/"]);
+    const state = history.state;
+    if (state && state.fromHome) {
+      this.router.navigate(["/"], { fragment: "recent-posts" });
+    } else if (state && state.fromChat) {
+      this.router.navigate(["/chat"]);
+    } else {
+      this.location.back();
+    }
   }
 
   getPageTitle(): string {

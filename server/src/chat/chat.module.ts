@@ -26,6 +26,6 @@ import { Message, MessageSchema } from "./schemas/message.schema";
   ],
   controllers: [ChatController],
   providers: [ChatService, ChatGateway, N8nChatbotService, GeminiService],
-  exports: [ChatService],
+  exports: [ChatService, ChatGateway],
 })
 export class ChatModule {}
