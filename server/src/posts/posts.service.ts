@@ -248,6 +248,11 @@ export class PostsService extends BaseCrudService<
       metadata,
     };
 
+    // Luôn reset về PENDING_SYSTEM khi người dùng sửa bài (ngoại trừ bài đã đóng/trả)
+    if (existing.status !== "ARCHIVED" && existing.status !== "RETURNED") {
+      updateDoc.status = "PENDING_SYSTEM";
+    }
+
     // Nếu client gửi images / image_public_ids thì cập nhật, nếu không giữ nguyên
     if (dto.images) {
       updateDoc.images = dto.images;
@@ -256,11 +261,17 @@ export class PostsService extends BaseCrudService<
       updateDoc.image_public_ids = (dto as any).image_public_ids;
     }
 
-    return this.model
+    const updated = await this.model
       .findByIdAndUpdate(id, updateDoc, {
         new: true,
         runValidators: true,
       })
       .exec();
+
+    if (updated && updated.status === "PENDING_SYSTEM") {
+      this.eventEmitter.emit("item.created", { itemId: updated._id });
+    }
+
+    return updated;
   }
 }

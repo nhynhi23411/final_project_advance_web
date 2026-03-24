@@ -147,14 +147,6 @@ export class PostsController {
       throw new BadRequestException("Chỉ sửa được bài của bạn");
     }
 
-    // profanity check when updating
-    if (dto.title && this.keywordService.checkProfanity(dto.title)) {
-      throw new BadRequestException("Tiêu đề chứa từ ngữ không phù hợp");
-    }
-    if (dto.description && this.keywordService.checkProfanity(dto.description)) {
-      throw new BadRequestException("Mô tả chứa từ ngữ không phù hợp");
-    }
-
     // Nếu có file mới, upload lên Cloudinary và cập nhật dto.images / dto.image_public_ids
     if (file?.buffer) {
       const result = await this.cloudinary.uploadBuffer(file.buffer, {

@@ -194,4 +194,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     return { ok: true, conversationId, ...result };
   }
+  
+  /** Emit a notification event to a specific user's private room. */
+  emitNotification(userId: string, notification: any) {
+    this.server.to(`user:${userId}`).emit("newNotification", notification);
+  }
 }

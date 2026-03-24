@@ -5,6 +5,7 @@ import { Model, Types } from "mongoose";
 import { Notification, NotificationDocument, NotificationType } from "./schemas/notification.schema";
 import { Post, PostDocument } from "../posts/schemas/post.schema";
 import { User, UserDocument } from "../users/schemas/user.schema";
+import { ChatGateway } from "../chat/chat.gateway";
 
 @Injectable()
 export class NotificationsService {
@@ -15,6 +16,7 @@ export class NotificationsService {
     private notificationModel: Model<NotificationDocument>,
     @InjectModel(Post.name) private postModel: Model<PostDocument>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly chatGateway: ChatGateway,
   ) {}
 
   /** Create a notification record. */
@@ -39,6 +41,10 @@ export class NotificationsService {
       message,
       is_read: false,
     });
+    
+    // Emit real-time event
+    this.chatGateway.emitNotification(recipientUserId, notif);
+    
     return notif;
   }
 
@@ -279,13 +285,46 @@ export class NotificationsService {
     const title = (post as any)?.title ?? "Bài đăng";
     await this.createNotification(
       userId,
-      adminUserId,
+      adminUserId === "SYSTEM" ? postId : adminUserId,
       "post_rejected",
       postId,
       "Bài đăng của bạn đã bị từ chối",
       `Bài đăng "${title}" đã bị từ chối. Vui lòng xem lý do và đăng lại nếu cần.`,
     );
     this.logger.log(`Notification sent: post rejected ${postId} to user ${userId}`);
+  }
+
+  /**
+   * Notify post owner when system flags their post for review.
+   */
+  @OnEvent("post.flagged")
+  async handlePostFlagged(payload: {
+    postId: string;
+    userId: string;
+    reasons: string[];
+  }): Promise<void> {
+    const { postId, userId, reasons } = payload;
+    const post = await this.postModel
+      .findById(postId)
+      .select("title")
+      .lean()
+      .exec();
+    const title = (post as any)?.title ?? "Bài đăng";
+    
+    let reasonText = "chứa nội dung cần kiểm tra";
+    if (reasons.includes("blacklist:title") || reasons.includes("blacklist:description")) {
+       reasonText = "chứa từ ngữ không phù hợp";
+    }
+
+    await this.createNotification(
+      userId,
+      postId, // Use postId as sender if no admin
+      "post_flagged",
+      postId,
+      "Bài đăng đang được kiểm duyệt",
+      `Bài đăng "${title}" tạm thời bị ẩn và đang được quản trị viên kiểm duyệt do ${reasonText}.`,
+    );
+    this.logger.log(`Notification sent: post flagged ${postId} to user ${userId}`);
   }
 
   /**

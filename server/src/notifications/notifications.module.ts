@@ -5,6 +5,7 @@ import { Post, PostSchema } from "../posts/schemas/post.schema";
 import { User, UserSchema } from "../users/schemas/user.schema";
 import { NotificationsService } from "./notifications.service";
 import { NotificationsController } from "./notifications.controller";
+import { ChatModule } from "../chat/chat.module";
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { NotificationsController } from "./notifications.controller";
       { name: Post.name, schema: PostSchema },
       { name: User.name, schema: UserSchema },
     ]),
+    ChatModule,
   ],
   providers: [NotificationsService],
   controllers: [NotificationsController],

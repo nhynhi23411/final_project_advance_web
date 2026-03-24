@@ -9,7 +9,8 @@ export type NotificationType =
   | "post_approved"
   | "post_needs_update"
   | "post_rejected"
-  | "post_closed_by_user";
+  | "post_closed_by_user"
+  | "post_flagged";
 
 @Schema({ timestamps: { createdAt: "created_at", updatedAt: "updated_at" } })
 export class Notification {
@@ -20,7 +21,7 @@ export class Notification {
   sender_user_id!: Types.ObjectId;
 
   @Prop({
-    enum: ["claim", "match_suggestion", "post_approved", "post_needs_update", "post_rejected", "post_closed_by_user"],
+    enum: ["claim", "match_suggestion", "post_approved", "post_needs_update", "post_rejected", "post_closed_by_user", "post_flagged"],
     required: true,
   })
   notification_type!: NotificationType;

@@ -4,6 +4,7 @@ import { BehaviorSubject, Observable, Subscription, interval, of } from "rxjs";
 import { startWith, switchMap, catchError, map } from "rxjs/operators";
 import { environment } from "../../environments/environment";
 import { AuthService } from "./auth.service";
+import { ChatService } from "./chat.service";
 
 export interface ApiNotification {
   _id: string;
@@ -31,20 +32,28 @@ export class NotificationService {
 
   constructor(
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private chatService: ChatService,
   ) {
     this.authService.isLoggedIn$.subscribe((isLoggedIn) => {
       if (!isLoggedIn) {
         this.unreadCount.next(0);
-        this.stopPolling();
+        // this.stopPolling();
       } else {
-        this.startPolling();
+        // this.startPolling();
+        this.chatService.connect();
       }
+    });
+
+    this.chatService.onNewNotification().subscribe(() => {
+      this.refreshUnreadCount();
     });
   }
 
   /** Poll every 30s; start immediately. Only runs when user is logged in. */
   private startPolling(): void {
+    // Polling disabled in favor of real-time WebSockets.
+    /*
     this.stopPolling();
     this.pollingSubscription = interval(30000)
       .pipe(
@@ -52,6 +61,7 @@ export class NotificationService {
         switchMap(() => this.fetchUnreadCount())
       )
       .subscribe((count) => this.unreadCount.next(count));
+    */
   }
 
   private stopPolling(): void {
