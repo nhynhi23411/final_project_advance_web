@@ -159,7 +159,7 @@ Admin site chạy tại `http://localhost:4200`
 ### Chạy Client Site
 ```bash
 cd client-site
-ng serve --port 4201
+ng serve --port 4300
 ```
 Client site chạy tại `http://localhost:4300`
 
