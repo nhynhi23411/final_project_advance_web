@@ -20,10 +20,8 @@ export class GeminiService {
   private knowledgeBaseCache = "";
 
   constructor(private readonly configService: ConfigService) {
-    this.model = this.configService.get<string>("GEMINI_MODEL") || "gemini-2.0-flash";
-    this.apiKey =
-      this.configService.get<string>("GEMINI_API_KEY") ||
-      "AIzaSyDh5xujx37sBx9_u8SjYt6C9h3usGJ2Wms";
+    this.model = this.configService.get<string>("GEMINI_MODEL") || "gemini-flash-latest";
+    this.apiKey = this.configService.get<string>("GEMINI_API_KEY") || "";
     this.timeoutMs = Number(this.configService.get<string>("GEMINI_TIMEOUT_MS") || 45000);
   }
 
@@ -138,6 +136,9 @@ export class GeminiService {
 
   private async generateContent(prompt: string): Promise<string> {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
+    if (!this.apiKey) {
+      throw new Error("GEMINI_API_KEY is missing");
+    }
     const response = await axios.post(
       url,
       {
@@ -145,7 +146,7 @@ export class GeminiService {
           parts: [
             {
               text:
-                "Bạn là trợ lý hỗ trợ khách hàng của hệ thống Lost & Found. Hãy ưu tiên sử dụng dữ liệu Knowledge Base được cung cấp để trả lời chính xác. Trả lời ngắn gọn, tự nhiên, thân thiện bằng tiếng Việt. Nếu câu hỏi không có thông tin rõ trong Knowledge Base, KHONG duoc tra loi cuc cut nhu 'toi khong biet'. Thay vao do: (1) xac nhan nhu cau cua nguoi dung mot cach dong cam, (2) dua ra huong dan chung an toan va hop ly dua tren quy trinh Lost & Found, (3) neu can thi moi de xuat lien he Admin de duoc xac nhan chinh thuc. Neu thong tin khong chac chan, hay noi ro do la huong dan tam thoi.",
+                "Bạn là trợ lý hỗ trợ khách hàng của hệ thống Lost & Found. Hãy ưu tiên sử dụng dữ liệu Knowledge Base được cung cấp để trả lời chính xác. Trả lời ngắn gọn, tự nhiên, thân thiện bằng tiếng Việt. Luôn trả lời bằng văn bản thuần, không dùng Markdown, không dùng ký hiệu như **, #, -, *, hoặc danh sách đánh số. Nếu cần liệt kê nhiều ý, hãy viết thành câu bình thường trong một đoạn văn mạch lạc. Nếu câu hỏi không có thông tin rõ trong Knowledge Base, không trả lời cụt như 'tôi không biết'. Thay vào đó, hãy xác nhận nhu cầu của người dùng một cách đồng cảm, đưa ra hướng dẫn chung an toàn và hợp lý theo quy trình Lost & Found, rồi mới đề xuất liên hệ Admin nếu cần xác nhận chính thức. Nếu thông tin chưa chắc chắn, hãy nói rõ đó là hướng dẫn tạm thời.",
             },
           ],
         },
