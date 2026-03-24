@@ -7,6 +7,7 @@ import { ChatService } from "./chat.service";
 import { ChatController } from "./chat.controller";
 import { ChatGateway } from "./chat.gateway";
 import { N8nChatbotService } from "./n8n-chatbot.service";
+import { GeminiService } from "./gemini.service";
 import {
   Conversation,
   ConversationSchema,
@@ -24,7 +25,7 @@ import { Message, MessageSchema } from "./schemas/message.schema";
     ]),
   ],
   controllers: [ChatController],
-  providers: [ChatService, ChatGateway, N8nChatbotService],
+  providers: [ChatService, ChatGateway, N8nChatbotService, GeminiService],
   exports: [ChatService],
 })
 export class ChatModule {}

@@ -1,5 +1,10 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from "@angular/core";
-import { ChatbotService, ChatMessage } from "../../services/chatbot.service";
+import {
+  ChatbotService,
+  ChatMessage,
+  ChatbotClientError,
+  N8nChatResponse,
+} from "../../services/chatbot.service";
 import { Subject } from "rxjs";
 import { takeUntil } from "rxjs/operators";
 
@@ -77,31 +82,16 @@ export class ChatbotComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.chatbotService.sendMessage(message).subscribe({
       next: (response) => {
         this.chatbotService.setLoading(false);
-
-        if (response.success && response.data) {
-          // Extract the response message from n8n
-          const botMessage =
-            response.data.reply ||
-            response.data.message ||
-            response.data.output ||
-            "Sorry, I couldn't process your request.";
-
-          this.chatbotService.addMessage("bot", String(botMessage));
-        } else {
-          this.chatbotService.addMessage(
-            "bot",
-            response.error ||
-              "An error occurred. Please try again.",
-          );
-        }
+        const botMessage = this.extractBotMessage(response);
+        this.chatbotService.addMessage("bot", botMessage);
       },
-      error: (error) => {
+      error: (error: ChatbotClientError) => {
         this.chatbotService.setLoading(false);
         console.error("Error sending message:", error);
 
         this.chatbotService.addMessage(
           "bot",
-          "Sorry, I encountered an error. Please try again later.",
+          error?.message || "Đã xảy ra lỗi, vui lòng thử lại sau.",
         );
       },
     });
@@ -120,5 +110,51 @@ export class ChatbotComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   toggleChat(): void {
     this.showChat = !this.showChat;
+  }
+
+  private extractBotMessage(response: N8nChatResponse): string {
+    if (!response?.success) {
+      return (
+        response?.error ||
+        "Chatbot chưa thể xử lý yêu cầu của bạn. Vui lòng thử lại."
+      );
+    }
+
+    if (response.botText && response.botText.trim()) {
+      return response.botText.trim();
+    }
+
+    const data = response.data;
+    if (!data) {
+      return "Mình chưa nhận được nội dung phản hồi. Bạn thử lại giúp mình nhé.";
+    }
+
+    if (typeof data === "string") {
+      return data;
+    }
+
+    if (Array.isArray(data)) {
+      const firstItem = data[0];
+      if (typeof firstItem === "string") {
+        return firstItem;
+      }
+      if (firstItem && typeof firstItem === "object") {
+        return String(
+          firstItem.botText ||
+            firstItem.reply ||
+            firstItem.message ||
+            firstItem.output ||
+            "Mình chưa hiểu ý, bạn thử diễn đạt cách khác nhé.",
+        );
+      }
+    }
+
+    return String(
+      data.botText ||
+        data.reply ||
+        data.message ||
+        data.output ||
+        "Mình chưa hiểu ý, bạn thử diễn đạt cách khác nhé.",
+    );
   }
 }

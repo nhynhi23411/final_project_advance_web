@@ -17,7 +17,7 @@ import { memoryStorage, File } from "multer";
 import { JwtAuthGuard } from "../auth/jwt-auth.guard";
 import { CloudinaryService } from "../cloudinary/cloudinary.service";
 import { ChatService } from "./chat.service";
-import { N8nChatbotService } from "./n8n-chatbot.service";
+import { GeminiService } from "./gemini.service";
 
 const uploadOpts = {
   storage: memoryStorage(),
@@ -30,7 +30,7 @@ export class ChatController {
   constructor(
     private readonly chatService: ChatService,
     private readonly cloudinary: CloudinaryService,
-    private readonly n8nChatbotService: N8nChatbotService,
+    private readonly geminiService: GeminiService,
   ) {}
 
   @Get("conversations")
@@ -118,11 +118,12 @@ export class ChatController {
     if (!body?.message || typeof body.message !== "string") {
       throw new BadRequestException("message là bắt buộc");
     }
+    const normalizedMessage = body.message.trim();
+    if (!normalizedMessage) {
+      throw new BadRequestException("message không được để trống");
+    }
 
-    const result = await this.n8nChatbotService.sendMessageToN8n({
-      chatInput: body.message.trim(),
-      userId: req.user.userId,
-    });
+    const result = await this.geminiService.chatWithKnowledgeBase(normalizedMessage);
 
     return result;
   }

@@ -14,8 +14,8 @@
     <!-- Header -->
     <div class="chat-header">
       <div class="chat-header-content">
-        <h2 class="chat-title">Chat with AI</h2>
-        <p class="chat-subtitle">Powered by n8n</p>
+        <h2 class="chat-title">Lost & Found Assistant</h2>
+        <p class="chat-subtitle">Powered by Gemini</p>
       </div>
       <div class="chat-header-actions">
         <button
@@ -76,7 +76,7 @@
         class="message-input"
         [(ngModel)]="inputMessage"
         (keypress)="handleKeyPress($event)"
-        placeholder="Type your message... (Enter to send, Shift+Enter for new line)"
+        placeholder="Type your message"
         [disabled]="isLoading"
         rows="1"
       ></textarea>
