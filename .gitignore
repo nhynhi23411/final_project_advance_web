@@ -27,10 +27,11 @@ Thumbs.db
 *.log
 npm-debug.log*
 yarn-error.log
-# .env
-# .env.local
-# .env.*.local
-# *.env
+.env
+.env.local
+.env.*.local
+*.env
+server/.env
 
 # Coverage / test
 coverage/
