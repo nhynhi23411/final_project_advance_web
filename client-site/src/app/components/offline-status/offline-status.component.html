@@ -1,0 +1,6 @@
+<ng-container *ngIf="(networkService.isOnline$ | async) === false">
+  <div class="offline-banner">
+    <i class="fas fa-wifi offline-icon"></i>
+    <span>Bạn đang <strong>ngoại tuyến</strong>. Chat và đăng bài sẽ không hoạt động cho đến khi có kết nối.</span>
+  </div>
+</ng-container>

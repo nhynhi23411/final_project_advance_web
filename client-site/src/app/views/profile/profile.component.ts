@@ -42,10 +42,10 @@ export class ProfileComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private itemService: ItemService,
-    private router: Router,
+    public router: Router,
     private toastService: ToastService,
     private notificationService: NotificationService,
-    private authService: AuthService
+    public authService: AuthService
   ) {}
 
   ngOnInit(): void {

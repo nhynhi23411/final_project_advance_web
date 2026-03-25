@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { HttpClientModule, HTTP_INTERCEPTORS } from "@angular/common/http";
 import { MatDialogModule } from "@angular/material/dialog";
 import { SocketIoConfig, SocketIoModule } from "ngx-socket-io";
+import { ServiceWorkerModule } from "@angular/service-worker";
 import { AuthInterceptor } from "./services/auth.interceptor";
 import { environment } from "../environments/environment";
 
@@ -55,6 +56,7 @@ import { MapExampleComponent } from "./components/maps/map-example/map-example.c
 import { TableDropdownComponent } from "./components/dropdowns/table-dropdown/table-dropdown.component";
 import { NotificationDropdownComponent } from "./components/dropdowns/notification-dropdown/notification-dropdown.component";
 import { UserDropdownComponent } from "./components/dropdowns/user-dropdown/user-dropdown.component";
+import { OfflineStatusComponent } from "./components/offline-status/offline-status.component";
 import { GlobalErrorHandler } from "./global-error.handler";
 
 const socketConfig: SocketIoConfig = {
@@ -104,6 +106,7 @@ const socketConfig: SocketIoConfig = {
     EditItemComponent,
     MyClaimsComponent,
     ChatComponent,
+    OfflineStatusComponent,
   ],
   imports: [
     BrowserModule,
@@ -114,6 +117,11 @@ const socketConfig: SocketIoConfig = {
     HttpClientModule,
     MatDialogModule,
     SocketIoModule.forRoot(socketConfig),
+    ServiceWorkerModule.register('ngsw-worker.js', {
+      enabled: environment.production,
+      // Đăng ký SW sau khi app ổn định 30s, không ảnh hưởng startup performance
+      registrationStrategy: 'registerWhenStable:30000'
+    }),
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

@@ -15,6 +15,7 @@ import {
   UserStatusEvent,
 } from "../../services/chat.service";
 import { Item, ItemService } from "../../services/item.service";
+import { NetworkService } from "../../services/network.service";
 
 interface PostContextPayload {
   postId: string;
@@ -74,6 +75,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly itemService: ItemService,
+    private readonly networkService: NetworkService,
   ) {}
 
   ngOnInit(): void {
@@ -253,6 +255,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     const content = this.draftMessage.trim();
     if (!content) return;
 
+    // PWA: Block send when offline
+    if (!this.networkService.isOnline) {
+      this.error = 'Bạn đang ngoại tuyến. Tin nhắn sẽ không được gửi cho đến khi có kết nối mạng.';
+      return;
+    }
+
     this.sending = true;
     this.chatService.sendText(
       this.selectedConversation.conversationId,
@@ -265,6 +273,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   onPickImage(evt: Event): void {
     if (!this.selectedConversation || this.imageUploading) return;
+    // PWA: Block image send when offline
+    if (!this.networkService.isOnline) {
+      this.error = 'Bạn đang ngoại tuyến. Không thể gửi ảnh khi không có kết nối mạng.';
+      return;
+    }
     const input = evt.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;

@@ -4,6 +4,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { CATEGORIES, CATEGORY_METADATA, MetadataField } from '../../config/category-metadata.config';
 import { ItemService, ItemPayload } from '../../services/item.service';
 import { ImageUploaderComponent } from '../../components/image-uploader/image-uploader.component';
+import { NetworkService } from '../../services/network.service';
 
 /** Wards (phường) in Thành phố Thủ Đức, TP.HCM — predefined list. */
 export const THU_DUC_WARDS: string[] = [
@@ -69,6 +70,7 @@ export class PostItemComponent implements OnInit {
         private itemService: ItemService,
         private router: Router,
         private route: ActivatedRoute,
+        private networkService: NetworkService,
     ) { }
 
     ngOnInit(): void {
@@ -141,6 +143,11 @@ export class PostItemComponent implements OnInit {
     }
 
     onSubmit(): void {
+        // PWA: Block submission when offline
+        if (!this.networkService.isOnline) {
+            this.submitError = 'Bạn đang ngoại tuyến (Offline). Vui lòng kiểm tra kết nối mạng và thử lại.';
+            return;
+        }
         Object.keys(this.form.controls).forEach(key => {
             this.form.get(key)!.markAsTouched();
         });
