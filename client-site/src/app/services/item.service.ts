@@ -43,6 +43,7 @@ export interface Item {
     images: string[];
     image_public_ids: string[];
     status?: string;
+    view_count?: number;
     approved_at?: Date | string;
     created_by?: string;
     created_by_user_id?: string;

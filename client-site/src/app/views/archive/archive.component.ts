@@ -14,7 +14,7 @@ export class ArchiveComponent implements OnInit {
 
   constructor(
     private itemService: ItemService,
-    private authService: AuthService,
+    public authService: AuthService,
     private router: Router
   ) {}
 
