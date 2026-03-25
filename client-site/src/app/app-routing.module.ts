@@ -24,6 +24,7 @@ import { ReturnProcessComponent } from "./views/return-process/return-process.co
 import { TermsComponent } from "./views/terms/terms.component";
 import { EditItemComponent } from "./views/edit-item/edit-item.component";
 import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
+import { MyPostsComponent } from "./views/my-posts/my-posts.component";
 import { ChatComponent } from "./views/chat/chat.component";
 
 import { AuthGuard } from "./guards/auth.guard";
@@ -50,6 +51,7 @@ const routes: Routes = [
     canActivate: [AuthGuard],
   },
   { path: "my-claims", component: MyClaimsComponent, canActivate: [AuthGuard] },
+  { path: "my-posts", component: MyPostsComponent, canActivate: [AuthGuard] },
   { path: "chat", component: ChatComponent, canActivate: [AuthGuard] },
   { path: "post-item", component: PostItemComponent, canActivate: [AuthGuard] },
   { path: "posts", component: PostsComponent },

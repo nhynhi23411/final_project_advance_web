@@ -1,0 +1,115 @@
+/* Copy of missing segmented filter styles for standalone MyPosts usage */
+.prof-filter-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.prof-filter-segmented {
+  display: inline-flex;
+  background-color: #f1f5f9;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.prof-filter-pill {
+  border: none;
+  background: transparent;
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #64748b;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.prof-filter-pill:hover {
+  color: #1e293b;
+}
+
+.prof-filter-pill-active {
+  background-color: #fff;
+  color: #3b82f6;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Beautiful custom buttons for the grid cards */
+.my-posts-btn-group {
+  display: flex;
+  gap: 12px;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.mp-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.mp-btn-primary {
+  background-color: #3b82f6;
+  color: white;
+}
+.mp-btn-primary:hover {
+  background-color: #2563eb;
+  transform: translateY(-1px);
+}
+
+.mp-btn-secondary {
+  background-color: #f8fafc;
+  color: #475569;
+  border-color: #cbd5e1;
+}
+.mp-btn-secondary:hover {
+  background-color: #f1f5f9;
+  color: #1e293b;
+}
+
+.mp-btn-danger {
+  background-color: #fef2f2;
+  color: #ef4444;
+  border-color: #fecaca;
+}
+.mp-btn-danger:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+/* Claim Alert */
+.mp-claim-alert {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background-color: #fefce8;
+  border: 1px solid #fde047;
+  color: #a16207;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: pulseClaim 2s infinite;
+}
+
+.mp-claim-alert i {
+  color: #eab308;
+  font-size: 1rem;
+}
+
+@keyframes pulseClaim {
+  0% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.5); }
+  70% { box-shadow: 0 0 0 6px rgba(250, 204, 21, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+}

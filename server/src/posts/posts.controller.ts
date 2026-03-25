@@ -147,6 +147,14 @@ export class PostsController {
       throw new BadRequestException("Chỉ sửa được bài của bạn");
     }
 
+    const status = (post as any).status;
+    const BLOCKED_STATUSES = ["ARCHIVED", "RETURNED", "REJECTED"];
+    if (BLOCKED_STATUSES.includes(status)) {
+      throw new BadRequestException(
+        `Không thể sửa bài đăng ở trạng thái ${status}.`,
+      );
+    }
+
     // Nếu có file mới, upload lên Cloudinary và cập nhật dto.images / dto.image_public_ids
     if (file?.buffer) {
       const result = await this.cloudinary.uploadBuffer(file.buffer, {

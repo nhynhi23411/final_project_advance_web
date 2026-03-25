@@ -1,0 +1,104 @@
+<app-auth-navbar></app-auth-navbar>
+
+<main class="archive-page min-h-screen">
+  <div class="archive-container">
+    <div style="margin-bottom: 12px; padding-top: 12px;">
+      <button type="button" (click)="goBack()" class="archive-btn-secondary" style="background: transparent; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05); cursor: pointer; padding: 6px 16px; border-radius: 6px; font-weight: 600; font-size: 0.875rem;">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> Quay lại
+      </button>
+    </div>
+    <header class="archive-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+      <div>
+        <h1 class="archive-title">Bài đăng của tôi</h1>
+        <p class="archive-desc">Quản lý các tin đăng báo mất và nhặt được đồ của bạn.</p>
+      </div>
+      <div>
+        <button type="button" (click)="goToPostItem()" class="archive-btn-primary">
+          <i class="fas fa-plus" aria-hidden="true"></i> Tạo tin mới
+        </button>
+      </div>
+    </header>
+
+    <div *ngIf="!authService.isLoggedIn" class="archive-login-required">
+      <i class="fas fa-lock"></i>
+      <p>Bạn cần đăng nhập để xem bài đăng của mình.</p>
+      <a routerLink="/auth/login" class="archive-btn-primary">Đăng nhập</a>
+    </div>
+
+    <div *ngIf="authService.isLoggedIn && error" class="archive-error">
+      {{ error }}
+    </div>
+
+    <div *ngIf="authService.isLoggedIn && !error">
+      <div *ngIf="!isLoading && items.length > 0" class="prof-filter-wrap" style="margin-bottom: 24px;">
+        <div class="prof-filter-segmented" role="tablist">
+          <button type="button" class="prof-filter-pill" [class.prof-filter-pill-active]="postTypeFilter === 'all'" (click)="setPostTypeFilter('all')" role="tab">Tất cả</button>
+          <button type="button" class="prof-filter-pill" [class.prof-filter-pill-active]="postTypeFilter === 'LOST'" (click)="setPostTypeFilter('LOST')" role="tab">Đồ bị mất</button>
+          <button type="button" class="prof-filter-pill" [class.prof-filter-pill-active]="postTypeFilter === 'FOUND'" (click)="setPostTypeFilter('FOUND')" role="tab">Đồ nhặt được</button>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="archive-loading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Đang tải...</p>
+      </div>
+
+      <div *ngIf="!isLoading && items.length === 0" class="archive-empty">
+        <i class="fas fa-inbox"></i>
+        <h2>Bạn chưa có bài đăng nào</h2>
+        <p>Hãy đăng tin đầu tiên để cộng đồng hỗ trợ tìm kiếm.</p>
+        <a routerLink="/post-item" class="archive-btn-primary">Tạo tin mới</a>
+      </div>
+
+      <div *ngIf="!isLoading && items.length > 0 && filteredItems.length === 0" class="archive-empty">
+        <i class="fas fa-filter"></i>
+        <h2>Không có bài đăng nào thuộc loại này.</h2>
+        <button type="button" class="archive-btn-secondary" (click)="setPostTypeFilter('all')">Xem tất cả</button>
+      </div>
+
+      <div *ngIf="!isLoading && filteredItems.length > 0" class="archive-grid">
+        <article *ngFor="let item of filteredItems" class="archive-card">
+          <div class="archive-card-image">
+            <img
+              *ngIf="getItemImage(item) as src"
+              [src]="src"
+              [alt]="item.title"
+            />
+            <div *ngIf="!getItemImage(item)" class="archive-card-noimg">
+              <i class="fas fa-image"></i>
+            </div>
+            <span class="archive-card-badge" [ngClass]="getStatusUelClass(item.status)">
+              {{ getStatusLabel(item.status) }}
+            </span>
+          </div>
+          <div class="archive-card-body">
+            <h2 class="archive-card-title">{{ item.title }}</h2>
+            <p class="archive-card-meta">
+              <span [ngStyle]="{ color: (item.type || item.post_type) === 'LOST' ? '#ef4444' : '#10b981', fontWeight: 600 }">
+                <i [class]="(item.type || item.post_type) === 'LOST' ? 'fas fa-exclamation-circle' : 'fas fa-hand-holding-heart'" aria-hidden="true"></i>
+                {{ getTypeLabel(item.type || item.post_type) }}
+              </span>
+            </p>
+            <p class="archive-card-meta"><i class="fas fa-map-marker-alt"></i> {{ item.location_text | slice:0:50 }}{{ (item.location_text?.length || 0) > 50 ? '…' : '' }}</p>
+            <p class="archive-card-date"><i class="fas fa-clock"></i> Đăng ngày: {{ formatDate(item.created_at || item.createdAt) }}</p>
+            
+            <div *ngIf="$any(item).active_claim_count > 0" class="mp-claim-alert">
+              <i class="fas fa-bell"></i> Có {{ $any(item).active_claim_count }} yêu cầu nhận đồ chờ duyệt!
+            </div>
+
+            <div class="my-posts-btn-group">
+              <button type="button" class="mp-btn mp-btn-primary" (click)="viewItem(item._id)">
+                Xem
+              </button>
+              <button type="button" class="mp-btn mp-btn-secondary" [routerLink]="['/edit-item', item._id]">
+                Sửa
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</main>
+
+<app-footer></app-footer>

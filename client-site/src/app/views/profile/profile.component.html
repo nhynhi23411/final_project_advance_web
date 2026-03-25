@@ -16,6 +16,11 @@
   </div>
 
   <div *ngIf="!loading && !error" class="prof-container">
+    <div style="margin-bottom: 12px; padding-top: 12px;">
+      <button type="button" (click)="goBack()" class="prof-btn prof-btn-secondary" style="background: transparent; border: 1px solid #cbd5e1; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> Quay lại
+      </button>
+    </div>
     <!-- Profile header card -->
     <section class="prof-header-card">
       <div class="prof-header-inner">
@@ -117,6 +122,16 @@
           <button type="button" class="prof-filter-pill" [class.prof-filter-pill-active]="postTypeFilter === 'LOST'" (click)="setPostTypeFilter('LOST')" role="tab">Đồ bị mất</button>
           <button type="button" class="prof-filter-pill" [class.prof-filter-pill-active]="postTypeFilter === 'FOUND'" (click)="setPostTypeFilter('FOUND')" role="tab">Đồ nhặt được</button>
         </div>
+        <select class="prof-filter-select" [(ngModel)]="statusFilter" (change)="setStatusFilter(statusFilter)" style="margin-left:12px; padding:4px 10px; border-radius:8px; border:1px solid #d1d5db; font-size:0.85rem; height:36px;">
+          <option value="all">Mọi trạng thái</option>
+          <option value="PENDING_SYSTEM">Chờ hệ thống</option>
+          <option value="PENDING_ADMIN">Chờ duyệt</option>
+          <option value="APPROVED">Đã duyệt</option>
+          <option value="NEEDS_UPDATE">Cần cập nhật</option>
+          <option value="REJECTED">Từ chối</option>
+          <option value="ARCHIVED">Lưu trữ</option>
+          <option value="RETURNED">Đã trả</option>
+        </select>
       </div>
       <div *ngIf="loadingPosts" class="prof-loading-inline">
         <i class="fas fa-spinner prof-spinner" aria-hidden="true"></i>
@@ -135,8 +150,8 @@
       <!-- Empty: có bài nhưng filter không có kết quả -->
       <div *ngIf="!loadingPosts && myPosts.length > 0 && filteredMyPosts.length === 0" class="prof-empty prof-empty-filter">
         <i class="fas fa-filter prof-empty-icon" aria-hidden="true"></i>
-        <p class="prof-empty-text">Không có bài đăng nào thuộc loại này.</p>
-        <button type="button" class="prof-btn prof-btn-secondary" (click)="setPostTypeFilter('all')">Xem tất cả</button>
+        <p class="prof-empty-text">Không có bài đăng nào ở trạng thái này.</p>
+        <button type="button" class="prof-btn prof-btn-secondary" (click)="setPostTypeFilter('all'); setStatusFilter('all')">Xem tất cả</button>
       </div>
       <!-- Danh sách bài đăng (đã lọc) -->
       <div *ngIf="!loadingPosts && filteredMyPosts.length > 0" class="prof-post-list">
@@ -154,6 +169,11 @@
               <i class="fas fa-map-marker-alt prof-post-location-icon" aria-hidden="true"></i>
               {{ post.location_text }}
             </p>
+
+            <div *ngIf="$any(post).active_claim_count > 0" class="prof-claim-alert">
+              <i class="fas fa-bell"></i> Có {{ $any(post).active_claim_count }} yêu cầu nhận đồ chờ xem xét!
+            </div>
+
             <span class="prof-post-status" [ngClass]="getStatusUelClass($any(post).status)">
               {{ getStatusLabel($any(post).status) }}
             </span>
@@ -164,6 +184,7 @@
               Xem
             </button>
             <button
+              *ngIf="isPostEditable(post)"
               type="button"
               class="prof-btn prof-btn-secondary"
               (click)="router.navigate(['/edit-item', post._id])"
@@ -224,7 +245,27 @@
         </p>
       </div>
     </section>
+
+
   </div>
 </main>
+
+<!-- Delete Post Confirmation Modal -->
+<div *ngIf="showDeleteModal" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+  <div style="position: absolute; inset: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); transition: opacity 0.2s;" (click)="closeDeleteModal()"></div>
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden" style="position: relative; z-index: 10000; width: 100%; max-width: 400px; animation: fadeInUp 0.3s ease-out forwards;">
+    <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
+      <i class="fas fa-trash-alt text-red-500" style="font-size: 1.25rem;" aria-hidden="true"></i>
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: #1e293b; margin: 0; line-height: 1;">Xác nhận xóa bài đăng</h3>
+    </div>
+    <div style="padding: 24px 20px; color: #475569; text-align: center; font-size: 0.9375rem; font-weight: 500; line-height: 1.5;">
+      Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.
+    </div>
+    <div style="padding: 16px 20px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px;">
+      <button type="button" style="padding: 8px 16px; background-color: white; border: 1px solid #cbd5e1; border-radius: 6px; color: #475569; font-size: 0.875rem; font-weight: 600; cursor: pointer;" (click)="closeDeleteModal()">Hủy</button>
+      <button type="button" style="padding: 8px 16px; background-color: #ef4444; border: none; border-radius: 6px; color: white; font-size: 0.875rem; font-weight: 600; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" (click)="confirmDeletePost()">Xóa bài đăng</button>
+    </div>
+  </div>
+</div>
 
 <app-footer></app-footer>

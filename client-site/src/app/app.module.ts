@@ -35,6 +35,7 @@ import { ReturnProcessComponent } from "./views/return-process/return-process.co
 import { TermsComponent } from "./views/terms/terms.component";
 import { EditItemComponent } from "./views/edit-item/edit-item.component";
 import { MyClaimsComponent } from "./views/my-claims/my-claims.component";
+import { MyPostsComponent } from "./views/my-posts/my-posts.component";
 import { ChatComponent } from "./views/chat/chat.component";
 
 // shared components
@@ -105,6 +106,7 @@ const socketConfig: SocketIoConfig = {
     TermsComponent,
     EditItemComponent,
     MyClaimsComponent,
+    MyPostsComponent,
     ChatComponent,
     OfflineStatusComponent,
   ],

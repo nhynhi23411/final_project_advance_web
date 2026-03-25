@@ -27,6 +27,12 @@ export class ItemDetailComponent implements OnInit {
   MAX_CLAIMS_LIMIT = MAX_CLAIMS_LIMIT;
   selectedImage: string | null = null;
   selectedImageIndex = 0;
+
+  showReviewModal = false;
+  reviewAction: "UNDER_VERIFICATION" | "SUCCESSFUL" | "REJECTED" | "CANCELLED" | null = null;
+  reviewClaimId: string | null = null;
+
+  showDeleteItemModal = false;
   hasClaimed = false;
   hasFinderSuggestion = false;
   hasOwnerSuggestionForThisPost = false;
@@ -198,20 +204,35 @@ export class ItemDetailComponent implements OnInit {
     claimId: string,
     action: "UNDER_VERIFICATION" | "SUCCESSFUL" | "REJECTED" | "CANCELLED",
   ): void {
-    if (confirm(`Bạn có chắc chắn muốn thực hiện hành động này?`)) {
-      this.claimService.reviewClaim(claimId, action).subscribe({
-        next: () => {
-          this.toastService.success("Cập nhật trạng thái claim thành công!");
-          if (this.item && this.item._id) {
-            this.loadClaimsForPost(this.item._id);
-          }
-        },
-        error: (err) => {
-          console.error(err);
-          this.toastService.error("Có lỗi xảy ra khi xử lý yêu cầu.");
-        },
-      });
-    }
+    this.reviewClaimId = claimId;
+    this.reviewAction = action;
+    this.showReviewModal = true;
+  }
+
+  closeReviewModal(): void {
+    this.showReviewModal = false;
+    this.reviewAction = null;
+    this.reviewClaimId = null;
+  }
+
+  confirmReviewClaim(): void {
+    if (!this.reviewClaimId || !this.reviewAction) return;
+    const claimId = this.reviewClaimId;
+    const action = this.reviewAction;
+    this.closeReviewModal();
+
+    this.claimService.reviewClaim(claimId, action).subscribe({
+      next: () => {
+        this.toastService.success("Cập nhật trạng thái claim thành công!");
+        if (this.item && this.item._id) {
+          this.loadClaimsForPost(this.item._id);
+        }
+      },
+      error: (err) => {
+        console.error(err);
+        this.toastService.error("Có lỗi xảy ra khi xử lý yêu cầu.");
+      },
+    });
   }
 
   getClaimStatusLabel(status: string): string {
@@ -584,11 +605,23 @@ export class ItemDetailComponent implements OnInit {
     this.router.navigate(["/edit-item", this.item._id]);
   }
 
+  /** Open delete confirmation modal */
+  openDeleteItemModal(): void {
+    this.showDeleteItemModal = true;
+  }
+
+  closeDeleteItemModal(): void {
+    this.showDeleteItemModal = false;
+  }
+
+  confirmDeleteItem(): void {
+    this.closeDeleteItemModal();
+    this.deleteItem();
+  }
+
   /** Xóa bài đăng ngay từ trang chi tiết */
   deleteItem(): void {
     if (!this.item?._id) return;
-    const confirmed = window.confirm("Bạn có chắc muốn xóa bài đăng này?");
-    if (!confirmed) return;
 
     this.itemService.deleteItem(this.item._id).subscribe({
       next: () => {

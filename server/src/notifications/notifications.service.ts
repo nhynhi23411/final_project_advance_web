@@ -201,7 +201,7 @@ export class NotificationsService {
 
     await this.createNotification(
       claimerId,
-      reviewerName === "bạn" ? claimerId : postId, // Self-notification for CANCELLED
+      claimerId, // Always use the claimer's own ID as sender (self-notification for CANCELLED, post owner for others)
       "claim",
       postId,
       title,
