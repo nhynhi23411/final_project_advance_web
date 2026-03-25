@@ -24,6 +24,7 @@ interface NavbarNotification {
 export class AuthNavbarComponent implements OnInit {
   navbarOpen = false;
   userMenuOpen = false;
+  showLogoutModal = false;
   notifOpen = false;
   chatUnreadCount = 0;
   notifications: NavbarNotification[] = [];
@@ -89,8 +90,19 @@ export class AuthNavbarComponent implements OnInit {
     this.router.navigate(["/items", notification.targetPostId]);
   }
 
-  logout(): void {
+  openLogoutModal(): void {
+    this.showLogoutModal = true;
+    this.closeUserMenu();
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
+    this.showLogoutModal = false;
     this.authService.logout();
+    this.router.navigate(["/"]);
   }
 
   onChatLinkClick(): void {

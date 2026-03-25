@@ -171,6 +171,9 @@ export class ModerationDetailComponent implements OnInit, AfterViewChecked {
 
   get metadataRows(): Array<{ label: string; value: string }> {
     const createdBy = this.pickFirstValue([
+      'created_by_user_id.name',
+      'created_by_user_id.username',
+      'created_by_user_id.email',
       'createdBy.name',
       'created_by.name',
       'author.name',
@@ -180,22 +183,48 @@ export class ModerationDetailComponent implements OnInit, AfterViewChecked {
       'username'
     ]);
 
-    const category = this.pickFirstValue(['category', 'post_type', 'type']);
-    const location = this.pickFirstValue(['location', 'place', 'address']);
+    const createdByEmail = this.pickFirstValue([
+      'created_by_user_id.email',
+      'createdBy.email',
+      'author.email',
+      'user.email',
+      'email'
+    ]);
+
+    const postType = this.pickFirstValue(['type', 'post_type']);
+    const displayType = postType === 'LOST' ? 'Đồ bị mất' : postType === 'FOUND' ? 'Đồ nhặt được' : this.toText(postType, '-');
+
+    const category = this.pickFirstValue(['category', 'post_type_label']);
+    const locationText = this.pickFirstValue(['location_text', 'location', 'place', 'address']);
+    const color = this.pickFirstValue(['color', 'colour']);
+    const lostFoundDate = this.pickFirstValue(['lost_found_date', 'lostFoundDate', 'event_date', 'eventDate', 'date']);
     const createdAt = this.pickFirstValue(['created_at', 'createdAt', 'created']);
     const updatedAt = this.pickFirstValue(['updated_at', 'updatedAt', 'modifiedAt']);
 
     return [
       { label: 'ID', value: this.itemIdLabel },
-      { label: 'Tieu de', value: this.toText(this.item?.title, '-') },
-      { label: 'Trang thai', value: this.statusLabel(this.currentStatus) },
-      { label: 'Nguoi dang', value: this.toText(createdBy, '-') },
-      { label: 'Danh muc', value: this.toText(category, '-') },
-      { label: 'Khu vuc', value: this.toText(location, '-') },
-      { label: 'Ngay tao', value: this.formatDate(createdAt) },
-      { label: 'Cap nhat gan nhat', value: this.formatDate(updatedAt) }
+      { label: 'Tiêu đề', value: this.toText(this.item?.title, '-') },
+      { label: 'Trạng thái', value: this.statusLabel(this.currentStatus) },
+      { label: 'Loại bài đăng', value: displayType },
+      { label: 'Người đăng', value: this.toText(createdBy, '-') },
+      { label: 'Email người đăng', value: this.toText(createdByEmail, 'Chưa có') },
+      { label: 'Danh mục', value: this.toText(category, '-') },
+      { label: 'Màu sắc', value: this.toText(color, '-') },
+      { label: 'Địa điểm', value: this.toText(locationText, '-') },
+      { label: 'Ngày mất/nhặt được', value: lostFoundDate ? this.formatDate(lostFoundDate) : '-' },
+      { label: 'Ngày tạo', value: this.formatDate(createdAt) },
+      { label: 'Cập nhật gần nhất', value: this.formatDate(updatedAt) }
     ];
   }
+
+  get descriptionText(): string {
+    return this.toText(this.pickFirstValue(['description', 'desc']), '(Không có mô tả)');
+  }
+
+  get distinctiveMarksText(): string {
+    return this.toText(this.pickFirstValue(['distinctive_marks', 'distinctiveMarks', 'marks', 'notes', 'note']), '');
+  }
+
 
   get showNeedsUpdateBox(): boolean {
     return this.currentStatus === 'NEEDS_UPDATE';
@@ -400,57 +429,28 @@ export class ModerationDetailComponent implements OnInit, AfterViewChecked {
     }
 
     this.loading = true;
-    forkJoin({
-      pending: this.adminService.getPendingItems().pipe(
-        catchError((err) => {
-          console.error('Failed to fetch pending admin items', err);
-          return of([] as Item[]);
-        })
-      ),
-      needsUpdate: this.adminService.getNeedsUpdateItems().pipe(
-        catchError((err) => {
-          console.error('Failed to fetch needs-update items', err);
-          return of([] as Item[]);
-        })
-      )
-    })
-      .pipe(
-        finalize(() => {
-          this.loading = false;
-          this.cdr.markForCheck();
-        })
-      )
-      .subscribe({
-        next: ({ pending, needsUpdate }) => {
-          const items = [...pending, ...needsUpdate];
-          const found = items.find((entry) => this.getItemId(entry) === id);
-          if (found) {
-            this.item = found;
-            this.currentStatus = this.normalizeStatus(found.status);
-            return;
-          }
-
-          if (!this.item) {
-            this.item = {
-              id,
-              title: 'Không tìm thấy bài đăng trong danh sách chờ duyệt.',
-              status: 'DRAFT'
-            };
-            this.currentStatus = 'DRAFT';
-          }
-        },
-        error: (err) => {
-          console.error('Failed to fetch pending post detail', err);
-          if (!this.item) {
-            this.item = {
-              id,
-              title: 'Không thể tải dữ liệu bài đăng.',
-              status: 'DRAFT'
-            };
-            this.currentStatus = 'DRAFT';
-          }
+    this.adminService.getPostById(id).pipe(
+      finalize(() => {
+        this.loading = false;
+        this.cdr.markForCheck();
+      })
+    ).subscribe({
+      next: (item) => {
+        this.item = item;
+        this.currentStatus = this.normalizeStatus(item.status);
+      },
+      error: (err) => {
+        console.error('Failed to fetch post detail', err);
+        if (!this.item) {
+          this.item = {
+            id,
+            title: 'Không thể tải dữ liệu bài đăng.',
+            status: 'DRAFT'
+          };
+          this.currentStatus = 'DRAFT';
         }
-      });
+      }
+    });
   }
 
   private normalizeStatus(status: unknown): PostStatus {

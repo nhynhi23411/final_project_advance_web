@@ -299,6 +299,10 @@ export class AdminService {
     return this.http.get<Record<string, number>>(`${this.baseUrl}/admin/posts/counts`);
   }
 
+  getPostById(id: string): Observable<Item> {
+    return this.http.get<Item>(`${this.baseUrl}/admin/posts/${id}`);
+  }
+
   /** Admin override: update post content (title, description, category). */
   updatePost(id: string, dto: { title?: string; description?: string; category?: string }): Observable<Item> {
     return this.http.patch<Item>(`${this.baseUrl}/admin/posts/${id}`, dto);

@@ -163,14 +163,15 @@
                 ><span>Profile</span></a
               >
               <a
-                routerLink="/profile"
+                routerLink="/my-posts"
                 class="app-nav-user-item"
                 (click)="closeUserMenu()"
                 ><i class="fas fa-list" aria-hidden="true"></i
                 ><span>My Posts</span></a
               >
               <a
-                routerLink="/my-claims"
+                routerLink="/profile"
+                [queryParams]="{tab: 'claims'}"
                 class="app-nav-user-item"
                 (click)="closeUserMenu()"
                 ><i class="fas fa-file-contract" aria-hidden="true"></i
@@ -187,7 +188,7 @@
               <button
                 type="button"
                 class="app-nav-user-item app-nav-user-item-logout"
-                (click)="logout(); closeUserMenu()"
+                (click)="openLogoutModal()"
               >
                 <i class="fas fa-sign-out-alt" aria-hidden="true"></i
                 ><span>Đăng xuất</span>
@@ -197,5 +198,47 @@
         </div>
       </div>
     </div>
+
+<!-- Logout Confirmation Modal -->
+<div *ngIf="showLogoutModal" style="position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 1rem;">
+  <!-- Overlay -->
+  <div style="position: absolute; inset: 0; width: 100%; height: 100%; background-color: rgba(15, 23, 42, 0.5); backdrop-filter: blur(4px); transition: opacity 0.2s;" (click)="closeLogoutModal()"></div>
+  
+  <!-- Modal Content -->
+  <div class="bg-white rounded-lg shadow-xl overflow-hidden" style="position: relative; z-index: 10000; width: 100%; max-width: 400px; animation: fadeInUp 0.3s ease-out forwards;">
+    <div style="padding: 16px 20px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 12px;">
+      <i class="fas fa-exclamation-triangle text-red-500" style="font-size: 1.25rem;" aria-hidden="true"></i>
+      <h3 style="font-size: 1.125rem; font-weight: 700; color: #1e293b; margin: 0; line-height: 1;">Xác nhận đăng xuất</h3>
+    </div>
+    
+    <div style="padding: 24px 20px; color: #475569; text-align: center; font-size: 0.9375rem; font-weight: 500; line-height: 1.5;">
+      Bạn có chắc chắn muốn đăng xuất khỏi tài khoản không?
+    </div>
+    
+    <div style="padding: 16px 20px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: flex-end; gap: 12px;">
+      <button 
+        type="button"
+        style="padding: 8px 16px; background-color: white; border: 1px solid #cbd5e1; border-radius: 6px; color: #475569; font-size: 0.875rem; font-weight: 600; cursor: pointer;"
+        (click)="closeLogoutModal()"
+      >
+        Hủy
+      </button>
+      <button 
+        type="button"
+        style="padding: 8px 16px; background-color: #ef4444; border: none; border-radius: 6px; color: white; font-size: 0.875rem; font-weight: 600; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);"
+        (click)="confirmLogout()"
+      >
+        Đăng xuất
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
   </div>
 </nav>

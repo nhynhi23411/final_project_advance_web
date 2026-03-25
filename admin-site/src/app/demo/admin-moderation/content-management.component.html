@@ -148,9 +148,9 @@
           <tbody>
             <tr
               *ngFor="let item of filteredItems"
-              [class.pending-row]="activeTab === 'pending'"
-              [class.pending-row--clickable]="activeTab === 'pending'"
-              (click)="activeTab === 'pending' && openPendingDetail(item)"
+              [class.pending-row]="true"
+              class="pending-row--clickable"
+              (click)="openDetail(item)"
             >
               <td class="id-cell">{{ getItemId(item) || '—' }}</td>
               <td class="title-cell">{{ item.title || 'Không có tiêu đề' }}</td>
@@ -162,15 +162,13 @@
               <td *ngIf="activeTab === 'rejected' || activeTab === 'needs_update'" class="reason-cell">{{ getRejectedReason(item) }}</td>
               <td>
                 <div class="d-flex gap-1 flex-wrap">
-                  <ng-container *ngIf="activeTab === 'pending'">
                     <button
                       class="btn btn-outline-primary btn-sm"
-                      (click)="openPendingDetail(item, $event)"
+                      (click)="openDetail(item, $event)"
                       [disabled]="loading"
                     >
                       Xem chi tiết
                     </button>
-                  </ng-container>
                   <button
                     class="btn btn-outline-secondary btn-sm"
                     (click)="openQuickEdit(item, $event)"

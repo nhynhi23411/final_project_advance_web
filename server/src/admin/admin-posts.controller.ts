@@ -49,6 +49,12 @@ export class AdminPostsController {
     );
   }
 
+  @Get(":id")
+  async getOne(@Param("id") id: string) {
+    if (!isValidObjectId(id)) throw new BadRequestException("Invalid post ID");
+    return this.adminPostsService.getPostById(id);
+  }
+
   @Patch(":id/status")
   async updateStatus(
     @Param("id") id: string,

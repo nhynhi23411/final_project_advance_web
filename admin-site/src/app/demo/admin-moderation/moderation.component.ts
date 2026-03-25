@@ -153,13 +153,9 @@ export class ModerationComponent implements OnInit {
     });
   }
 
-  openPendingDetail(item: Item, event?: Event) {
+  openDetail(item: Item, event?: Event) {
     if (event) {
       event.stopPropagation();
-    }
-
-    if (this.activeTab !== 'pending') {
-      return;
     }
 
     const id = this.getItemId(item);

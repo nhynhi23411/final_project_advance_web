@@ -1,6 +1,7 @@
 import { Component, OnInit } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
+import { ActivatedRoute, Router } from "@angular/router";
+import { Location } from "@angular/common";
 import { environment } from "../../../environments/environment";
 import { ItemService, Item } from "../../services/item.service";
 import { ToastService } from "../../services/toast.service";
@@ -33,22 +34,39 @@ export class ProfileComponent implements OnInit {
   /** Filter My Posts by type: all / LOST / FOUND */
   postTypeFilter: "all" | "LOST" | "FOUND" = "all";
 
+  /** Filter My Posts by status */
+  statusFilter: string = "all";
+
   /** Edit profile */
   isEditing = false;
   saving = false;
   editForm = { name: "", email: "", phone: "" };
   editErrors: { name?: string; email?: string; phone?: string } = {};
 
+  showDeleteModal = false;
+  postToDeleteId: string | null = null;
+
   constructor(
     private http: HttpClient,
     private itemService: ItemService,
     public router: Router,
+    private route: ActivatedRoute,
     private toastService: ToastService,
     private notificationService: NotificationService,
-    public authService: AuthService
+    public authService: AuthService,
+    private location: Location
   ) {}
 
+  goBack(): void {
+    this.router.navigate(['/']);
+  }
+
   ngOnInit(): void {
+    this.route.queryParams.subscribe(params => {
+      if (params['tab']) {
+        this.activeTab = params['tab'] as any;
+      }
+    });
     this.loadProfile();
     // Mark all notifications as read when user opens Profile (e.g. NEEDS_UPDATE / REJECTED from admin)
     this.notificationService.markAllAsRead();
@@ -138,11 +156,23 @@ export class ProfileComponent implements OnInit {
     return new Date(d).toLocaleDateString("vi-VN");
   }
 
-  /** Xóa bài đăng */
+  /** Bật modal xác nhận xóa bài đăng */
   onDeletePost(id: string): void {
     if (!id) return;
-    const confirmed = window.confirm("Bạn có chắc muốn xóa bài đăng này?");
-    if (!confirmed) return;
+    this.postToDeleteId = id;
+    this.showDeleteModal = true;
+  }
+
+  closeDeleteModal(): void {
+    this.showDeleteModal = false;
+    this.postToDeleteId = null;
+  }
+
+  /** Thực hiện lệnh xóa bài đăng */
+  confirmDeletePost(): void {
+    const id = this.postToDeleteId;
+    if (!id) return;
+    this.closeDeleteModal();
 
     this.itemService.deleteItem(id).subscribe({
       next: () => {
@@ -186,14 +216,26 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  /** Bài đăng của user hiện tại, lọc theo postTypeFilter (type/post_type). */
+  /** Bài đăng của user hiện tại, lọc theo postTypeFilter và statusFilter. */
   get filteredMyPosts(): Item[] {
     if (!this.myPosts.length) return [];
-    if (this.postTypeFilter === "all") return this.myPosts;
-    return this.myPosts.filter((p) => {
-      const t = p.type ?? (p as any).post_type;
-      return t === this.postTypeFilter;
-    });
+    let result = this.myPosts;
+    if (this.postTypeFilter !== "all") {
+      result = result.filter((p) => {
+        const t = p.type ?? (p as any).post_type;
+        return t === this.postTypeFilter;
+      });
+    }
+    if (this.statusFilter !== "all") {
+      result = result.filter((p) => (p as any).status === this.statusFilter);
+    }
+    return result;
+  }
+
+  /** Whether the user can still edit this post */
+  isPostEditable(post: Item): boolean {
+    const s = (post as any).status;
+    return !['ARCHIVED', 'RETURNED', 'REJECTED'].includes(s);
   }
 
   setTab(tab: "posts" | "claims" | "archive"): void {
@@ -202,6 +244,10 @@ export class ProfileComponent implements OnInit {
 
   setPostTypeFilter(value: "all" | "LOST" | "FOUND"): void {
     this.postTypeFilter = value;
+  }
+
+  setStatusFilter(value: string): void {
+    this.statusFilter = value;
   }
 
   /** Bật chế độ chỉnh sửa hồ sơ */

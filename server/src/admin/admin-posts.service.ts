@@ -60,6 +60,15 @@ export class AdminPostsService {
     return this.postModel.find(query).sort({ createdAt: -1 }).exec();
   }
 
+  async getPostById(postId: string): Promise<PostDocument> {
+    const post = await this.postModel
+      .findById(postId)
+      .populate("created_by_user_id", "name username email phone")
+      .exec();
+    if (!post) throw new NotFoundException("Post not found");
+    return post;
+  }
+
   /** Admin override: update post content (title, description, category). */
   async updatePostContent(
     postId: string,

@@ -11,6 +11,9 @@ import { ToastService } from "../../services/toast.service";
 export class MyClaimsComponent implements OnInit {
   claims: Claim[] = [];
   loading = false;
+  
+  showCancelModal = false;
+  claimToCancel: Claim | null = null;
 
   /** Alias cho yêu cầu: myClaims để khớp yêu cầu đề bài */
   get myClaims(): Claim[] {
@@ -91,12 +94,22 @@ export class MyClaimsComponent implements OnInit {
     return c.status === "PENDING";
   }
 
-  onCancelClaim(c: Claim): void {
+  openCancelModal(c: Claim): void {
     if (!this.canCancel(c)) return;
-    const confirmed = window.confirm(
-      "Bạn có chắc chắn muốn hủy yêu cầu này không? Hành động này không thể hoàn tác."
-    );
-    if (!confirmed) return;
+    this.claimToCancel = c;
+    this.showCancelModal = true;
+  }
+
+  closeCancelModal(): void {
+    this.showCancelModal = false;
+    this.claimToCancel = null;
+  }
+
+  confirmCancelClaim(): void {
+    if (!this.claimToCancel) return;
+    const c = this.claimToCancel;
+    this.closeCancelModal();
+    
     this.claimService.reviewClaim(c._id, "CANCELLED").subscribe({
       next: () => {
         this.toastService.success("Đã hủy yêu cầu xác minh.");
