@@ -33,7 +33,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.23.0",
     "nodemailer": "^8.0.3",
-    "npm": "^11.11.1",
+    "npm": "^11.12.1",
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "reflect-metadata": "^0.2.2",

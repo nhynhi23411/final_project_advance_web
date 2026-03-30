@@ -164,8 +164,10 @@ export class SystemConfigComponent implements OnInit {
   }
 
   openDeleteModal(kw: BlacklistedKeyword): void {
-    this.deleteTarget = kw;
-    this.showDeleteModal = true;
+    if (confirm(`Bạn có chắc muốn xóa từ khóa "${kw.keyword}" không?`)) {
+      this.deleteTarget = kw;
+      this.confirmDelete();
+    }
   }
 
   confirmDelete(): void {
@@ -174,7 +176,6 @@ export class SystemConfigComponent implements OnInit {
     this.adminService.deleteBlacklistedKeyword(this.deleteTarget._id).subscribe({
       next: () => {
         this.keywords = this.keywords.filter(k => k._id !== this.deleteTarget!._id);
-        this.showDeleteModal = false;
         this.deleteTarget = null;
         this.isDeletingKeyword = false;
         this.showKeywordSuccess('Xóa từ khóa thành công!');
