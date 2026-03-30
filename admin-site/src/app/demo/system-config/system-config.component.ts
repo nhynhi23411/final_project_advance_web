@@ -136,16 +136,28 @@ export class SystemConfigComponent implements OnInit {
   }
 
   openEditModal(kw: BlacklistedKeyword): void {
-    this.editTarget = kw;
-    this.editKeywordValue = kw.keyword;
-    this.showEditModal = true;
+    try {
+      this.editTarget = kw;
+      this.editKeywordValue = kw.keyword;
+      this.showEditModal = true;
+      console.log('Edit modal opened:', kw);
+      this.cdr.markForCheck();
+    } catch (err) {
+      console.error('Error opening edit modal:', err);
+      this.keywordError = 'Lỗi khi mở modal chỉnh sửa';
+    }
   }
 
   saveEdit(): void {
-    if (!this.editTarget || !this.editKeywordValue.trim()) return;
+    if (!this.editTarget || !this.editKeywordValue.trim()) {
+      console.warn('Edit validation failed:', this.editTarget, this.editKeywordValue);
+      return;
+    }
     this.isSavingEdit = true;
+    console.log('Saving keyword:', this.editKeywordValue);
     this.adminService.updateBlacklistedKeyword(this.editTarget._id, { keyword: this.editKeywordValue.trim() }).subscribe({
       next: (updated) => {
+        console.log('Keyword updated successfully:', updated);
         const idx = this.keywords.findIndex(k => k._id === this.editTarget!._id);
         if (idx !== -1) this.keywords[idx] = updated;
         this.showEditModal = false;
@@ -155,9 +167,11 @@ export class SystemConfigComponent implements OnInit {
         this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error(err);
-        this.keywordError = 'Cập nhật thất bại.';
+        console.error('Error updating keyword:', err);
+        this.keywordError = err.error?.message || 'Cập nhật thất bại. Vui lòng thử lại.';
         this.isSavingEdit = false;
+        this.showEditModal = false;
+        this.editTarget = null;
         this.cdr.markForCheck();
       },
     });
@@ -178,6 +192,7 @@ export class SystemConfigComponent implements OnInit {
         this.keywords = this.keywords.filter(k => k._id !== this.deleteTarget!._id);
         this.deleteTarget = null;
         this.isDeletingKeyword = false;
+        this.showDeleteModal = false;
         this.showKeywordSuccess('Xóa từ khóa thành công!');
         this.cdr.markForCheck();
       },
@@ -185,6 +200,8 @@ export class SystemConfigComponent implements OnInit {
         console.error(err);
         this.keywordError = 'Xóa thất bại.';
         this.isDeletingKeyword = false;
+        this.showDeleteModal = false;
+        this.deleteTarget = null;
         this.cdr.markForCheck();
       },
     });
@@ -195,6 +212,8 @@ export class SystemConfigComponent implements OnInit {
     this.showDeleteModal = false;
     this.editTarget = null;
     this.deleteTarget = null;
+    this.editKeywordValue = '';
+    this.cdr.markForCheck();
   }
 
   private showKeywordSuccess(msg: string): void {

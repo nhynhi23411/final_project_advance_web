@@ -749,12 +749,15 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   inset: 0;
   background: rgba(15, 23, 42, 0.5);
   backdrop-filter: blur(4px);
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
   z-index: 1000;
   padding: 1rem;
-  animation: fadeIn 0.15s ease;
+  animation: fadeIn 0.15s ease forwards;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 @keyframes fadeIn {
@@ -769,13 +772,27 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   width: 100%;
   max-width: 440px;
   animation: slideUp 0.2s ease;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  margin: 0 !important;
+  position: relative !important;
 
   &--danger .modal-header { border-bottom-color: #fecdd3; }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(16px) scale(0.97); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
+  from { 
+    opacity: 0; 
+    transform: translateY(16px) scale(0.97); 
+    visibility: hidden;
+  }
+  to   { 
+    opacity: 1; 
+    transform: translateY(0) scale(1); 
+    visibility: visible;
+  }
 }
 
 .modal-header {
@@ -784,6 +801,7 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   gap: 0.85rem;
   padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #f1f5f9;
+  visibility: visible !important;
 }
 
 .modal-header-icon {
@@ -794,6 +812,7 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  visibility: visible !important;
   i { font-size: 0.95rem; color: white; }
 
   &.modal-icon--edit   { background: linear-gradient(135deg, #3b82f6, #2563eb); }
@@ -806,6 +825,7 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   font-weight: 700;
   color: #1e293b;
   margin: 0;
+  visibility: visible !important;
 }
 
 .modal-close {
@@ -821,12 +841,16 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   justify-content: center;
   transition: all 0.15s;
   font-size: 0.85rem;
+  pointer-events: auto !important;
+  visibility: visible !important;
 
   &:hover { background: #e2e8f0; color: #475569; }
 }
 
 .modal-body {
   padding: 1.25rem 1.5rem;
+  display: block !important;
+  visibility: visible !important;
 }
 
 .modal-footer {
@@ -835,6 +859,7 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   gap: 0.75rem;
   padding: 1rem 1.5rem 1.25rem 1.5rem;
   border-top: 1px solid #f1f5f9;
+  visibility: visible !important;
 }
 
 .form-label {
@@ -843,6 +868,7 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   font-weight: 600;
   color: #374151;
   margin-bottom: 0.5rem;
+  visibility: visible !important;
 }
 
 .form-input {
@@ -854,6 +880,11 @@ $shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
   color: #1e293b;
   transition: border-color 0.2s, box-shadow 0.2s;
   box-sizing: border-box;
+  display: block !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+
+  &::placeholder { color: #cbd5e1; }
 
   &:focus {
     outline: none;
