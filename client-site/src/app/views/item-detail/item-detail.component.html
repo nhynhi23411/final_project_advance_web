@@ -310,12 +310,20 @@
             ></i>
             {{ getPrimaryActionButtonLabel() }}
           </button>
-          <p
-            *ngIf="!isLostItem() && activeClaimsCount >= MAX_CLAIMS_LIMIT"
-            class="item-detail-claim-limit"
-          >
-            Bạn đã đạt giới hạn yêu cầu
-          </p>
+          <ng-container *ngIf="!isLostItem()">
+            <p
+              *ngIf="activeClaimsCount >= MAX_CLAIMS_LIMIT"
+              class="item-detail-claim-limit"
+            >
+              Bạn đã đạt giới hạn yêu cầu
+            </p>
+            <p
+              *ngIf="activeClaimsCount < MAX_CLAIMS_LIMIT && $any(item)?.active_claim_count >= MAX_CLAIMS_LIMIT"
+              class="item-detail-claim-limit"
+            >
+              Bài đăng đã đạt giới hạn yêu cầu
+            </p>
+          </ng-container>
         </div>
 
         <!-- Card: Thông tin đăng -->

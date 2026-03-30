@@ -59,6 +59,10 @@ export class ClaimsService {
             throw new BadRequestException(`Bạn đã đạt giới hạn ${MAX_CLAIMS_LIMIT} claims đang chờ xử lý.`);
         }
 
+        if (post.active_claim_count >= MAX_CLAIMS_LIMIT) {
+            throw new BadRequestException(`Bài đăng này đã nhận đủ ${MAX_CLAIMS_LIMIT} yêu cầu xác minh.`);
+        }
+
         const claim = await this.claimModel.create({
             target_post_id: new Types.ObjectId(dto.post_id),
             claimant_user_id: new Types.ObjectId(claimerId),
@@ -90,7 +94,7 @@ export class ClaimsService {
             throw new BadRequestException("Claim đã được xử lý");
         }
 
-        const post = await this.postModel.findById(claim.post_id);
+        const post = await this.postModel.findById(claim.target_post_id);
         if (!post) throw new NotFoundException("Post không tồn tại");
 
         if (dto.action === "CANCELLED") {
@@ -118,7 +122,7 @@ export class ClaimsService {
             const rejectedCount = rejectedClaimsResponse.modifiedCount;
 
             if (rejectedCount > 0) {
-                await this.postModel.findByIdAndUpdate(claim.post_id, {
+                await this.postModel.findByIdAndUpdate(claim.target_post_id, {
                     $inc: { active_claim_count: -rejectedCount },
                 });
             }
@@ -172,7 +176,7 @@ export class ClaimsService {
 
             const rejectedCount = rejectedClaimsResponse.modifiedCount;
 
-            await this.postModel.findByIdAndUpdate(claim.post_id, {
+            await this.postModel.findByIdAndUpdate(claim.target_post_id, {
                 status: "RETURNED",
                 $inc: { active_claim_count: -(rejectedCount + 1) },
             });
@@ -215,7 +219,7 @@ export class ClaimsService {
             claim.status = dto.action;
             await claim.save();
 
-            await this.postModel.findByIdAndUpdate(claim.post_id, {
+            await this.postModel.findByIdAndUpdate(claim.target_post_id, {
                 $inc: { active_claim_count: -1 },
             });
 
