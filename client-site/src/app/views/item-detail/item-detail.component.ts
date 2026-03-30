@@ -315,8 +315,10 @@ export class ItemDetailComponent implements OnInit {
   }
 
   isClaimButtonDisabled(): boolean {
-    // Disable if max claims limit reached or already claimed
-    return this.activeClaimsCount >= MAX_CLAIMS_LIMIT || this.hasClaimed;
+    // Disable if max claims limit reached (for user or post) or already claimed
+    const postLimitReached = (this.item as any)?.active_claim_count >= MAX_CLAIMS_LIMIT;
+    const userLimitReached = this.activeClaimsCount >= MAX_CLAIMS_LIMIT;
+    return postLimitReached || userLimitReached || this.hasClaimed;
   }
 
   isSubmitting = false;
