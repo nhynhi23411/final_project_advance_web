@@ -1,6 +1,7 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import axios from "axios";
+import type { AxiosError } from "axios";
 import { promises as fs } from "fs";
 import * as path from "path";
 
@@ -16,12 +17,24 @@ export class GeminiService {
   private readonly logger = new Logger(GeminiService.name);
   private readonly model: string;
   private readonly apiKey: string;
+  private readonly apiVersion: string;
+  private readonly fallbackModels: string[];
   private readonly timeoutMs: number;
   private knowledgeBaseCache = "";
 
   constructor(private readonly configService: ConfigService) {
-    this.model = this.configService.get<string>("GEMINI_MODEL") || "gemini-flash-latest";
-    this.apiKey = this.configService.get<string>("GEMINI_API_KEY") || "";
+    this.model =
+      this.configService.get<string>("GEMINI_MODEL")?.trim() ||
+      "gemini-1.5-flash";
+    this.apiKey = this.configService.get<string>("GEMINI_API_KEY")?.trim() || "";
+    this.apiVersion =
+      this.configService.get<string>("GEMINI_API_VERSION")?.trim() || "v1beta";
+    this.fallbackModels =
+      this.configService
+        .get<string>("GEMINI_MODEL_FALLBACKS")
+        ?.split(",")
+        .map((model) => model.trim())
+        .filter(Boolean) || ["gemini-1.5-flash", "gemini-2.0-flash"];
     this.timeoutMs = Number(this.configService.get<string>("GEMINI_TIMEOUT_MS") || 45000);
   }
 
@@ -135,35 +148,91 @@ export class GeminiService {
   }
 
   private async generateContent(prompt: string): Promise<string> {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${this.model}:generateContent?key=${this.apiKey}`;
     if (!this.apiKey) {
       throw new Error("GEMINI_API_KEY is missing");
     }
-    const response = await axios.post(
-      url,
-      {
-        systemInstruction: {
-          parts: [
-            {
-              text:
-                "Bạn là trợ lý hỗ trợ khách hàng của hệ thống Lost & Found. Hãy ưu tiên sử dụng dữ liệu Knowledge Base được cung cấp để trả lời chính xác. Trả lời ngắn gọn, tự nhiên, thân thiện bằng tiếng Việt. Luôn trả lời bằng văn bản thuần, không dùng Markdown, không dùng ký hiệu như **, #, -, *, hoặc danh sách đánh số. Nếu cần liệt kê nhiều ý, hãy viết thành câu bình thường trong một đoạn văn mạch lạc. Nếu câu hỏi không có thông tin rõ trong Knowledge Base, không trả lời cụt như 'tôi không biết'. Thay vào đó, hãy xác nhận nhu cầu của người dùng một cách đồng cảm, đưa ra hướng dẫn chung an toàn và hợp lý theo quy trình Lost & Found, rồi mới đề xuất liên hệ Admin nếu cần xác nhận chính thức. Nếu thông tin chưa chắc chắn, hãy nói rõ đó là hướng dẫn tạm thời.",
-            },
-          ],
-        },
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: prompt }],
-          },
-        ],
-      },
-      { timeout: this.timeoutMs },
+    const modelsToTry = Array.from(
+      new Set([this.model, ...this.fallbackModels].filter(Boolean)),
     );
+    let lastError: unknown;
 
-    const text =
-      response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-      "Xin lỗi, mình chưa có thông tin về vấn đề này. Bạn vui lòng liên hệ Admin để được hỗ trợ thêm.";
+    for (const modelName of modelsToTry) {
+      try {
+        const response = await axios.post(
+          this.buildGenerateContentUrl(modelName),
+          {
+            systemInstruction: {
+              parts: [
+                {
+                  text:
+                    "Bạn là trợ lý hỗ trợ khách hàng của hệ thống Lost & Found. Hãy ưu tiên sử dụng dữ liệu Knowledge Base được cung cấp để trả lời chính xác. Trả lời ngắn gọn, tự nhiên, thân thiện bằng tiếng Việt. Luôn trả lời bằng văn bản thuần, không dùng Markdown, không dùng ký hiệu như **, #, -, *, hoặc danh sách đánh số. Nếu cần liệt kê nhiều ý, hãy viết thành câu bình thường trong một đoạn văn mạch lạc. Nếu câu hỏi không có thông tin rõ trong Knowledge Base, không trả lời cụt như 'tôi không biết'. Thay vào đó, hãy xác nhận nhu cầu của người dùng một cách đồng cảm, đưa ra hướng dẫn chung an toàn và hợp lý theo quy trình Lost & Found, rồi mới đề xuất liên hệ Admin nếu cần xác nhận chính thức. Nếu thông tin chưa chắc chắn, hãy nói rõ đó là hướng dẫn tạm thời.",
+                },
+              ],
+            },
+            contents: [
+              {
+                role: "user",
+                parts: [{ text: prompt }],
+              },
+            ],
+          },
+          { timeout: this.timeoutMs },
+        );
 
-    return String(text).trim();
+        const text =
+          response.data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+          "Xin lỗi, mình chưa có thông tin về vấn đề này. Bạn vui lòng liên hệ Admin để được hỗ trợ thêm.";
+
+        return String(text).trim();
+      } catch (error) {
+        lastError = error;
+        const status = this.getAxiosStatus(error);
+        const errorDetails = this.extractAxiosErrorMessage(error);
+        this.logger.warn(
+          `Gemini call failed with model ${modelName} (status: ${status || "n/a"}): ${errorDetails}`,
+        );
+
+        if (status === 403 || status === 404) {
+          continue;
+        }
+
+        throw new Error(errorDetails);
+      }
+    }
+
+    throw new Error(
+      `Gemini request failed for all configured models. ${this.extractAxiosErrorMessage(lastError)} ` +
+        "If status is 403, check API key restrictions and enable Generative Language API for the key.",
+    );
+  }
+
+  private buildGenerateContentUrl(modelName: string): string {
+    return `https://generativelanguage.googleapis.com/${this.apiVersion}/models/${modelName}:generateContent?key=${this.apiKey}`;
+  }
+
+  private getAxiosStatus(error: unknown): number | undefined {
+    if (!axios.isAxiosError(error)) {
+      return undefined;
+    }
+    return error.response?.status;
+  }
+
+  private extractAxiosErrorMessage(error: unknown): string {
+    if (!error) {
+      return "Unknown Gemini error";
+    }
+
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<{
+        error?: { message?: string };
+      }>;
+      const apiMessage = axiosError.response?.data?.error?.message;
+      if (apiMessage) {
+        return apiMessage;
+      }
+      return axiosError.message;
+    }
+
+    return error instanceof Error ? error.message : String(error);
   }
 }
